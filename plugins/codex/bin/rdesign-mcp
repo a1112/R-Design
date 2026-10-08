@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+if [ -z "${RDESIGN_HOME:-}" ]; then
+  printf '%s\n' 'Set RDESIGN_HOME to the checked out and installed R-Design repository.' >&2
+  exit 1
+fi
+exec "$RDESIGN_HOME/node_modules/.bin/tsx" "$RDESIGN_HOME/packages/mcp-server/src/index.ts"

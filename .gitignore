@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.rdesign/
+playwright-report/
+test-results/
+.DS_Store
+._*
+.env
+*.log
+apps/ipad/.build/

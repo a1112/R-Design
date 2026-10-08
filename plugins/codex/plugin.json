@@ -1,0 +1,18 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "r-design",
+  "version": "0.1.0",
+  "description": "Runtime UI context, annotations, isolated candidates and reviewed acceptance through R-Design Bridge.",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "R-Design",
+        "shortDescription": "Design against a running UI and verify changes",
+        "longDescription": "Connect to an authorized R-Design Bridge, inspect UI objects, prepare isolated candidates, verify evidence and review acceptance. The shared workbench remains available in a browser.",
+        "developerName": "R-Design",
+        "category": "Developer Tools",
+        "capabilities": ["Read", "Write"]
+      }
+    }
+  }
+}

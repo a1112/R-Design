@@ -1,0 +1,82 @@
+# R-Design
+
+面向桌面与 iPad 的实时 UI 设计工作台。真实运行实例提供画面与结构，源码提供长期实现，批注表达设计意图，候选变更保存代码与验证证据。
+
+本仓库依据 [完整设计方案 v1.0](docs/specs/design-v1.0.pdf) 从空仓库实现。当前可用主线是受控 React + TypeScript + Vite 项目的真实画面、控件选择、原始笔迹、精确属性修改、隔离候选、桌面/窄屏验证、审查接受与保护后续编辑的回退。平台和功能验证状态见 [验收矩阵](docs/specs/acceptance-matrix.md)。设计中的 30 fps / P95 指标仍是待测目标，当前传输使用低帧率无损 PNG + WebSocket。
+
+## 运行
+
+需要 Node.js 22.12+（推荐 24）及可用的 Chromium。首次安装：
+
+```sh
+npm install
+npx playwright install chromium
+npm run dev
+```
+
+打开 **http://127.0.0.1:4310**。Bridge 启动一个受控浏览器实例，所有工作台观察同一表面；实际样例的独立预览地址是 http://127.0.0.1:4311。打开这个预览地址会创建独立页面，不能当作工作台所跟随的实例。
+
+建议先试一次完整修改：
+
+1. 点击左侧「图层」，选择 `start-button`，或在设计模式点击运行画面的「开始监控」按钮。
+2. 把文字改为「立即开始」，圆角改为 `12`，点击「准备修改」。
+3. 检查修改理解卡，确认生成隔离候选。
+4. 在「任务」运行验证，查看源码差异、真实候选截图及交互证据。
+5. 验证通过后接受。真实实例重载并回传新画面；需要时回退该变更。
+
+「交互」会取得短期输入租约；「批注」冻结观看帧并在本机绘制，不会点击业务按钮。保存笔迹和文字只创建评论。文字意见必须经过理解确认才会变成任务。离线批注先持久化，恢复连接时重放同一操作身份；旧对象失联时保留快照意见。
+
+## 工程结构
+
+- `apps/workbench-web`：响应式工作台、画板、属性、批注、资产、候选差异和配对。
+- `apps/bridge`：鉴权、项目授权、运行实例、实时画面、输入租约和统一 API。
+- `apps/ipad`：SwiftUI / WKWebView / PencilKit 原生外壳及原始绘图缓存。
+- `packages/protocol`：文档、源码、运行三个版本域和类型协议。
+- `packages/runtime-web`：事件驱动 DOM/几何采集与开发期 JSX 身份插件。
+- `packages/source-binding`：源码指纹、语法树定位、确定性属性变换和安全路径。
+- `packages/document-core`：项目文档、内容哈希、事务、持久化幂等结果。
+- `packages/change-engine`、`scenario-runner`：候选构建、真实场景截图、审批哈希与回退。
+- `packages/mcp-server`、`plugins/codex`：十一个 MCP 工具和连接/实现/审查技能。
+- `packages/agent-provider`、`asset-provider`：显式配置的独立执行者和图像提供方。
+- `fixtures/react-monitor`：可重复设备监控样板，包含卡片、表格、图表、表单、弹窗和窄屏布局。
+
+项目文档、笔迹、资产清单、快照、变更与操作日志保存于 `.rdesign/`，不依赖聊天历史。候选隔离在 `.rdesign/candidates/`。环境变量覆盖数据目录后也可独立迁移。工作台支持导出/导入带 schema 的文档；导入不授予源码修改权，也不接受可执行 SVG/HTML 或越界路径。
+
+## 接入已有开发项目
+
+启动参数 `RDESIGN_WORKSPACE` 指向明确授权的 React/Vite 项目目录。首版预览运行器适用于常规 `src/`、`index.html`、JSX/TSX 工程，并提供本仓库 React 运行依赖；复杂自定义 Vite 插件、服务代理和其他框架须另设适配。当前使用 `src/` 资源导入；`public/` 不自动映射到根路径，以便严格检查资源文件和符号链接。运行实例需要显式接入 Runtime SDK，源码标识只用于开发构建，不能把未知业务数据变成可写常量。
+
+详见 [Runtime SDK 接入](packages/runtime-web/README.md)。唯一实例上的 JSX 文字常量和内联样式可直接修改；共享节点、动态表达式和未知映射会拒绝回写。外部源码更新会重新读取版本并重载受控页面，不保留临时覆盖。
+
+默认绑定本机。跨设备启动需要 TLS 和准确的授权来源：
+
+```sh
+RDESIGN_HOST=0.0.0.0 \
+RDESIGN_PUBLIC_ORIGIN=https://your-mac.local:4310 \
+RDESIGN_TLS_CERT=/absolute/path/server.crt \
+RDESIGN_TLS_KEY=/absolute/path/server.key \
+npm run dev
+```
+
+证书必须由 iPad 信任且覆盖配置域名。不能跳过证书校验。电脑使用 `https://127.0.0.1:4310` 进入本机入口（证书需覆盖该地址），创建一次性配对码；iPad 访问配置的 HTTPS 地址兑换短期令牌。远端不能调用本机 bootstrap 取管理员令牌。配对码一次有效、90 秒过期；设备可随时撤销。
+
+## Codex 与 AI
+
+[Codex 插件安装及工具模式](plugins/codex/README.md)使用同一 Bridge 和项目。MCP 不传输每帧媒体，也不假设宿主支持内嵌完整画布；工具模式返回同一工作台入口。宿主驱动修改不会隐式再启动另一个执行者。
+
+图像提供方需要在 Bridge 进程明确配置 `OPENAI_API_KEY`、`RDESIGN_IMAGE_MODEL` 和 `RDESIGN_IMAGE_COST_CEILING_USD`。工作台再次要求批准提示词外发和单次预算；默认未配置，不产生模型调用或费用。模型/账户收费与硬限额由提供方决定，配置成本上界只是项目调用前置检查。重复请求使用持久化生成身份；结果不明确时拒绝自动再次收费。
+
+独立代码执行提供 [可运行的 Codex SDK Worker](apps/agent-worker/README.md)，启动命令为 `npm run worker`；须显式配置独立 API 账户、Worker 令牌和单次成本估算上限。默认不启动模型任务。`AgentProvider` 通过独立令牌和候选目录接入该 Worker。配置方法、隔离要求及实际验证边界见 [平台与宿主兼容矩阵](docs/compatibility/host-matrix.md)。工作目录隔离不等于安全沙箱；不连接生产实例，不读取宿主私有凭据。
+
+## 验证
+
+```sh
+npm run build
+npm test
+npm run test:e2e
+npm run build --workspace=@rdesign/fixture-monitor
+```
+
+端到端测试使用独立临时项目副本、数据目录和 4410/4411 端口，不改变默认样例或用户工作区。覆盖同实例多客户端、真实候选、拒绝版本错位、外部编辑保护、目标回退、离线笔迹、丢失回执重放和授权撤销。
+
+iPad 原生工程见 [构建说明](apps/ipad/README.md)。已提供可编译外壳；Apple Pencil、中文输入、旋转、分屏、多窗口与局域网实际延迟仍需真机验收。Tauri、Windows 原生窗口、多人协作和完整矢量/动画编辑属于方案后续扩展。

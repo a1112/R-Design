@@ -1,0 +1,15 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createWorkerService } from './service.js';
+import { createWorkerApp } from './http.js';
+const root=path.resolve(fileURLToPath(new URL('../../..',import.meta.url)));
+const port=Number(process.env.RDESIGN_AGENT_WORKER_PORT??4320);
+if(!process.env.OPENAI_API_KEY)throw new Error('Standalone worker requires its own explicit OPENAI_API_KEY; host credentials are not reused.');
+if(!process.env.RDESIGN_AGENT_WORKER_TOKEN||process.env.RDESIGN_AGENT_WORKER_TOKEN.length<32)throw new Error('Configure RDESIGN_AGENT_WORKER_TOKEN with at least 32 characters.');
+if(!Number.isFinite(Number(process.env.RDESIGN_AGENT_RUN_COST_CEILING_USD))||Number(process.env.RDESIGN_AGENT_RUN_COST_CEILING_USD)<=0)throw new Error('Configure an explicit RDESIGN_AGENT_RUN_COST_CEILING_USD estimate.');
+const data=path.resolve(process.env.RDESIGN_DATA_DIR??path.join(root,'.rdesign'));
+const service=await createWorkerService({candidateRoot:path.resolve(process.env.RDESIGN_AGENT_CANDIDATE_ROOT??path.join(data,'candidates')),directory:path.join(data,'agent-worker')});
+const app=createWorkerApp(service,process.env.RDESIGN_AGENT_WORKER_TOKEN,port);
+const server=app.listen(port,'127.0.0.1',()=>console.log(`R-Design independent SDK worker listening on 127.0.0.1:${port}; no run starts until explicitly requested.`));
+const shutdown=()=>{void service.close().finally(()=>server.close(()=>process.exit(0)));};
+process.on('SIGTERM',shutdown);process.on('SIGINT',shutdown);
