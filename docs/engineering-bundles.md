@@ -66,6 +66,8 @@ The configuration uses the same `repositoryRoot`, credential-free `repositoryUrl
 
 Each staged record compares original bytes from the pinned Git commit with the recorded original SHA256 and captured adapted bytes with the staged SHA256. Split resources use JSON `{ "base64": "canonical-base64" }` chunks in original order. The packer verifies the reconstructed byte length and SHA256 against the original Git blob; it preserves large resources without re-encoding. An empty `splitResources` array is valid.
 
+Git paths use NUL-separated records, so Unicode original filenames work without changing `core.quotePath`. Split resources are limited to the same supported image/font extensions and content headers as portable binary assets. Reconstructed bytes also receive the existing private-content check before output; base64 does not exempt text or binary assets from that check. A synthetic private marker is rejected identically when supplied directly or through resource chunks, without echoing its contents.
+
 The prepared tree passes the same path, file, dependency and bundle limits as import. The packer seals its captured bytes, records every prepared file hash in reserved `src/rdesign-prepared-origin.json`, and runs the existing v1 validator/preflight. It does not prove that the ledger lists every original frontend file or that an adapter preserves application semantics. Those require separate source review, resource coverage, browser scenes, business assertions and candidate tests. Private source text, authenticated dependency URLs and production data must not be placed in public recipes or bundles.
 
 ```text

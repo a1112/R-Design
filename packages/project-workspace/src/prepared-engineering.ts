@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { createProject, digest, DomainError } from '../../document-core/src/index.js';
 import { codeHash } from '../../source-binding/src/index.js';
-import { assertPortableSourcePaths, isPrivateSourceName, readPortableSourceFiles, validatePortableProjectBundle, type ProjectManifest, type PortableProjectBundle } from './index.js';
+import { assertPortableBinaryResource, assertPortableSourcePaths, isPrivateSourceName, readPortableSourceFiles, validatePortableProjectBundle, type ProjectManifest, type PortableProjectBundle } from './index.js';
 import { committedGit, preflightEngineeringBundle, type EngineeringConfig } from './engineering.js';
 
 /** Prepared files are explicit adapter output, never executed by this packer. */
@@ -27,8 +27,9 @@ export async function packPreparedEngineeringBundle(config: PreparedEngineeringC
   if (ledger.schemaVersion !== 1 || ledger.source?.repository !== repository || ledger.source?.commit !== config.commit || !Array.isArray(ledger.stagedFiles) || !ledger.stagedFiles.length || ledger.stagedFiles.length > 1000 || !Array.isArray(ledger.splitResources) || ledger.splitResources.length > 1000) throw new DomainError('ENGINEERING_PROVENANCE', '预备工程来源账本不匹配', 400);
   const original = async (file: string) => {
     if (typeof file !== 'string' || !file || file.includes('\\') || file.includes('\0') || path.posix.isAbsolute(file) || file.split('/').some(part => !part || part === '.' || part === '..' || isPrivateSourceName(part))) throw new DomainError('ENGINEERING_PROVENANCE', '原始文件路径无效', 400);
-    const record = (await git(['ls-tree', config.commit, '--', file])).toString('utf8').trim();
-    if (!/^100(?:644|755) blob [0-9a-f]{40}\t/.test(record) || record.slice(record.indexOf('\t') + 1) !== file) throw new DomainError('ENGINEERING_PROVENANCE', '来源必须是提交中的常规文件', 400);
+    const records = (await git(['ls-tree', '-z', config.commit, '--', file])).toString('utf8').split('\0').filter(Boolean);
+    const record = records[0] ?? '';
+    if (records.length !== 1 || !/^100(?:644|755) blob [0-9a-f]{40}\t/.test(record) || record.slice(record.indexOf('\t') + 1) !== file) throw new DomainError('ENGINEERING_PROVENANCE', '来源必须是提交中的常规文件', 400);
     return git(['show', config.commit + ':' + file], 24 * 1024 * 1024 + 1);
   };
   for (const item of ledger.stagedFiles) {
@@ -47,6 +48,7 @@ export async function packPreparedEngineeringBundle(config: PreparedEngineeringC
     });
     const reconstructed = Buffer.concat(chunks);
     if (reconstructed.length !== item.bytes || digest(reconstructed) !== item.sha256 || digest(await original(item.file)) !== item.sha256) throw new DomainError('ENGINEERING_PROVENANCE', '资源分片不是原始提交字节', 400);
+    assertPortableBinaryResource(item.file, reconstructed);
   }
   const originPath = 'src/rdesign-prepared-origin.json';
   if (files.has(originPath)) throw new DomainError('ENGINEERING_PROVENANCE', '保留的来源文件已存在', 400);

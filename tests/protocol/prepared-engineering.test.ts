@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { packPreparedEngineeringBundle, type PreparedEngineeringConfig } from '../../packages/project-workspace/src/prepared-engineering';
 import { preflightEngineeringBundle } from '../../packages/project-workspace/src/engineering';
-import { ProjectWorkspace } from '../../packages/project-workspace/src/index';
+import { ProjectWorkspace, readPortableSourceFiles } from '../../packages/project-workspace/src/index';
 import { DocumentStore, digest } from '../../packages/document-core/src/index';
 import { BrowserRuntime } from '../../apps/bridge/src/runtime';
 
@@ -19,7 +19,7 @@ async function fixture() {
   const upstream = "import React from 'react';import {createRoot} from 'react-dom/client';createRoot(document.getElementById('root')!).render(<h1 data-rdesign-id=\"prepared-title\">Original frontend</h1>);";
   const adapted = "import {installRuntime} from '@rdesign/runtime-web';\n" + upstream.replace('Original frontend', 'Prepared frontend') + '\ninstallRuntime();';
   await writeFile(path.join(original, 'src/main.tsx'), upstream);
-  const resource = Buffer.alloc(1024 * 1024 + 7, 45); await writeFile(path.join(original, 'large.png'), resource);
+  const resource = Buffer.concat([Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aEIoAAAAASUVORK5CYII=', 'base64'), Buffer.alloc(1024 * 1024, 0)]); await writeFile(path.join(original, 'large.png'), resource);
   await run('git', ['init', original]); await run('git', ['-C', original, 'add', '.']);
   await run('git', ['-C', original, '-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', '-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', 'commit', '-m', 'synthetic source']);
   const commit = (await run('git', ['-C', original, 'rev-parse', 'HEAD'])).stdout.trim();
@@ -35,6 +35,42 @@ async function fixture() {
 }
 
 describe('explicit prepared-source engineering', () => {
+  it.each(['text', 'binary'])('rejects identical synthetic private bytes directly and after %s resource splitting without echoing content', async kind => {
+    const { original, prepared, config, ledger } = await fixture();
+    const synthetic = 'SYNTHETIC_NOT_A_REAL_CREDENTIAL_0123456789';
+    const secret = Buffer.from('api_key = "' + synthetic + '"');
+    const resource = kind === 'binary' ? Buffer.concat([Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aEIoAAAAASUVORK5CYII=', 'base64'), secret]) : secret;
+    const file = 'resource.' + (kind === 'binary' ? 'png' : 'txt');
+    await writeFile(path.join(original, file), resource);
+    await run('git', ['-C', original, 'add', file]);
+    await run('git', ['-C', original, '-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', '-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', 'commit', '-m', 'synthetic resource']);
+    config.commit = (await run('git', ['-C', original, 'rev-parse', 'HEAD'])).stdout.trim(); ledger.source.commit = config.commit;
+    const direct = path.join(prepared, 'src', file); await writeFile(direct, resource);
+    let directError: any; try { await readPortableSourceFiles(prepared); } catch (error) { directError = error; }
+    expect(directError?.code).toBe('IMPORT_SECRET'); expect(String(directError?.message).includes(synthetic)).toBe(false);
+    await rm(direct);
+    const chunk = 'src/rdesign-preview/private-resource.json'; await writeFile(path.join(prepared, chunk), JSON.stringify({ base64: resource.toString('base64') }));
+    ledger.splitResources = [{ file, bytes: resource.length, sha256: digest(resource), chunks: [chunk] }];
+    await writeFile(path.join(prepared, config.provenanceFile), JSON.stringify(ledger));
+    let splitError: any; try { await packPreparedEngineeringBundle(config); } catch (error) { splitError = error; }
+    expect(splitError?.code).toBe(directError?.code); expect(String(splitError?.message).includes(synthetic)).toBe(false);
+  });
+
+  it('uses NUL Git records for Unicode staged paths and Unicode split-resource paths', async () => {
+    const { original, prepared, config, ledger, adapted } = await fixture();
+    await run('git', ['-C', original, 'config', 'core.quotePath', 'true']);
+    await mkdir(path.join(original, '资源'));
+    await run('git', ['-C', original, 'mv', 'src/main.tsx', 'src/组件.tsx']);
+    await run('git', ['-C', original, 'mv', 'large.png', '资源/大图片.png']);
+    await run('git', ['-C', original, '-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', '-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', 'commit', '-m', 'Unicode synthetic source']);
+    config.commit = (await run('git', ['-C', original, 'rev-parse', 'HEAD'])).stdout.trim(); ledger.source.commit = config.commit;
+    ledger.stagedFiles[0].sourcePath = 'src/组件.tsx'; ledger.stagedFiles[0].path = 'src/组件.tsx';
+    await writeFile(path.join(prepared, 'src/组件.tsx'), adapted);
+    ledger.splitResources[0].file = '资源/大图片.png'; await writeFile(path.join(prepared, config.provenanceFile), JSON.stringify(ledger));
+    const bundle = await packPreparedEngineeringBundle(config); expect(preflightEngineeringBundle(bundle).passed).toBe(true);
+    expect(bundle.sourceFiles.find(file => file.path === 'src/组件.tsx')?.content).toBe(adapted);
+  });
+
   it('verifies original and adapted bytes plus lossless chunks, imports and renders without changing input', async () => {
     const { root, prepared, original, config, adapted } = await fixture();
     await writeFile(path.join(original, 'src/main.tsx'), 'dirty bytes to preserve');
