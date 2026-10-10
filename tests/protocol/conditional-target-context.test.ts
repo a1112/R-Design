@@ -186,4 +186,53 @@ describe('conditional page target verification', () => {
       expect((await f.runtime.viewContext('alternate-title')).scenario?.steps).toEqual(other.steps);
     } finally { await f.runtime.close(); }
   }, 120000);
+  it('enters the selected safe route before refreshing source that invalidates only the previous route', async () => {
+    let outsideHits = 0;
+    const outside = createServer((_request, response) => { outsideHits++; response.end('Synthetic outside destination'); });
+    await new Promise<void>(resolve => outside.listen(0, '127.0.0.1', resolve));
+    const address = outside.address(); if (!address || typeof address === 'string') throw new Error('Missing outside origin');
+    const outsideUrl = `http://127.0.0.1:${address.port}/outside`;
+    let f: Awaited<ReturnType<typeof fixture>> | undefined;
+    try {
+      f = await fixture(); const first = await captureScenario(f.runtime, settings);
+      expect(first.status).toBe('frozen'); expect(f.runtime.status).toBe('live');
+      const changed = source.replace('function App(){', `if(location.hash==='#workspace')location.replace(${JSON.stringify(outsideUrl)});function App(){`);
+      await writeFile(path.join(f.root, 'src/main.tsx'), changed);
+      const next = await captureScenario(f.runtime, overview);
+      expect(next.nodes.find(node => node.sourceNodeId === 'overview')?.text).toBe('Overview');
+      expect(next.codeRevision).toBe(await codeHash(f.root)); expect(f.runtime.status).toBe('live');
+      expect(f.runtime.page.url()).toBe(f.runtime.url() + overview.route); expect(outsideHits).toBe(0);
+      expect((await f.runtime.viewContext('overview')).scenario?.steps).toEqual([]);
+    } finally { await f?.runtime.close(); await new Promise<void>(resolve => outside.close(() => resolve())); }
+  }, 120000);
+
+  it('performs no outside-origin input when a target appears only after navigation during locator waiting', async () => {
+    const outside = createServer((_request, response) => { response.setHeader('Content-Type', 'text/html'); response.end('<input data-rdesign-id="late-input"><button data-rdesign-id="late-button" onclick="window.outsideClicks=(window.outsideClicks||0)+1">Outside</button>'); });
+    await new Promise<void>(resolve => outside.listen(0, '127.0.0.1', resolve));
+    const address = outside.address(); if (!address || typeof address === 'string') throw new Error('Missing outside origin');
+    const outsideUrl = `http://127.0.0.1:${address.port}/outside`;
+    const redirecting = source + `\nwindow.__lateRedirect=()=>location.assign(${JSON.stringify(outsideUrl)});`;
+    let f: Awaited<ReturnType<typeof fixture>> | undefined;
+    try {
+      f = await fixture(redirecting);
+      for (const action of ['restore', 'capture'] as const) for (const input of ['fill', 'click'] as const) {
+        await f.runtime.page.goto(f.runtime.url(), { waitUntil: 'networkidle' });
+        const scene: Scenario = { ...structuredClone(settings), route: '/?late=1#workspace',
+          steps: [{ action: input, target: input === 'fill' ? 'late-input' : 'late-button', value: 'Synthetic delayed input' }], readySelector: '[data-rdesign-id="late-input"]' };
+        const operation = action === 'restore' ? f.runtime.restoreViewContext({ route: scene.route, viewport: scene.viewport, scenario: scene }) : captureScenario(f.runtime, scene);
+        const outcome = operation.then(() => null, error => error);
+        await f.runtime.page.waitForURL(f.runtime.url() + scene.route);
+        await f.runtime.page.locator('[data-rdesign-id="open-settings"]').waitFor();
+        // Initial same-origin navigation settles before the input waits for a
+        // missing target. Navigation is initiated only after that wait begins.
+        await f.runtime.page.waitForTimeout(700);
+        expect(await f.runtime.page.locator('[data-rdesign-id="late-input"],[data-rdesign-id="late-button"]').count()).toBe(0);
+        await f.runtime.page.evaluate(() => (window as any).__lateRedirect());
+        expect(await outcome).toMatchObject({ code: 'VIEW_ORIGIN' });
+        expect(new URL(f.runtime.page.url()).origin).toBe(new URL(outsideUrl).origin);
+        expect(await f.runtime.page.locator('[data-rdesign-id="late-input"]').inputValue()).toBe('');
+        expect(await f.runtime.page.evaluate(() => (window as any).outsideClicks ?? 0)).toBe(0);
+      }
+    } finally { await f?.runtime.close(); await new Promise<void>(resolve => outside.close(() => resolve())); }
+  }, 120000);
 });
