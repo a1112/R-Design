@@ -1,0 +1,107 @@
+[
+  {
+    "id": "desktop",
+    "name": "模型目录 · 离线桌面",
+    "route": "/",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".window-shell",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "narrow",
+    "name": "模型目录 · 窄屏",
+    "route": "/",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "steps": [],
+    "readySelector": ".window-shell",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "chat-offline",
+    "name": "离线多模态对话",
+    "route": "/?view=chat",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".chat-workspace",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "deployment-offline",
+    "name": "本地部署边界",
+    "route": "/?view=deployments",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".window-shell",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "performance-offline",
+    "name": "未测量性能中心",
+    "route": "/?view=performance",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".window-shell",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "ranking",
+    "name": "设备排行离线",
+    "route": "/?view=ranking",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".window-shell",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "playground",
+    "name": "独立操练场未连接",
+    "route": "/?view=playground",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".playground-launcher",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  }
+]

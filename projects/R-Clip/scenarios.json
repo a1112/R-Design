@@ -1,0 +1,73 @@
+[
+  {
+    "id": "desktop",
+    "name": "合成历史 · 桌面",
+    "route": "/",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": "input[aria-label=\"搜索历史\"]",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "narrow",
+    "name": "合成历史 · 窄屏",
+    "route": "/",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "steps": [],
+    "readySelector": ".history",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "search",
+    "name": "合成片段搜索",
+    "route": "/",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [
+      {
+        "action": "fill",
+        "target": "clip-search",
+        "value": "design-preview"
+      }
+    ],
+    "readySelector": ".history-scroll:has([data-rdesign-id=\"clip-item\"]):not(:has(.row-select[aria-label^=\"预览代码\"]))",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "settings",
+    "name": "设置与无原生能力",
+    "route": "/",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [
+      {
+        "action": "click",
+        "target": "clip-settings"
+      }
+    ],
+    "readySelector": "dialog[open]",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  }
+]

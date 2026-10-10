@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "name": "ModelBase",
+  "source": {
+    "repository": "a1112/ModelBase",
+    "ref": "main",
+    "commit": "d57f53597e53c3693fdb0ebfeb4595b912ad2f77",
+    "visibility": "private"
+  },
+  "packageFile": "frontend/package.json",
+  "entry": "frontend/src/main.tsx",
+  "capture": [
+    "frontend/src"
+  ],
+  "dependencies": {
+    "react-markdown": "9.0.3",
+    "remark-gfm": "4.0.1"
+  },
+  "notice": "模型目录为预览；服务离线；不部署模型、不进行推理或跑分；未读取 API 凭据。",
+  "workspaceAliases": {},
+  "replacements": [
+    {
+      "file": "frontend/src/App.tsx",
+      "after": "useState(new URLSearchParams(location.search).get('view') || 'models')",
+      "reason": "preview route chooses an existing original page",
+      "count": 1,
+      "beforeLength": 18,
+      "beforeSha256": "45519da3e0fec679f3727931682933d30b536c1ebcdca0e65de5abd272bd7441"
+    }
+  ],
+  "pins": [],
+  "omissionPolicy": [
+    "upstream test runners and development tests",
+    "native/backend sources",
+    "executable build configurations",
+    "credentials, environment files, Git history, node_modules"
+  ],
+  "expectedAcceptance": {
+    "checksum": "pending frozen generator",
+    "schema": "pending frozen schema",
+    "import": "pending frozen tool",
+    "runtime": "pending",
+    "mapping": "pending",
+    "interaction": "pending"
+  }
+}
