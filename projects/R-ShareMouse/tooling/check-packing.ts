@@ -7,7 +7,9 @@ const { packPreparedEngineeringBundle } = await hostModule('packages/project-wor
 const { preflightEngineeringBundle } = await hostModule('packages/project-workspace/src/engineering.ts');
 const { REVIEWED_RUNTIME_DEPENDENCIES, CORE_PROJECT_DEPENDENCIES } = await hostModule('packages/project-workspace/src/runtime-dependencies.ts');
 const { isPrivateSourceName } = await hostModule('packages/project-workspace/src/index.ts');
-for (const name of process.argv.slice(2)) {
+const names = process.argv.slice(2);
+if (!names.length || names.some(name => !/^[A-Za-z0-9_-]+$/.test(name))) throw new Error('Pass explicit project directory names');
+for (const name of names) {
   const project = path.join(repoRoot, 'projects', name);
   const recipe = JSON.parse(await readFile(path.join(project, 'prepared-packing.config.json'), 'utf8'));
   const root = path.resolve(repoRoot, recipe.preparedDirectory);
@@ -19,11 +21,13 @@ for (const name of process.argv.slice(2)) {
   try {
     const bundle = await packPreparedEngineeringBundle({ ...recipe, repositoryRoot: path.resolve(repoRoot, recipe.repositoryRoot), preparedDirectory: root });
     const preflight = preflightEngineeringBundle(bundle);
+    if (!preflight.passed) throw Object.assign(new Error('Official bundle preflight failed'), { code: 'PREFLIGHT_FAILED' });
     const output = path.join(repoRoot, '.rdesign/desktop-deliverables', `${name}.prepared.rdesign-project.json`);
     await mkdir(path.dirname(output), { recursive: true }); await writeFile(output, JSON.stringify(bundle, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
     report.packing = { status: 'passed', output, checksum: bundle.checksum, preflight };
   } catch (error) {
     report.packing = { status: 'blocked', code: (error as any).code ?? 'PACKING_FAILED', detail: (error as Error).message };
+    process.exitCode = 1;
   }
   await writeFile(path.join(project, 'prepared-packing-summary.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify({ name, toolSha: frozenSha, packing: report.packing, unregisteredDependencies: dependencyGaps.length, provenancePathGaps }));

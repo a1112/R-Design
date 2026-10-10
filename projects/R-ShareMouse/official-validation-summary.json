@@ -10,14 +10,14 @@
     "frontend": "apps/rshare-desktop-frontend"
   },
   "bundle": {
-    "file": ".rdesign/desktop-official-deliverables/R-ShareMouse.11e2461.rdesign-project.json",
-    "checksum": "1e6e86104481f6a7310b163e3798eceb3d255f776e03572008543a9eb3edddb9",
-    "fileSha256": "5dbde501654f0091d3418dfcb96209df97110bdd89bef1d1d49d26c1f835eb19",
-    "bytes": 13926406,
+    "file": ".rdesign/desktop-official-deliverables/R-ShareMouse.11e2461.review-fixes.rdesign-project.json",
+    "checksum": "413b6502cf191df34e7653b22da505b347060dfbd2dc567df83b21ff0ede1539",
+    "fileSha256": "ef149dae0f44e7f1809a4c643ab55aa6497bbeb89b33e73729310004bd3477ed",
+    "bytes": 13928477,
     "sourceFiles": 116
   },
   "mode": "Actual official ProjectWorkspace, BrowserRuntime, scenario runner and ChangeEngine; no runtime overrides or project dependency installations",
-  "runRoot": ".rdesign/desktop-official-validation/R-ShareMouse/run-ZREBOc",
+  "runRoot": ".rdesign/desktop-official-validation/R-ShareMouse/run-kNNK1O",
   "scenes": [
     {
       "id": "layout-desktop",
@@ -27,7 +27,7 @@
         "height": 900
       },
       "screenshot": "layout-desktop.png",
-      "frameCodeRevision": "01fb8303e1f65ca13063d988f2d20c252be92affd42613a0fd0d9873e4e1504b",
+      "frameCodeRevision": "434471bc80db44a4bf23a829185143925a32f458c8a02fa7fd81b30c72ec0bdb",
       "nodes": 146,
       "exactOriginalSourceNodes": 60,
       "clippedControls": 0
@@ -40,7 +40,7 @@
         "height": 844
       },
       "screenshot": "layout-narrow.png",
-      "frameCodeRevision": "01fb8303e1f65ca13063d988f2d20c252be92affd42613a0fd0d9873e4e1504b",
+      "frameCodeRevision": "434471bc80db44a4bf23a829185143925a32f458c8a02fa7fd81b30c72ec0bdb",
       "nodes": 146,
       "exactOriginalSourceNodes": 59,
       "clippedControls": 0
@@ -53,7 +53,7 @@
         "height": 900
       },
       "screenshot": "settings-desktop.png",
-      "frameCodeRevision": "01fb8303e1f65ca13063d988f2d20c252be92affd42613a0fd0d9873e4e1504b",
+      "frameCodeRevision": "434471bc80db44a4bf23a829185143925a32f458c8a02fa7fd81b30c72ec0bdb",
       "nodes": 104,
       "exactOriginalSourceNodes": 32,
       "clippedControls": 0
@@ -66,7 +66,7 @@
         "height": 844
       },
       "screenshot": "settings-narrow.png",
-      "frameCodeRevision": "01fb8303e1f65ca13063d988f2d20c252be92affd42613a0fd0d9873e4e1504b",
+      "frameCodeRevision": "434471bc80db44a4bf23a829185143925a32f458c8a02fa7fd81b30c72ec0bdb",
       "nodes": 96,
       "exactOriginalSourceNodes": 28,
       "clippedControls": 0
@@ -89,9 +89,9 @@
   "nativeBackend": "unavailable; no native/backend capability accepted",
   "preflight": {
     "passed": true,
-    "checksum": "1e6e86104481f6a7310b163e3798eceb3d255f776e03572008543a9eb3edddb9",
+    "checksum": "413b6502cf191df34e7653b22da505b347060dfbd2dc567df83b21ff0ede1539",
     "sourceFileCount": 116,
-    "sourceBytes": 12541060,
+    "sourceBytes": 12543087,
     "scenarioCount": 4,
     "errors": [],
     "warnings": [
@@ -101,8 +101,8 @@
   "import": {
     "passed": true,
     "ids": [
-      "project_9cf520dd-8239-4254-ab37-800c9bd9b343",
-      "project_cf86ac64-435e-4932-ad00-771213f63cad"
+      "project_1b1e7fe9-ac23-4240-98c3-13614a973cfc",
+      "project_5a584a3c-3b6d-424a-aa3f-7631325bb8b8"
     ],
     "distinctSourceDirectories": true,
     "incomingEvidenceStatus": "unverified",
@@ -259,7 +259,325 @@
         "nativeWindowAndService": "explicitly unavailable; no native success accepted"
       }
     ],
-    "desktopBehavior": "The responsive CSS and canvas fitting are inactive above 640px; formal desktop scenes are tested separately",
+    "samePageRoundTrips": [
+      {
+        "desktopMode": "default",
+        "width": 390,
+        "passed": true,
+        "desktop": {
+          "zoom": 1,
+          "panOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "fitted": {
+          "zoom": 1,
+          "panOffset": {
+            "x": -38.5,
+            "y": -90.5
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "fitAudit": {
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "visibleControls": 21,
+          "clipped": [],
+          "horizontalOverflow": []
+        },
+        "restored": {
+          "zoom": 1,
+          "panOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "manualNarrow": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 31.205882352941174,
+            "y": -84.64705882352942
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "manualNarrowRestored": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 31.205882352941174,
+            "y": -84.64705882352942
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "resetFit": {
+          "zoom": 1,
+          "panOffset": {
+            "x": -38.5,
+            "y": -90.5
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "finalDesktop": {
+          "zoom": 1,
+          "panOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "sameDocument": true,
+        "actualZoomButtonAndCanvasDrag": true
+      },
+      {
+        "desktopMode": "default",
+        "width": 320,
+        "passed": true,
+        "desktop": {
+          "zoom": 1,
+          "panOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "fitted": {
+          "zoom": 0.885993,
+          "panOffset": {
+            "x": -52.911817587723604,
+            "y": -69.07537644202606
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "fitAudit": {
+          "viewport": {
+            "width": 320,
+            "height": 844
+          },
+          "visibleControls": 21,
+          "clipped": [],
+          "horizontalOverflow": []
+        },
+        "restored": {
+          "zoom": 1,
+          "panOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "manualNarrow": {
+          "zoom": 0.735994,
+          "panOffset": {
+            "x": 24.654412943583775,
+            "y": -57.9492495862738
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "manualNarrowRestored": {
+          "zoom": 0.735994,
+          "panOffset": {
+            "x": 24.654412943583775,
+            "y": -57.9492495862738
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "resetFit": {
+          "zoom": 0.885993,
+          "panOffset": {
+            "x": -52.911817587723604,
+            "y": -69.07537644202606
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "finalDesktop": {
+          "zoom": 1,
+          "panOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "sameDocument": true,
+        "actualZoomButtonAndCanvasDrag": true
+      },
+      {
+        "desktopMode": "manual",
+        "width": 390,
+        "passed": true,
+        "desktop": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 141.1764705882353,
+            "y": 41.23529411764706
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "fitted": {
+          "zoom": 1,
+          "panOffset": {
+            "x": -38.5,
+            "y": -90.5
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "fitAudit": {
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "visibleControls": 21,
+          "clipped": [],
+          "horizontalOverflow": []
+        },
+        "restored": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 141.1764705882353,
+            "y": 41.23529411764706
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "manualNarrow": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 31.205882352941174,
+            "y": -84.64705882352942
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "manualNarrowRestored": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 31.205882352941174,
+            "y": -84.64705882352942
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "resetFit": {
+          "zoom": 1,
+          "panOffset": {
+            "x": -38.5,
+            "y": -90.5
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "finalDesktop": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 141.1764705882353,
+            "y": 41.23529411764706
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "sameDocument": true,
+        "actualZoomButtonAndCanvasDrag": true
+      },
+      {
+        "desktopMode": "manual",
+        "width": 320,
+        "passed": true,
+        "desktop": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 141.1764705882353,
+            "y": 41.23529411764706
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "fitted": {
+          "zoom": 0.885993,
+          "panOffset": {
+            "x": -52.911817587723604,
+            "y": -69.07537644202606
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "fitAudit": {
+          "viewport": {
+            "width": 320,
+            "height": 844
+          },
+          "visibleControls": 21,
+          "clipped": [],
+          "horizontalOverflow": []
+        },
+        "restored": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 141.1764705882353,
+            "y": 41.23529411764706
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "manualNarrow": {
+          "zoom": 0.735994,
+          "panOffset": {
+            "x": 24.654412943583775,
+            "y": -57.9492495862738
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "manualNarrowRestored": {
+          "zoom": 0.735994,
+          "panOffset": {
+            "x": 24.654412943583775,
+            "y": -57.9492495862738
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "resetFit": {
+          "zoom": 0.885993,
+          "panOffset": {
+            "x": -52.911817587723604,
+            "y": -69.07537644202606
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "finalDesktop": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 141.1764705882353,
+            "y": 41.23529411764706
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "sameDocument": true,
+        "actualZoomButtonAndCanvasDrag": true
+      }
+    ],
+    "desktopBehavior": "Actual 1440 → 390/320 → 1440 round trips restore default and user-chosen desktop zoom/pan; user-chosen narrow views persist until explicit reset",
     "horizontalOverflowAccepted": false,
     "nativeOrBackendAccepted": false
   },
@@ -272,11 +590,11 @@
     "byteIdenticalRevert": "not asserted",
     "originalText": "设备与显示器",
     "sourceBinding": {
-      "sourceNodeId": "source-9269544dbf8a99b1",
+      "sourceNodeId": "source-b5f4bc7bbf8a39c0",
       "file": "src/app/components/MonitorManager.tsx",
-      "line": 1519,
+      "line": 1554,
       "column": 14,
-      "fileHash": "44c719c3660d6db54e8c667991a05f756a800c72896ce824368b84e12a095848",
+      "fileHash": "92997ef06b7c50f76048a845527857d8426fdf518ef991e03333f0288709b9d0",
       "reliability": "exact",
       "scope": "instance",
       "editableProperties": [

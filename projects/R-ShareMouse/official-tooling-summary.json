@@ -4,16 +4,20 @@
   "freshPublicCheckoutHasLocalNodeModules": false,
   "freshPublicCheckoutHasProjectDependencyDirectory": false,
   "documentedFrozenLoader": "passed",
-  "allOfficialRuntimeImports": "passed",
-  "typescriptHarnessSyntax": "passed including sharemouse-narrow.ts",
+  "allOfficialRuntimeImports": "passed actual pinned host modules after raw Git/blob validation",
+  "typescriptHarnessSyntax": "passed",
   "repoRootEqualsInvocationWorkspace": true,
-  "scope": "Only the frozen host installation is required; no legacy preview module is loaded",
+  "scope": "Frozen host installation only; new actual preparation and responsive source adapter succeeded with independent copies; no root/project dependency installation",
   "helperSha256": {
-    "frozen-host.mjs": "b48ec5b49445ac8778920d7dc1ceec2722ddfdb2c15ceb5f07b97dfa412d985f",
-    "prepare-official.mjs": "3d21166be513c0febb50eb3d2f7b5d84abba120c06fffa93c1a2e51929170fca",
-    "official-verify.ts": "8fe66c7a7b1b1a058a526cc8b0001fec9a3d6a25f8696619a621497d403982fd",
-    "official-workbench.ts": "5c8351273b87d2f244f9db8a05f1b285e105e0dc935596bd75b00b167248d46f",
-    "apply-sharemouse-responsive.mjs": "06901677f6feea2c85c38a720438254d40c120b563ec556afb51253e3a1e2193",
-    "sharemouse-narrow.ts": "bea445e0750b1d3460ab5d23b888154d87cb98c5835b25b6c2d2269aaddfb1a2"
+    "engineering-guards.mjs": "4c63ced5f2bf79001e920937849b4ea0c25d7be0b737171d9760e6695c431842",
+    "frozen-host.mjs": "957a9dd2c0c56a06dcf1768b322db9d3512f22bdf4afb5e083bebf05a039fb62",
+    "prepare-official.mjs": "d291c2b1c976f7ac0ada777a5a05890544ba1d00ce692bf20fd4f8863667ca22",
+    "official-verify.ts": "ecf9378289cfa5a2885f4b8d2afdb40168faf3eec793d9d5ddc98cf89ff904d0",
+    "official-workbench.ts": "33a85e9e154ed15ea685995ceb32312ebd186e102ebdcbc0efe8687908af5805",
+    "apply-sharemouse-responsive.mjs": "c9ab97fc2cf3edb21b29fadc2382cec142915a5b5020c84d5758b782c56bd1c4",
+    "sharemouse-narrow.ts": "2c3da40aaedf6e58440fa0b6ff4636031dc3e42a6f8df0d7d67aaa2f52ac73cb",
+    "check-packing.ts": "dda2cdc2bc30eb99060c8deb96fcec2a75c4ae2e4b678b7e37c5c29ead28e359",
+    "recheck.mjs": "d0478a3b22adf92ddfd4347784b946d8ebddc5da8bbab76c32c248d116b268d5",
+    "tests/engineering-guards.test.mjs": "1e1732cf55f4b61914a32b8b7f24cb679b80fa480881faf631a357c7c04ee20b"
   }
 }

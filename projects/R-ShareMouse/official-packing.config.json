@@ -2,7 +2,7 @@
   "repositoryRoot": "../sources/R-ShareMouse",
   "repositoryUrl": "https://github.com/a1112/R-ShareMouse",
   "commit": "2f5d8a489a0622d4b56687ffe692e7ae30af310d",
-  "preparedDirectory": ".rdesign/desktop-official-prepared/11e2461ecabcbed1be938fefb08a7a6b73bc2629/R-ShareMouse",
+  "preparedDirectory": ".rdesign/desktop-official-prepared/11e2461ecabcbed1be938fefb08a7a6b73bc2629/pr3-review-fixes/R-ShareMouse",
   "provenanceFile": "src/rdesignPackingLedger.json",
   "name": "R-ShareMouse · 完整前端设计工程",
   "scenarios": [

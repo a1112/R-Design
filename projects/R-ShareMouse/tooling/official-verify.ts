@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { repoRoot, frozenRoot, frozenSha, frozenKind, hostModule } from './frozen-host.mjs';
+import { repoRoot, frozenRoot, frozenSha, frozenKind, hostModule, engineeringBundleFile } from './frozen-host.mjs';
 import { verifyShareMouseNarrow } from './sharemouse-narrow.js';
 
 const { ProjectWorkspace, validatePortableProjectBundle } = await hostModule('packages/project-workspace/src/index.ts');
@@ -17,7 +17,7 @@ const name = process.argv[2];
 assert(name && /^[A-Za-z0-9_-]+$/.test(name));
 const folder = path.join(repoRoot, 'projects', name);
 const adapter = JSON.parse(await readFile(path.join(folder, 'adapter.json'), 'utf8'));
-const bundleFile = path.join(repoRoot, '.rdesign/desktop-official-deliverables', `${name}.${frozenSha.slice(0, 7)}.rdesign-project.json`);
+const bundleFile = engineeringBundleFile(name);
 const bytes = await readFile(bundleFile), bundle = JSON.parse(bytes.toString('utf8'));
 const parent = path.join(repoRoot, '.rdesign/desktop-official-validation', name); await mkdir(parent, { recursive: true });
 const runRoot = await mkdtemp(path.join(parent, 'run-'));

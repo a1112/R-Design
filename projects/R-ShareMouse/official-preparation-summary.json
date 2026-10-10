@@ -11,6 +11,11 @@
   },
   "copiedFileCount": 114,
   "byteIdenticalPreparedCopy": true,
+  "copyIsolation": {
+    "independentDirectories": true,
+    "independentFileInodes": true,
+    "noAliases": true
+  },
   "sourceFiles": [
     {
       "path": "index.html",
@@ -25,16 +30,8 @@
       "sha256": "b1406b05e3dc3c6b156692fc033819ee88adc381b346c3b4975749d0c3ef7b44"
     },
     {
-      "path": "src/app/MobileController.tsx",
-      "sha256": "94f3c1afbf8d6c52f100fad605d5979174157409bb4459cb08ab25a69c19f78d"
-    },
-    {
-      "path": "src/app/NetworkAudioPanel.tsx",
-      "sha256": "36daa9e629a7ad56c9b3d4e85b8b8301008dbe6157a5bb743f4e448b3e7ef2eb"
-    },
-    {
-      "path": "src/app/WakePanel.tsx",
-      "sha256": "ffa72106e66f0761cf97bf1a589c5a5412c1bad1e424c8206f616cc5b7e901da"
+      "path": "src/app/components/figma/ImageWithFallback.tsx.reference.txt",
+      "sha256": "79caaf9d1736698c090823383f7b18a9496e9c1309a40f925c8aeb37e496bd8e"
     },
     {
       "path": "src/app/components/FileTransfersPanel.tsx",
@@ -43,10 +40,6 @@
     {
       "path": "src/app/components/MonitorManager.tsx",
       "sha256": "49217776e9e43d1246fe37930103cd548afd9d9e443369c8b4bd8195bd91be9c"
-    },
-    {
-      "path": "src/app/components/figma/ImageWithFallback.tsx.reference.txt",
-      "sha256": "79caaf9d1736698c090823383f7b18a9496e9c1309a40f925c8aeb37e496bd8e"
     },
     {
       "path": "src/app/components/ui/accordion.tsx.reference.txt",
@@ -281,12 +274,20 @@
       "sha256": "4c7ce1328653bd59473c65180a9a8044f235c032c096f2bc2ad143bede580d88"
     },
     {
+      "path": "src/app/MobileController.tsx",
+      "sha256": "94f3c1afbf8d6c52f100fad605d5979174157409bb4459cb08ab25a69c19f78d"
+    },
+    {
       "path": "src/app/monitor-context-menu.mjs",
       "sha256": "fd20d23f758e7b7498eb4596e7b02e50adfd411ad5234b2d50072ae54cd29361"
     },
     {
       "path": "src/app/network-audio-model.mjs",
       "sha256": "04b309916588a93013296150edb86558834a3b0dd794da950076e207924d1f99"
+    },
+    {
+      "path": "src/app/NetworkAudioPanel.tsx",
+      "sha256": "36daa9e629a7ad56c9b3d4e85b8b8301008dbe6157a5bb743f4e448b3e7ef2eb"
     },
     {
       "path": "src/app/ui-state-client.mjs",
@@ -303,6 +304,10 @@
     {
       "path": "src/app/wake-model.mjs",
       "sha256": "eeda6a3d97c773790afb7fc2eb956c9476be6ac8ec6444a9bc9dcdaa31c5f20e"
+    },
+    {
+      "path": "src/app/WakePanel.tsx",
+      "sha256": "ffa72106e66f0761cf97bf1a589c5a5412c1bad1e424c8206f616cc5b7e901da"
     },
     {
       "path": "src/app/window-platform.mjs",
@@ -485,7 +490,7 @@
       "originalSourcePath": "apps/rshare-desktop-frontend/src/app/components/MonitorManager.tsx",
       "originalSourceSha256": "36a8c88faa7e518370fc610259e874e517bf7b744e85baaf4acbdbdd668664a6",
       "beforeSha256": "49217776e9e43d1246fe37930103cd548afd9d9e443369c8b4bd8195bd91be9c",
-      "afterSha256": "44c719c3660d6db54e8c667991a05f756a800c72896ce824368b84e12a095848"
+      "afterSha256": "92997ef06b7c50f76048a845527857d8426fdf518ef991e03333f0288709b9d0"
     },
     {
       "path": "src/main.tsx",

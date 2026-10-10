@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { mkdir, open, writeFile } from 'node:fs/promises';
+import { mkdir, open, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { repoRoot } from './prepare.mjs';
 import { frozenSha } from './frozen-host.mjs';
@@ -18,6 +18,17 @@ for (const name of names) {
     await handle.close();
     evidence.operations.push({ script, code, log }); console.log(JSON.stringify({ name, script, code }));
     if (code !== 0) { process.exitCode = 1; break; }
+    if (script === 'check-packing.ts') {
+      try {
+        const packing = JSON.parse(await readFile(path.join(repoRoot, 'projects', name, 'prepared-packing-summary.json'), 'utf8'));
+        if (packing.name !== name || packing.toolSha !== frozenSha || packing.packing?.status !== 'passed' || packing.packing?.preflight?.passed !== true) throw new Error('Official packing evidence did not pass for this project and host');
+        evidence.operations.at(-1).packingEvidence = 'passed';
+      } catch (error) {
+        evidence.operations.at(-1).packingEvidence = 'blocked';
+        evidence.operations.at(-1).detail = error.message;
+        process.exitCode = 1; break;
+      }
+    }
   }
   await writeFile(path.join(logs, 'report.json'), JSON.stringify(report, null, 2) + '\n');
 }
