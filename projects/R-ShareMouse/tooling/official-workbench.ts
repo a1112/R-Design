@@ -5,8 +5,7 @@ import { once } from 'node:events';
 import { createServer } from 'node:net';
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { repoRoot } from './prepare.mjs';
-import { frozenRoot, frozenSha, hostModule } from './frozen-host.mjs';
+import { repoRoot, frozenRoot, frozenSha, hostModule } from './frozen-host.mjs';
 
 const { chromium } = await hostModule('node_modules/playwright/index.mjs');
 const names = process.argv.slice(2); assert(names.length > 0);

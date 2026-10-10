@@ -1,7 +1,8 @@
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
-import { repoRoot } from './prepare.mjs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+export const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 
 export const frozenSha = '3fba881610f73705c1da026d0ed5298d79855441';
 export const frozenRoot = path.resolve(repoRoot, '../frozen-tool');

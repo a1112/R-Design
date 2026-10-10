@@ -3,8 +3,7 @@ import { cp, mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
-import { repoRoot } from './prepare.mjs';
-import { frozenSha } from './frozen-host.mjs';
+import { repoRoot, frozenSha } from './frozen-host.mjs';
 
 const handoffFile = process.argv[2];
 const names = process.argv.slice(3);

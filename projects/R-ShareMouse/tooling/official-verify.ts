@@ -3,8 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { repoRoot } from './prepare.mjs';
-import { frozenRoot, frozenSha, hostModule } from './frozen-host.mjs';
+import { repoRoot, frozenRoot, frozenSha, hostModule } from './frozen-host.mjs';
 
 const { ProjectWorkspace, validatePortableProjectBundle } = await hostModule('packages/project-workspace/src/index.ts');
 const { preflightEngineeringBundle } = await hostModule('packages/project-workspace/src/engineering.ts');
