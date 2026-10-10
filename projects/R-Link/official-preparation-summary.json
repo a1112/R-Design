@@ -1,6 +1,7 @@
 {
   "name": "R-Link",
-  "testedHostSha": "3fba881610f73705c1da026d0ed5298d79855441",
+  "testedHostSha": "11e2461ecabcbed1be938fefb08a7a6b73bc2629",
+  "preparedHandoffSha": "3fba881610f73705c1da026d0ed5298d79855441",
   "source": {
     "repository": "a1112/R-Link",
     "branch": "main",
@@ -600,6 +601,6 @@
       "sha256": "e0a871e805043a24cd41a1f1b0ba74a20d5d2de1e5e9c166f1c69d85b6a14b4f"
     }
   ],
-  "scope": "Complete prepared source/resources; dormant modules remain verbatim references; no additional dependency installation or host overrides",
+  "scope": "Complete prepared source/resources; dormant modules remain verbatim references; no additional dependency installation or host overrides. An explicitly supplied ancestor handoff only establishes the source recipe; actual compatibility is checked independently on testedHostSha.",
   "parentFrozenChecksum": "5a1f679e2794e41fcb3589bac1530c93dacedefb33d9f136bcae2c86a3aefc54"
 }

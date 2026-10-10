@@ -3,13 +3,18 @@ import { cp, mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
-import { repoRoot, frozenSha } from './frozen-host.mjs';
+import { repoRoot, frozenRoot, frozenSha } from './frozen-host.mjs';
 
 const handoffFile = process.argv[2];
 const names = process.argv.slice(3);
 if (!handoffFile || !names.length) throw new Error('Pass the frozen handoff JSON and explicit project names');
 const handoff = JSON.parse(await readFile(handoffFile, 'utf8'));
-assert.equal(handoff.candidate.sha, frozenSha);
+assert.equal(execFileSync('git', ['rev-parse', 'HEAD'], { cwd: frozenRoot, encoding: 'utf8' }).trim(), frozenSha);
+assert.equal(execFileSync('git', ['status', '--porcelain', '--untracked-files=no'], { cwd: frozenRoot, encoding: 'utf8' }).trim(), '');
+if (handoff.candidate.sha !== frozenSha) {
+  assert(process.env.RDESIGN_PREPARED_HANDOFF_SHA === handoff.candidate.sha, 'An ancestor prepared-source handoff requires its explicit SHA');
+  execFileSync('git', ['merge-base', '--is-ancestor', handoff.candidate.sha, frozenSha], { cwd: frozenRoot });
+}
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 async function files(root, prefix = '') {
   const result = [];
@@ -45,6 +50,6 @@ for (const name of names) {
   const recipe = { ...config, repositoryRoot: path.relative(repoRoot, sourceRoot), preparedDirectory: path.relative(repoRoot, prepared) };
   const folder = path.join(repoRoot, 'projects', name);
   await writeFile(path.join(folder, 'official-packing.config.json'), JSON.stringify(recipe, null, 2) + '\n');
-  await writeFile(path.join(folder, 'official-preparation-summary.json'), JSON.stringify({ name, testedHostSha: frozenSha, source: adapter.source, copiedFileCount: inputFiles.length, byteIdenticalPreparedCopy: true, sourceFiles: hashes, scope: 'Complete prepared source/resources; dormant modules remain verbatim references; no additional dependency installation or host overrides', parentFrozenChecksum: upstream.checksum }, null, 2) + '\n');
+  await writeFile(path.join(folder, 'official-preparation-summary.json'), JSON.stringify({ name, testedHostSha: frozenSha, preparedHandoffSha: handoff.candidate.sha, source: adapter.source, copiedFileCount: inputFiles.length, byteIdenticalPreparedCopy: true, sourceFiles: hashes, scope: 'Complete prepared source/resources; dormant modules remain verbatim references; no additional dependency installation or host overrides. An explicitly supplied ancestor handoff only establishes the source recipe; actual compatibility is checked independently on testedHostSha.', parentFrozenChecksum: upstream.checksum }, null, 2) + '\n');
   console.log(JSON.stringify({ name, copiedFiles: inputFiles.length, config: path.join(folder, 'official-packing.config.json') }));
 }

@@ -3,7 +3,8 @@ import { randomUUID } from 'node:crypto';
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { repoRoot, frozenRoot, frozenSha, hostModule } from './frozen-host.mjs';
+import { repoRoot, frozenRoot, frozenSha, frozenKind, hostModule } from './frozen-host.mjs';
+import { verifyShareMouseNarrow } from './sharemouse-narrow.js';
 
 const { ProjectWorkspace, validatePortableProjectBundle } = await hostModule('packages/project-workspace/src/index.ts');
 const { preflightEngineeringBundle } = await hostModule('packages/project-workspace/src/engineering.ts');
@@ -20,7 +21,7 @@ const bundleFile = path.join(repoRoot, '.rdesign/desktop-official-deliverables',
 const bytes = await readFile(bundleFile), bundle = JSON.parse(bytes.toString('utf8'));
 const parent = path.join(repoRoot, '.rdesign/desktop-official-validation', name); await mkdir(parent, { recursive: true });
 const runRoot = await mkdtemp(path.join(parent, 'run-'));
-const report: any = { name, testedHostSha: frozenSha, extensionMergedIntoMain: false, source: adapter.source, bundle: { file: bundleFile, checksum: bundle.checksum, fileSha256: digest(bytes), bytes: bytes.length, sourceFiles: bundle.sourceFiles.length }, mode: 'Actual official ProjectWorkspace, BrowserRuntime, scenario runner and ChangeEngine; no runtime overrides or project dependency installations', runRoot, scenes: [], interactions: [], pageErrors: [], externalRequests: [], failures: [], nativeBackend: 'unavailable; no native/backend capability accepted' };
+const report: any = { name, testedHostSha: frozenSha, extensionMergedIntoMain: frozenKind === 'merged-main', source: adapter.source, bundle: { file: bundleFile, checksum: bundle.checksum, fileSha256: digest(bytes), bytes: bytes.length, sourceFiles: bundle.sourceFiles.length }, mode: 'Actual official ProjectWorkspace, BrowserRuntime, scenario runner and ChangeEngine; no runtime overrides or project dependency installations', runRoot, scenes: [], interactions: [], pageErrors: [], externalRequests: [], failures: [], nativeBackend: 'unavailable; no native/backend capability accepted' };
 let runtime: any, candidateLive: any;
 try {
   validatePortableProjectBundle(bundle); report.preflight = preflightEngineeringBundle(bundle); assert(report.preflight.passed);
@@ -65,6 +66,7 @@ try {
     const state = await runtime.page.evaluate(() => ({ native: '__TAURI_INTERNALS__' in window || '__TAURI__' in window, blocked: (window as any).__RDESIGN_DESIGN_PREVIEW__.diagnostics.blocked }));
     assert.equal(state.native, false); assert(state.blocked.some(value => value.includes('/__rshare/service')));
     report.interactions.push({ name: 'Start service rejects with original unavailable UI', passed: true, nativeSuccess: false });
+    report.responsiveAcceptance = await verifyShareMouseNarrow(runtime, runRoot);
   } else if (name === 'R-Link') {
     const expand = runtime.page.getByRole('button', { name: '展开侧栏', exact: true }); if (await expand.count()) await expand.click();
     await runtime.page.getByText('设备管理', { exact: true }).first().click(); assert.equal(new URL(runtime.page.url()).hash, '#remote');

@@ -1,7 +1,7 @@
 {
   "name": "R-ShareMouse",
-  "testedHostSha": "3fba881610f73705c1da026d0ed5298d79855441",
-  "extensionMergedIntoMain": false,
+  "testedHostSha": "11e2461ecabcbed1be938fefb08a7a6b73bc2629",
+  "extensionMergedIntoMain": true,
   "source": {
     "repository": "a1112/R-ShareMouse",
     "branch": "main",
@@ -10,14 +10,14 @@
     "frontend": "apps/rshare-desktop-frontend"
   },
   "bundle": {
-    "file": ".rdesign/desktop-official-deliverables/R-ShareMouse.3fba881.rdesign-project.json",
-    "checksum": "27ee0b64e43a67460ad6bf30f204e736bfc1f44ec32ad0b70354127f513df70a",
-    "fileSha256": "02e204114586ce2349c2de7073fc1c3653a883bcf2068297b473fde16913cb0c",
-    "bytes": 13915205,
-    "sourceFiles": 115
+    "file": ".rdesign/desktop-official-deliverables/R-ShareMouse.11e2461.rdesign-project.json",
+    "checksum": "1e6e86104481f6a7310b163e3798eceb3d255f776e03572008543a9eb3edddb9",
+    "fileSha256": "5dbde501654f0091d3418dfcb96209df97110bdd89bef1d1d49d26c1f835eb19",
+    "bytes": 13926406,
+    "sourceFiles": 116
   },
   "mode": "Actual official ProjectWorkspace, BrowserRuntime, scenario runner and ChangeEngine; no runtime overrides or project dependency installations",
-  "runRoot": ".rdesign/desktop-official-validation/R-ShareMouse/run-OcmuVe",
+  "runRoot": ".rdesign/desktop-official-validation/R-ShareMouse/run-ZREBOc",
   "scenes": [
     {
       "id": "layout-desktop",
@@ -27,7 +27,7 @@
         "height": 900
       },
       "screenshot": "layout-desktop.png",
-      "frameCodeRevision": "3781d9f409b5fc7c00b17b90f8a6f8607fdd07cb0491a62f16cf4d630f5729b0",
+      "frameCodeRevision": "01fb8303e1f65ca13063d988f2d20c252be92affd42613a0fd0d9873e4e1504b",
       "nodes": 146,
       "exactOriginalSourceNodes": 60,
       "clippedControls": 0
@@ -40,10 +40,10 @@
         "height": 844
       },
       "screenshot": "layout-narrow.png",
-      "frameCodeRevision": "3781d9f409b5fc7c00b17b90f8a6f8607fdd07cb0491a62f16cf4d630f5729b0",
-      "nodes": 116,
-      "exactOriginalSourceNodes": 51,
-      "clippedControls": 7
+      "frameCodeRevision": "01fb8303e1f65ca13063d988f2d20c252be92affd42613a0fd0d9873e4e1504b",
+      "nodes": 146,
+      "exactOriginalSourceNodes": 59,
+      "clippedControls": 0
     },
     {
       "id": "settings-desktop",
@@ -53,9 +53,22 @@
         "height": 900
       },
       "screenshot": "settings-desktop.png",
-      "frameCodeRevision": "3781d9f409b5fc7c00b17b90f8a6f8607fdd07cb0491a62f16cf4d630f5729b0",
-      "nodes": 119,
+      "frameCodeRevision": "01fb8303e1f65ca13063d988f2d20c252be92affd42613a0fd0d9873e4e1504b",
+      "nodes": 104,
       "exactOriginalSourceNodes": 32,
+      "clippedControls": 0
+    },
+    {
+      "id": "settings-narrow",
+      "passed": true,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "settings-narrow.png",
+      "frameCodeRevision": "01fb8303e1f65ca13063d988f2d20c252be92affd42613a0fd0d9873e4e1504b",
+      "nodes": 96,
+      "exactOriginalSourceNodes": 28,
       "clippedControls": 0
     }
   ],
@@ -76,10 +89,10 @@
   "nativeBackend": "unavailable; no native/backend capability accepted",
   "preflight": {
     "passed": true,
-    "checksum": "27ee0b64e43a67460ad6bf30f204e736bfc1f44ec32ad0b70354127f513df70a",
-    "sourceFileCount": 115,
-    "sourceBytes": 12531319,
-    "scenarioCount": 3,
+    "checksum": "1e6e86104481f6a7310b163e3798eceb3d255f776e03572008543a9eb3edddb9",
+    "sourceFileCount": 116,
+    "sourceBytes": 12541060,
+    "scenarioCount": 4,
     "errors": [],
     "warnings": [
       "结构预检不证明运行、后端、原生能力或业务状态转换；导入后场景须重新验收"
@@ -88,14 +101,168 @@
   "import": {
     "passed": true,
     "ids": [
-      "project_5980a913-15e1-47b9-9d2f-b0ffebbeb448",
-      "project_2f6f9566-52d7-4f87-9e18-7746b5ed300d"
+      "project_9cf520dd-8239-4254-ab37-800c9bd9b343",
+      "project_cf86ac64-435e-4932-ad00-771213f63cad"
     ],
     "distinctSourceDirectories": true,
     "incomingEvidenceStatus": "unverified",
-    "preservedFiles": 114
+    "preservedFiles": 115
   },
   "productionBuild": "passed",
+  "responsiveAcceptance": {
+    "passed": true,
+    "viewportChecks": [
+      {
+        "width": 390,
+        "height": 844,
+        "passed": true,
+        "originalSevenControls": [
+          {
+            "control": "启动服务",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "最小化",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "最大化",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "关闭",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "上移",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "下移",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "右移",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          }
+        ],
+        "layout": {
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "visibleControls": 21,
+          "clipped": [],
+          "horizontalOverflow": []
+        },
+        "settings": {
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "visibleControls": 19,
+          "clipped": [],
+          "horizontalOverflow": []
+        },
+        "keyboardNavigation": "passed actual Tab focus",
+        "sidebarToggle": "passed original local state",
+        "zoomAndFitReset": "passed original zoom/pan readback",
+        "settingsNavigation": "all seven original sections reachable via their vertical scroll container",
+        "themeSelection": "passed actual aria-pressed readback for dark/light/system",
+        "nativeWindowAndService": "explicitly unavailable; no native success accepted"
+      },
+      {
+        "width": 320,
+        "height": 844,
+        "passed": true,
+        "originalSevenControls": [
+          {
+            "control": "启动服务",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "最小化",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "最大化",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "关闭",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "上移",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "下移",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "右移",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          }
+        ],
+        "layout": {
+          "viewport": {
+            "width": 320,
+            "height": 844
+          },
+          "visibleControls": 21,
+          "clipped": [],
+          "horizontalOverflow": []
+        },
+        "settings": {
+          "viewport": {
+            "width": 320,
+            "height": 844
+          },
+          "visibleControls": 19,
+          "clipped": [],
+          "horizontalOverflow": []
+        },
+        "keyboardNavigation": "passed actual Tab focus",
+        "sidebarToggle": "passed original local state",
+        "zoomAndFitReset": "passed original zoom/pan readback",
+        "settingsNavigation": "all seven original sections reachable via their vertical scroll container",
+        "themeSelection": "passed actual aria-pressed readback for dark/light/system",
+        "nativeWindowAndService": "explicitly unavailable; no native success accepted"
+      }
+    ],
+    "desktopBehavior": "The responsive CSS and canvas fitting are inactive above 640px; formal desktop scenes are tested separately",
+    "horizontalOverflowAccepted": false,
+    "nativeOrBackendAccepted": false
+  },
   "candidate": {
     "passed": true,
     "prepare": "passed",
@@ -105,11 +272,11 @@
     "byteIdenticalRevert": "not asserted",
     "originalText": "设备与显示器",
     "sourceBinding": {
-      "sourceNodeId": "source-a731dd54736a8e4f",
+      "sourceNodeId": "source-9269544dbf8a99b1",
       "file": "src/app/components/MonitorManager.tsx",
-      "line": 1480,
+      "line": 1519,
       "column": 14,
-      "fileHash": "49217776e9e43d1246fe37930103cd548afd9d9e443369c8b4bd8195bd91be9c",
+      "fileHash": "44c719c3660d6db54e8c667991a05f756a800c72896ce824368b84e12a095848",
       "reliability": "exact",
       "scope": "instance",
       "editableProperties": [
@@ -162,7 +329,12 @@
       {
         "name": "设置 · 外观",
         "passed": true,
-        "detail": "就绪条件 [data-rdesign-page=\"settings\"]；1440×900 源分辨率 PNG"
+        "detail": "就绪条件 [data-rdesign-id=\"rshare-theme-light\"]；1440×900 源分辨率 PNG"
+      },
+      {
+        "name": "设置 · 外观窄屏",
+        "passed": true,
+        "detail": "就绪条件 [data-rdesign-id=\"rshare-theme-light\"]；390×844 源分辨率 PNG"
       },
       {
         "name": "基础键盘焦点",

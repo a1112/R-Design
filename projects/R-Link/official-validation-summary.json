@@ -1,7 +1,7 @@
 {
   "name": "R-Link",
-  "testedHostSha": "3fba881610f73705c1da026d0ed5298d79855441",
-  "extensionMergedIntoMain": false,
+  "testedHostSha": "11e2461ecabcbed1be938fefb08a7a6b73bc2629",
+  "extensionMergedIntoMain": true,
   "source": {
     "repository": "a1112/R-Link",
     "branch": "main",
@@ -10,14 +10,14 @@
     "frontend": "apps/r-link-web"
   },
   "bundle": {
-    "file": ".rdesign/desktop-official-deliverables/R-Link.3fba881.rdesign-project.json",
-    "checksum": "729a2689633b6b022cf3750ae7358900049bc43afa394f3980a27f0b513e4810",
-    "fileSha256": "490a958dc11d11929906724447ea80f4a6aa8fe36e08d9046025d25a71f8cf9e",
+    "file": ".rdesign/desktop-official-deliverables/R-Link.11e2461.rdesign-project.json",
+    "checksum": "f0d3136250bbed024beec91c7979b0281227971b9d880291eebb47b22ca921cb",
+    "fileSha256": "93d8f5e18f22ee743611ecf76e6c5f24da8108915606d94a5f3f2fbf9e1a273e",
     "bytes": 1102205,
     "sourceFiles": 148
   },
   "mode": "Actual official ProjectWorkspace, BrowserRuntime, scenario runner and ChangeEngine; no runtime overrides or project dependency installations",
-  "runRoot": ".rdesign/desktop-official-validation/R-Link/run-huLfMF",
+  "runRoot": ".rdesign/desktop-official-validation/R-Link/run-UlwTBS",
   "scenes": [
     {
       "id": "main-desktop",
@@ -76,7 +76,7 @@
   "nativeBackend": "unavailable; no native/backend capability accepted",
   "preflight": {
     "passed": true,
-    "checksum": "729a2689633b6b022cf3750ae7358900049bc43afa394f3980a27f0b513e4810",
+    "checksum": "f0d3136250bbed024beec91c7979b0281227971b9d880291eebb47b22ca921cb",
     "sourceFileCount": 148,
     "sourceBytes": 1026497,
     "scenarioCount": 3,
@@ -88,8 +88,8 @@
   "import": {
     "passed": true,
     "ids": [
-      "project_f08ff3a0-d2bc-49fe-ad3a-b0bfb3d3897a",
-      "project_2c3c3632-b30d-46e7-9e68-5148542a6450"
+      "project_3fa030d3-b6d9-4ee7-95c7-a851ef8f26d4",
+      "project_7e4378b4-a6fc-4f81-92a7-2d49f8969476"
     ],
     "distinctSourceDirectories": true,
     "incomingEvidenceStatus": "unverified",

@@ -1,7 +1,7 @@
 {
   "name": "R-Link",
-  "testedHostSha": "3fba881610f73705c1da026d0ed5298d79855441",
-  "extensionMergedIntoMain": false,
+  "testedHostSha": "11e2461ecabcbed1be938fefb08a7a6b73bc2629",
+  "extensionMergedIntoMain": true,
   "source": {
     "repository": "a1112/R-Link",
     "branch": "main",
@@ -9,13 +9,13 @@
     "visibility": "public",
     "frontend": "apps/r-link-web"
   },
-  "runRoot": ".rdesign/desktop-official-workbench/R-Link/run-10Wntj",
+  "runRoot": ".rdesign/desktop-official-workbench/R-Link/run-1Uv3qy",
   "mode": "Actual Workbench file chooser, official Bridge and fresh process restart; headless browsers and independent loopback ports",
   "checks": [
     {
       "name": "Actual Workbench file chooser import/open/live source mappings",
       "passed": true,
-      "importedId": "project_521012ed-37bc-4575-a98e-d3abfbfb4791",
+      "importedId": "project_01307445-24f1-409b-bd34-20a64a811502",
       "incomingScenes": 3,
       "originalSourceNodes": 75
     },
@@ -26,7 +26,7 @@
         "width": 1440,
         "height": 900
       },
-      "snapshotId": "snapshot_958afaf4-b993-4bb3-881c-cf268b0d458c"
+      "snapshotId": "snapshot_d776918c-27d5-40af-9c18-63f0b1eb8af8"
     },
     {
       "name": "Actual Bridge scene main-narrow",
@@ -35,7 +35,7 @@
         "width": 390,
         "height": 844
       },
-      "snapshotId": "snapshot_87f2e41d-cef7-4c1b-92d4-f76eb666824e"
+      "snapshotId": "snapshot_7e9387c7-7fc8-4118-bc66-bffd15886d53"
     },
     {
       "name": "Actual Bridge scene devices-desktop",
@@ -44,16 +44,16 @@
         "width": 1440,
         "height": 900
       },
-      "snapshotId": "snapshot_fd0c5e89-b82d-445d-925e-519e32f2f4b8"
+      "snapshotId": "snapshot_da62ee09-2ebf-4748-a888-dad2ad499a69"
     },
     {
       "name": "Fresh Bridge + Workbench browser restart restores active project and saved snapshots",
       "passed": true,
-      "importedId": "project_521012ed-37bc-4575-a98e-d3abfbfb4791",
-      "oldSession": "256086ce-f3b1-48b3-a3b1-bfe4c05ad7f3",
-      "newSession": "bef48d49-0494-40c7-b834-75542177d46c",
+      "importedId": "project_01307445-24f1-409b-bd34-20a64a811502",
+      "oldSession": "6de3e943-05c6-4315-adcb-ac0dee4fd7b9",
+      "newSession": "6ce372f4-36dc-44f8-a4b1-a6218cd3caba",
       "restoredSnapshots": 3,
-      "originalLegacyProject": "project_3f51d3b5-c83e-4a69-aba7-c812f9867b73"
+      "originalLegacyProject": "project_f7debc43-bc3c-4eb5-aff7-d2d980e75d2f"
     }
   ],
   "clientPageErrors": [],

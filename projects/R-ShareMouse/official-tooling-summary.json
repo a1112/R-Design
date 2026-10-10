@@ -1,17 +1,19 @@
 {
-  "testedHostSha": "3fba881610f73705c1da026d0ed5298d79855441",
-  "extensionMergedIntoMain": false,
+  "testedHostSha": "11e2461ecabcbed1be938fefb08a7a6b73bc2629",
+  "extensionMergedIntoMain": true,
   "freshPublicCheckoutHasLocalNodeModules": false,
   "freshPublicCheckoutHasProjectDependencyDirectory": false,
   "documentedFrozenLoader": "passed",
   "allOfficialRuntimeImports": "passed",
-  "typescriptHarnessSyntax": "passed",
+  "typescriptHarnessSyntax": "passed including sharemouse-narrow.ts",
   "repoRootEqualsInvocationWorkspace": true,
-  "scope": "Only the frozen host installation is required for the official helpers; the legacy preparation module is not loaded",
+  "scope": "Only the frozen host installation is required; no legacy preview module is loaded",
   "helperSha256": {
-    "frozen-host.mjs": "1ca87d7b8db35f8a169a0ff9f02349c16d71aa2d4c37c073f3a8f03d02ab5b85",
-    "prepare-official.mjs": "14d4822069aaf5960971ca5f0828aab9e5eb43a125681755532c4a9671a78827",
-    "official-verify.ts": "70dca632e61787e4dcf0e878e425b173f09cdd5c036ca1f9808ddd839a54ab87",
-    "official-workbench.ts": "7f7cccd5971e9866bcf7abd98826b25b3d04cb0f9421aa4af274836ab41bcc45"
+    "frozen-host.mjs": "b48ec5b49445ac8778920d7dc1ceec2722ddfdb2c15ceb5f07b97dfa412d985f",
+    "prepare-official.mjs": "3d21166be513c0febb50eb3d2f7b5d84abba120c06fffa93c1a2e51929170fca",
+    "official-verify.ts": "8fe66c7a7b1b1a058a526cc8b0001fec9a3d6a25f8696619a621497d403982fd",
+    "official-workbench.ts": "5c8351273b87d2f244f9db8a05f1b285e105e0dc935596bd75b00b167248d46f",
+    "apply-sharemouse-responsive.mjs": "06901677f6feea2c85c38a720438254d40c120b563ec556afb51253e3a1e2193",
+    "sharemouse-narrow.ts": "bea445e0750b1d3460ab5d23b888154d87cb98c5835b25b6c2d2269aaddfb1a2"
   }
 }

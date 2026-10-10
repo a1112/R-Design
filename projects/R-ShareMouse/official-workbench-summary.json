@@ -1,7 +1,7 @@
 {
   "name": "R-ShareMouse",
-  "testedHostSha": "3fba881610f73705c1da026d0ed5298d79855441",
-  "extensionMergedIntoMain": false,
+  "testedHostSha": "11e2461ecabcbed1be938fefb08a7a6b73bc2629",
+  "extensionMergedIntoMain": true,
   "source": {
     "repository": "a1112/R-ShareMouse",
     "branch": "main",
@@ -9,14 +9,14 @@
     "visibility": "public",
     "frontend": "apps/rshare-desktop-frontend"
   },
-  "runRoot": ".rdesign/desktop-official-workbench/R-ShareMouse/run-RpgczY",
+  "runRoot": ".rdesign/desktop-official-workbench/R-ShareMouse/run-bWo6L1",
   "mode": "Actual Workbench file chooser, official Bridge and fresh process restart; headless browsers and independent loopback ports",
   "checks": [
     {
       "name": "Actual Workbench file chooser import/open/live source mappings",
       "passed": true,
-      "importedId": "project_6a453f4a-fd2f-458e-a4b7-9c006a313ffd",
-      "incomingScenes": 3,
+      "importedId": "project_dc1db1d1-6cc8-49e4-9754-c5b34e51d8ea",
+      "incomingScenes": 4,
       "originalSourceNodes": 60
     },
     {
@@ -26,7 +26,7 @@
         "width": 1440,
         "height": 900
       },
-      "snapshotId": "snapshot_d894cd04-d92d-4128-82c5-6c3d08f39e86"
+      "snapshotId": "snapshot_9ae9ba6a-eb0c-41fb-9fa3-061b99a68f48"
     },
     {
       "name": "Actual Bridge scene layout-narrow",
@@ -35,7 +35,7 @@
         "width": 390,
         "height": 844
       },
-      "snapshotId": "snapshot_a5b76980-940d-49fe-b3d7-fc7be41ef687"
+      "snapshotId": "snapshot_640f43e6-78be-4825-add6-f404d0d714ca"
     },
     {
       "name": "Actual Bridge scene settings-desktop",
@@ -44,16 +44,25 @@
         "width": 1440,
         "height": 900
       },
-      "snapshotId": "snapshot_e62f528e-eb1f-47a5-ad3e-ce5143638bf4"
+      "snapshotId": "snapshot_26678d27-0589-4bad-a496-c24ac49035d2"
+    },
+    {
+      "name": "Actual Bridge scene settings-narrow",
+      "passed": true,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "snapshotId": "snapshot_757e770c-f48c-4dc2-b64c-a5b0198dfdfa"
     },
     {
       "name": "Fresh Bridge + Workbench browser restart restores active project and saved snapshots",
       "passed": true,
-      "importedId": "project_6a453f4a-fd2f-458e-a4b7-9c006a313ffd",
-      "oldSession": "7338fe60-19ff-41e4-8d93-4adadc839292",
-      "newSession": "4c709668-0e6a-4676-b9b9-40d36a09944f",
-      "restoredSnapshots": 3,
-      "originalLegacyProject": "project_bdf39f2a-f151-4f24-a2c4-d8a700d81e99"
+      "importedId": "project_dc1db1d1-6cc8-49e4-9754-c5b34e51d8ea",
+      "oldSession": "0d323862-ebb4-4601-aed7-1256a03f5748",
+      "newSession": "33c46dac-ec65-44fd-8d5a-36bd4b8021a3",
+      "restoredSnapshots": 4,
+      "originalLegacyProject": "project_f6a6f823-5591-4534-b60a-172edc786aec"
     }
   ],
   "clientPageErrors": [],

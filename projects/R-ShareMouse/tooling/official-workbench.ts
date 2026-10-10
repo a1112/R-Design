@@ -5,7 +5,7 @@ import { once } from 'node:events';
 import { createServer } from 'node:net';
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { repoRoot, frozenRoot, frozenSha, hostModule } from './frozen-host.mjs';
+import { repoRoot, frozenRoot, frozenSha, frozenKind, hostModule } from './frozen-host.mjs';
 
 const { chromium } = await hostModule('node_modules/playwright/index.mjs');
 const names = process.argv.slice(2); assert(names.length > 0);
@@ -17,7 +17,7 @@ for (const name of names) {
   const runRoot = await mkdtemp(path.join(parent, 'run-')), dataRoot = path.join(runRoot, 'data');
   const port = await freePort(); let previewPort = await freePort(); while (previewPort === port) previewPort = await freePort();
   const base = `http://127.0.0.1:${port}`, bundleFile = path.join(repoRoot, '.rdesign/desktop-official-deliverables', `${name}.${frozenSha.slice(0, 7)}.rdesign-project.json`);
-  const report: any = { name, testedHostSha: frozenSha, extensionMergedIntoMain: false, source: adapter.source, runRoot, mode: 'Actual Workbench file chooser, official Bridge and fresh process restart; headless browsers and independent loopback ports', checks: [], clientPageErrors: [], failures: [] };
+  const report: any = { name, testedHostSha: frozenSha, extensionMergedIntoMain: frozenKind === 'merged-main', source: adapter.source, runRoot, mode: 'Actual Workbench file chooser, official Bridge and fresh process restart; headless browsers and independent loopback ports', checks: [], clientPageErrors: [], failures: [] };
   let child: any, browser: any, token = '';
   async function request(route: string, body?: any) {
     const response = await fetch(base + '/api' + route, { method: body === undefined ? 'GET' : 'POST', headers: { ...(token ? { Authorization: 'Bearer ' + token } : {}), ...(body === undefined ? {} : { 'Content-Type': 'application/json' }) }, ...(body === undefined ? {} : { body: JSON.stringify(body) }), signal: AbortSignal.timeout(60000) });
