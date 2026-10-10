@@ -53,6 +53,25 @@ export const REVIEWED_RUNTIME_DEPENDENCIES: Readonly<Record<string, string>> = O
   'prismjs': '1.30.0',
   'react-markdown-v10': '10.1.0',
   'rehype-sanitize': '6.0.0',
+  // Root reader uses its own PDF5/Zod4 profiles; existing callers retain PDF6/Zod3.
+  '@tauri-apps/plugin-dialog': '2.8.1',
+  cmdk: '1.1.1',
+  'dompurify-v3416': '3.4.16',
+  'github-slugger': '2.0.0',
+  'highlight-js-v1112': '11.12.0',
+  katex: '0.16.47',
+  mermaid: '11.17.2',
+  'pdfjs-dist-v5': '5.7.284',
+  'rehype-katex': '7.0.1',
+  'rehype-raw': '7.0.0',
+  'rehype-slug': '6.0.0',
+  'rehype-stringify': '10.0.1',
+  'remark-math': '6.0.0',
+  'remark-parse': '11.0.0',
+  'remark-rehype': '11.1.2',
+  unified: '11.0.5',
+  yjs: '13.6.32',
+  'zod-v4': '4.6.5',
 });
 
 export const CORE_PROJECT_DEPENDENCIES = new Set([
