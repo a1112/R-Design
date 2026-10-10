@@ -1,0 +1,65 @@
+{
+  "name": "R-Link",
+  "source": {
+    "repository": "a1112/R-Link",
+    "branch": "main",
+    "sha": "c7d45379038010face712f20f84d67f4e6b0e81b",
+    "visibility": "public",
+    "frontend": "apps/r-link-web"
+  },
+  "format": "rdesign-project",
+  "schemaVersion": 1,
+  "candidate": true,
+  "checksum": "2d7614e587e2f2f55dabcca90b8a5d3e7d4c2f2c48140e78a50cd31146eb6432",
+  "fileSha256": "9ff4f5de7d6d312342dbc7705ba4d788517b46e2e83d10354847e992b8f9d571",
+  "bytes": 1724350,
+  "sourceFiles": 145,
+  "snapshots": 3,
+  "perFileIntegrity": "passed",
+  "payloadIntegrity": "passed",
+  "preflight": {
+    "frozenHostSha": "fd563274e0add377460ec537729675af9b52a3ac",
+    "actualSchemaFileSha256": "c70dfba1a7dbbe64011bdf218fff74eb72af949741d636092f6ea6fb1272a01e",
+    "documentSchema": "passed",
+    "portableLayout": "passed",
+    "sourceFileSchema": "passed except the separately reported package dependency policy",
+    "credentialAndPrivatePathScan": "passed",
+    "binarySignatures": {
+      "status": "passed",
+      "files": 0
+    },
+    "perFileIntegrity": "passed",
+    "payloadIntegrity": "passed",
+    "packagePolicy": {
+      "status": "blocked",
+      "code": "IMPORT_CONFIG",
+      "dependencies": [
+        "@rdesign/runtime-web",
+        "@tauri-apps/api",
+        "framer-motion",
+        "lucide-react",
+        "react",
+        "react-dom",
+        "recharts",
+        "sonner",
+        "xterm",
+        "xterm-addon-fit",
+        "xterm-addon-web-links"
+      ],
+      "detail": "仅允许受支持且已登记版本的 React 工程依赖"
+    }
+  },
+  "frozenPreflight": {
+    "passed": false,
+    "code": "IMPORT_CONFIG",
+    "detail": "仅允许受支持且已登记版本的 React 工程依赖"
+  },
+  "import": {
+    "status": "blocked",
+    "code": "IMPORT_CONFIG",
+    "detail": "仅允许受支持且已登记版本的 React 工程依赖",
+    "baseline": "fd563274e0add377460ec537729675af9b52a3ac",
+    "required": "Explicit host dependency compatibility support"
+  },
+  "finalFrozenToolAcceptance": "blocked"
+}

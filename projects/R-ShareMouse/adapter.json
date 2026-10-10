@@ -1,0 +1,102 @@
+{
+  "adapterVersion": 1,
+  "name": "R-ShareMouse",
+  "source": {
+    "repository": "a1112/R-ShareMouse",
+    "branch": "main",
+    "sha": "2f5d8a489a0622d4b56687ffe692e7ae30af310d",
+    "visibility": "public",
+    "frontend": "apps/rshare-desktop-frontend"
+  },
+  "copy": [
+    {
+      "from": "src",
+      "to": "src"
+    },
+    {
+      "from": "public/assets",
+      "to": "src/assets"
+    }
+  ],
+  "aliases": {
+    "@": "src"
+  },
+  "styles": "src/styles/index.css",
+  "tailwind": 4,
+  "assetRewrites": {
+    "/assets/": "/src/assets/"
+  },
+  "previewModel": "offline-empty-daemon",
+  "previewNotice": "R-ShareMouse · 纯设计预览；daemon、设备控制、音频及文件传输不可用",
+  "routes": [
+    {
+      "name": "布局",
+      "route": "/"
+    },
+    {
+      "name": "设备",
+      "route": "/#devices"
+    },
+    {
+      "name": "日志",
+      "route": "/#logs"
+    },
+    {
+      "name": "设置",
+      "route": "/#settings"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "layout-desktop",
+      "name": "布局 · 桌面",
+      "route": "/",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "steps": [],
+      "readySelector": "[data-rdesign-id=\"rshare-shell\"]",
+      "dependencies": [
+        "src/app/App.tsx"
+      ],
+      "status": "unverified"
+    },
+    {
+      "id": "layout-narrow",
+      "name": "布局 · 窄屏",
+      "route": "/",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "steps": [],
+      "readySelector": "[data-rdesign-id=\"rshare-shell\"]",
+      "dependencies": [
+        "src/app/App.tsx"
+      ],
+      "status": "unverified"
+    },
+    {
+      "id": "settings-desktop",
+      "name": "设置 · 外观",
+      "route": "/#settings",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "steps": [],
+      "readySelector": "[data-rdesign-page=\"settings\"]",
+      "dependencies": [
+        "src/app/App.tsx"
+      ],
+      "status": "unverified"
+    }
+  ],
+  "limitations": [
+    "Native IPC rejects operations in this preview.",
+    "No daemon connection, discovery, pairing, input capture/injection, virtual display, audio, network gateway or file transfer is validated.",
+    "Narrow viewport records the original desktop layout and its clipping; it is not a mobile compatibility claim.",
+    "Large PNGs are losslessly represented as base64 text segments and reconstructed by the preview adapter."
+  ]
+}

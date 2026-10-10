@@ -1,0 +1,52 @@
+{
+  "name": "R-Link",
+  "source": {
+    "repository": "a1112/R-Link",
+    "branch": "main",
+    "sha": "c7d45379038010face712f20f84d67f4e6b0e81b",
+    "visibility": "public",
+    "frontend": "apps/r-link-web"
+  },
+  "readMode": "pinned committed Git objects only",
+  "originalFramework": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "copiedFiles": 137,
+  "omittedFiles": 34,
+  "losslessSegmentedAssets": [],
+  "requestedRuntimeDependencies": {
+    "@rdesign/runtime-web": "*",
+    "@tauri-apps/api": "^2.0.0",
+    "framer-motion": "12.43.0",
+    "lucide-react": "^0.487.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.15.2",
+    "sonner": "^2.0.3",
+    "xterm": "^5.3.0",
+    "xterm-addon-fit": "^0.8.0",
+    "xterm-addon-web-links": "^0.9.0"
+  },
+  "runtimeDependencies": {
+    "@rdesign/runtime-web": "*",
+    "@tauri-apps/api": "2.12.2",
+    "framer-motion": "12.43.0",
+    "lucide-react": "0.487.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "recharts": "2.15.4",
+    "sonner": "2.0.8",
+    "xterm": "5.3.0",
+    "xterm-addon-fit": "0.8.0",
+    "xterm-addon-web-links": "0.9.0"
+  },
+  "validation": {
+    "schema": "passed document/resources; package dependency policy blocked",
+    "checksum": "passed full v1 payload and individual files",
+    "import": "blocked frozen IMPORT_CONFIG",
+    "runtime": "passed compatibility rehearsal only",
+    "sourceMapping": "passed controlled literal/static-style mapping; dynamic/shared/canvas read-only",
+    "interactions": "passed registered UI transitions; no backend/native success"
+  }
+}

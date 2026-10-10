@@ -1,0 +1,95 @@
+{
+  "adapterVersion": 1,
+  "name": "R-Link",
+  "source": {
+    "repository": "a1112/R-Link",
+    "branch": "main",
+    "sha": "c7d45379038010face712f20f84d67f4e6b0e81b",
+    "visibility": "public",
+    "frontend": "apps/r-link-web"
+  },
+  "copy": [
+    {
+      "from": "src",
+      "to": "src"
+    }
+  ],
+  "aliases": {
+    "@": "src"
+  },
+  "styles": "src/styles/globals.css",
+  "tailwind": 4,
+  "previewModel": "explicit-ui-service-shell-no-session",
+  "previewNotice": "R-Link · 纯设计预览；无账户会话，无远程节点、SSH、隧道或文件服务",
+  "routes": [
+    {
+      "name": "设备拓扑",
+      "route": "/#network"
+    },
+    {
+      "name": "服务概览",
+      "route": "/#dashboard"
+    },
+    {
+      "name": "设备管理",
+      "route": "/#remote"
+    },
+    {
+      "name": "插件",
+      "route": "/#plugins"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "main-desktop",
+      "name": "主界面 · 桌面",
+      "route": "/#network",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "steps": [],
+      "readySelector": "#root > *",
+      "dependencies": [
+        "src/upstreamMain.tsx"
+      ],
+      "status": "unverified"
+    },
+    {
+      "id": "main-narrow",
+      "name": "主界面 · 窄屏",
+      "route": "/#network",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "steps": [],
+      "readySelector": "#root > *",
+      "dependencies": [
+        "src/upstreamMain.tsx"
+      ],
+      "status": "unverified"
+    },
+    {
+      "id": "devices-desktop",
+      "name": "设备管理 · 桌面",
+      "route": "/#remote",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "steps": [],
+      "readySelector": "[data-rdesign-route=\"remote\"]",
+      "dependencies": [
+        "src/components/pages/RemoteView.tsx"
+      ],
+      "status": "unverified"
+    }
+  ],
+  "limitations": [
+    "This is an explicit offline design preview of the real source application.",
+    "Native IPC and production API operations are unavailable; no native success is synthesized.",
+    "Narrow captures preserve the original application and record layout limitations.",
+    "Private upstream source, screenshots and complete bundles remain local."
+  ]
+}

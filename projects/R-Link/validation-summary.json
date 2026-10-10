@@ -1,0 +1,101 @@
+{
+  "name": "R-Link",
+  "source": {
+    "repository": "a1112/R-Link",
+    "branch": "main",
+    "sha": "c7d45379038010face712f20f84d67f4e6b0e81b",
+    "visibility": "public",
+    "frontend": "apps/r-link-web"
+  },
+  "styles": {
+    "source": "src/styles/globals.css",
+    "output": "src/rdesign.compiled.css",
+    "bytes": 130109,
+    "compiler": "@tailwindcss/node@4.1.12"
+  },
+  "toolBaseline": "ffaba7c22b7d027e78ebccbbae17f2c5d4ba1ab7",
+  "scenarios": [
+    {
+      "id": "main-desktop",
+      "passed": true,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "nodes": 241,
+      "exactSourceNodes": 75,
+      "clippedControls": 0,
+      "snapshot": "main-desktop.png"
+    },
+    {
+      "id": "main-narrow",
+      "passed": true,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "nodes": 217,
+      "exactSourceNodes": 71,
+      "clippedControls": 0,
+      "snapshot": "main-narrow.png"
+    },
+    {
+      "id": "devices-desktop",
+      "passed": true,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "nodes": 116,
+      "exactSourceNodes": 35,
+      "clippedControls": 0,
+      "snapshot": "devices-desktop.png"
+    }
+  ],
+  "interactions": [
+    {
+      "name": "Topology → device management",
+      "passed": true,
+      "assertion": "Original route switches; API errors stay unavailable with no authenticated user session"
+    },
+    {
+      "name": "Native window helper is unavailable",
+      "passed": true,
+      "assertion": "Browser helper rejects instead of returning a simulated native success"
+    }
+  ],
+  "nativeCapabilities": "unavailable; no native operations accepted",
+  "import": "blocked IMPORT_CONFIG at fd563274e0add377460ec537729675af9b52a3ac",
+  "testedDependencies": {
+    "@tauri-apps/api": "2.12.2",
+    "framer-motion": "12.43.0",
+    "lucide-react": "0.487.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "recharts": "2.15.4",
+    "sonner": "2.0.8",
+    "xterm": "5.3.0",
+    "xterm-addon-fit": "0.8.0",
+    "xterm-addon-web-links": "0.9.0"
+  },
+  "productionBuild": "passed",
+  "sourceMapping": {
+    "passed": true,
+    "file": "src/components/layout/Sidebar.tsx",
+    "line": 20,
+    "allowedProperties": [
+      "text"
+    ],
+    "checkedProperty": "text",
+    "checked": "Original visible JSX literal text or static inline style transformation; validation only, no source write",
+    "readonly": "Dynamic/i18n text, theme expressions and unbound canvas internals remain read-only"
+  },
+  "assets": {
+    "passed": true,
+    "losslessSegmentedAssets": 0
+  },
+  "pageErrors": [],
+  "runtime": "passed isolated headless Chromium; ephemeral loopback port",
+  "runtimeMode": "isolated compatibility rehearsal with explicit dependency aliases; this is not a frozen-host import acceptance",
+  "frozenRuntimeRevalidation": "pending owner follow-up SHA; this capture used baseline ffaba7c22b7d027e78ebccbbae17f2c5d4ba1ab7"
+}
