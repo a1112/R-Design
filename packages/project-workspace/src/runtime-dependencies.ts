@@ -33,6 +33,17 @@ export const REVIEWED_RUNTIME_DEPENDENCIES: Readonly<Record<string, string>> = O
   'react-dnd': '16.0.1',
   'react-dnd-html5-backend': '16.0.1',
   'react-syntax-highlighter': '16.1.2',
+  // Exact R-Code browser dependencies; existing icon versions keep their own names.
+  '@radix-ui/react-alert-dialog': '1.1.23',
+  '@radix-ui/react-checkbox': '1.3.11',
+  '@radix-ui/react-label': '2.1.15',
+  '@radix-ui/react-radio-group': '1.4.7',
+  '@radix-ui/react-scroll-area': '1.2.18',
+  '@radix-ui/react-switch': '1.3.7',
+  '@radix-ui/react-tabs': '1.1.21',
+  'zustand': '5.0.15',
+  'lucide-react-v116': '1.16.0',
+  'monaco-editor': '0.57.0',
 });
 
 export const CORE_PROJECT_DEPENDENCIES = new Set([
