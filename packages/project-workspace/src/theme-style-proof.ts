@@ -76,9 +76,16 @@ export function proveThemeStyleModule(bytes: Buffer) {
     if (t.isUnaryExpression(node) && !['+', '-', '!'].includes(node.operator)) fail();
     if (t.isIdentifier(node) && p.isBindingIdentifier() && forbiddenName.test(node.name)) fail();
     if (t.isIdentifier(node) && p.isReferencedIdentifier()) {
-      if (node.name === 'Array' && p.parentPath.isTSTypeReference() && p.key === 'typeName') return;
+      const typePosition = p.parentPath.isTSTypeReference() && p.key === 'typeName';
+      if (node.name === 'Array' && typePosition) return;
+      const binding = p.scope.getBinding(node.name);
+      if (binding?.path.isImportSpecifier()) {
+        const declaration = binding.path.parentPath.node;
+        const typeOnly = binding.path.node.importKind === 'type' || t.isImportDeclaration(declaration) && declaration.importKind === 'type';
+        if (typeOnly && !typePosition) fail();
+      }
       if (['root', 'entries', 'document'].includes(node.name) && !domNodes.has(node)) fail();
-      if (!p.scope.getBinding(node.name) && !(['Math', 'Number'].includes(node.name) || node.name === 'document' && domNodes.has(node))) fail();
+      if (!binding && !(['Math', 'Number'].includes(node.name) || node.name === 'document' && domNodes.has(node))) fail();
     }
     if (!t.isCallExpression(node) || domNodes.has(node)) return;
     const callee = node.callee;

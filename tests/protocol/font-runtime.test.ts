@@ -36,7 +36,7 @@ export const applyThemeToDOM = (theme: ResolvedTheme, tokens: ThemeTokens, appea
   entries.forEach(([key, value]) => root.style.setProperty(key, value));
 };`;
 
-async function fixture() {
+async function fixture(themeSource = style) {
   const root = await mkdtemp(path.join(os.tmpdir(), 'rd-font-proof-')); directories.push(root);
   const upstream = path.join(root, 'upstream'), prepared = path.join(root, 'prepared');
   await mkdir(path.join(upstream, 'web/src/theme'), { recursive: true }); await mkdir(path.join(prepared, 'src/theme'), { recursive: true });
@@ -52,20 +52,20 @@ function App(){const[mode,setMode]=useState<'light'|'dark'>('light'),[result,set
 createRoot(document.getElementById('root')!).render(<DndProvider backend={HTML5Backend}><App/></DndProvider>);`;
   const originalMain = main.replace('./theme/design-style', './theme/tokens');
   const adapted = "import {installRuntime} from '@rdesign/runtime-web';\n" + main + '\ninstallRuntime();';
-  const files = { 'web/src/main.tsx': originalMain, 'web/src/theme/tokens.ts': style, 'web/src/theme/registry.ts': registry, 'web/src/theme/types.ts': types, 'web/package.json': JSON.stringify({ dependencies: { react: '18.3.1', 'react-dom': '18.3.1', ...versions } }) };
+  const files = { 'web/src/main.tsx': originalMain, 'web/src/theme/tokens.ts': themeSource, 'web/src/theme/registry.ts': registry, 'web/src/theme/types.ts': types, 'web/package.json': JSON.stringify({ dependencies: { react: '18.3.1', 'react-dom': '18.3.1', ...versions } }) };
   for (const [file, content] of Object.entries(files)) await writeFile(path.join(upstream, file), content);
   await run('git', ['init', upstream]);
   async function commit() { await run('git', ['-C', upstream, 'add', '.']); await run('git', ['-C', upstream, '-c', 'user.name=Style Test', '-c', 'user.email=test@example.invalid', '-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false', 'commit', '-m', 'synthetic style fixture']); return (await run('git', ['-C', upstream, 'rev-parse', 'HEAD'])).stdout.trim(); }
   const sourceCommit = await commit();
   const ledger: any = { schemaVersion: 1, source: { repository: 'example/style-frontend', commit: sourceCommit }, stagedFiles: [
     { sourcePath: 'web/src/main.tsx', path: 'src/main.tsx', sourceSha256: digest(originalMain), sha256: digest(adapted) },
-    { sourcePath: 'web/src/theme/tokens.ts', path: 'src/theme/design-style.ts', sourceSha256: digest(style), sha256: digest(style), sourceRole: 'theme-style-module' },
+    { sourcePath: 'web/src/theme/tokens.ts', path: 'src/theme/design-style.ts', sourceSha256: digest(themeSource), sha256: digest(themeSource), sourceRole: 'theme-style-module' },
     ...[['registry.ts', registry], ['types.ts', types]].map(([file, content]) => ({ sourcePath: 'web/src/theme/' + file, path: 'src/theme/' + file, sourceSha256: digest(content), sha256: digest(content) }))
   ], splitResources: [] };
-  for (const [file, content] of Object.entries({ 'src/main.tsx': adapted, 'src/theme/design-style.ts': style, 'src/theme/registry.ts': registry, 'src/theme/types.ts': types, 'index.html': '<div id="root"></div><script type="module" src="/src/main.tsx"></script>', 'package.json': JSON.stringify(projectPackage(versions)) })) await writeFile(path.join(prepared, file), content);
+  for (const [file, content] of Object.entries({ 'src/main.tsx': adapted, 'src/theme/design-style.ts': themeSource, 'src/theme/registry.ts': registry, 'src/theme/types.ts': types, 'index.html': '<div id="root"></div><script type="module" src="/src/main.tsx"></script>', 'package.json': JSON.stringify(projectPackage(versions)) })) await writeFile(path.join(prepared, file), content);
   const provenanceFile = 'src/style-provenance.json';
   const save = () => writeFile(path.join(prepared, provenanceFile), JSON.stringify(ledger)); await save();
-  const config: PreparedEngineeringConfig = { repositoryRoot: upstream, repositoryUrl: 'https://github.com/example/style-frontend', commit: sourceCommit, name: 'Synthetic font compatibility', preparedDirectory: prepared, provenanceFile, themeStyleModule: { frontendDirectory: 'web', sourceSha256: digest(style) }, limitations: ['Synthetic DnD/Prism/colors only; no actual fonts, authentication or native/backend success'], scenarios: [
+  const config: PreparedEngineeringConfig = { repositoryRoot: upstream, repositoryUrl: 'https://github.com/example/style-frontend', commit: sourceCommit, name: 'Synthetic font compatibility', preparedDirectory: prepared, provenanceFile, themeStyleModule: { frontendDirectory: 'web', sourceSha256: digest(themeSource) }, limitations: ['Synthetic DnD/Prism/colors only; no actual fonts, authentication or native/backend success'], scenarios: [
     { id: 'main', name: 'Main', route: '/', viewport: { width: 1200, height: 820 }, readySelector: '[data-rdesign-id="font-fixture-title"]', steps: [], dependencies: ['src/main.tsx'], status: 'unverified' },
     { id: 'dark-narrow', name: 'Dark narrow', route: '/', viewport: { width: 390, height: 844 }, readySelector: 'html[data-theme="dark"]', steps: [{ action: 'click', target: 'font-fixture-theme' }], dependencies: ['src/main.tsx'], status: 'unverified' }
   ] };
@@ -79,6 +79,24 @@ describe('explicit font theme module and pinned runtime compatibility', () => {
   });
   it('proves synthetic unchanged colors without executing them', () => {
     expect(proveThemeStyleModule(Buffer.from(style))).toMatchObject({ parsedOnly: true, sourceSha256: digest(style), cssProperties: ['--background', '--primary', '--radius-scale'] });
+  });
+  const typeNames = ['AppearanceSettings', 'ResolvedTheme', 'ThemePresetId', 'ThemeTokens'];
+  it.each(typeNames)('allows %s in a TypeScript type position', name => {
+    const typed = style + `\nconst typedIdentity = (value: ${name}) => value;`;
+    expect(proveThemeStyleModule(Buffer.from(typed)).parsedOnly).toBe(true);
+  });
+  it.each(typeNames)('allows an actual local runtime parameter shadowing type-only %s', name => {
+    const local = style + `\nconst localIdentity = (${name}: number) => ${name};`;
+    expect(proveThemeStyleModule(Buffer.from(local)).parsedOnly).toBe(true);
+  });
+  it.each(typeNames)('rejects type-only %s as a runtime value', name => {
+    const invalid = style.replace('background: surface.background', `background: ${name}`);
+    expect(() => proveThemeStyleModule(Buffer.from(invalid))).toThrow();
+  });
+  it.each(typeNames)('rejects type-only runtime %s at the official prepared pack entry', async name => {
+    const invalid = style.replace('background: surface.background', `background: ${name}`);
+    const { config } = await fixture(invalid);
+    await expect(packPreparedEngineeringBundle(config)).rejects.toMatchObject({ code: 'ENGINEERING_STYLE' });
   });
   it.each([
     ['network', style.replace('return { background:', "fetch('/synthetic'); return { background:")],
@@ -157,7 +175,8 @@ describe('explicit font theme module and pinned runtime compatibility', () => {
     await expect(packPreparedEngineeringBundle(config)).rejects.toMatchObject({ code: 'ENGINEERING_STYLE' });
   });
   it('packs/imports actual DnD and Prism, applies colors, and verifies/applies/reverts a candidate', async () => {
-    const { root, upstream, config } = await fixture();
+    const typedSource = style + typeNames.map((name, index) => `\nconst typedIdentity${index} = (value: ${name}) => value;`).join('');
+    const { root, upstream, config } = await fixture(typedSource);
     const bundle = await packPreparedEngineeringBundle(config); expect(preflightEngineeringBundle(bundle).passed).toBe(true);
     const seed = await new DocumentStore(path.join(root, 'seed')).load('test');
     const catalog = await new ProjectWorkspace(path.join(root, 'catalog'), upstream, host).load(seed.project);
