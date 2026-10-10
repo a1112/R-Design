@@ -8,7 +8,7 @@
 
 ## 运行
 
-需要 Node.js 22.12+（推荐 24）及可用的 Chromium。首次安装：
+需要 Node.js 22.13+（推荐 24）及可用的 Chromium。PDF6 预览依赖声明 `>=22.13.0 || >=24`。首次安装：
 
 ```sh
 npm install

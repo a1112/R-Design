@@ -8,10 +8,15 @@ import path from 'node:path';
 import { existsSync, realpathSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { createServer as createSocketServer } from 'node:net';
-import type { RuntimeFrame, RuntimeTree, RuntimeVersion, ObservedNode } from '../../../packages/protocol/src/index.js';
+import type { RuntimeFrame, RuntimeTree, RuntimeVersion, ObservedNode, Scenario } from '../../../packages/protocol/src/index.js';
 import { sameTargetVersion } from '../../../packages/protocol/src/index.js';
 import { indexSources, codeHash } from '../../../packages/source-binding/src/index.js';
 import { DomainError, digest } from '../../../packages/document-core/src/index.js';
+export interface RuntimeViewContext {
+  route: string;
+  viewport: { width: number; height: number };
+  scenario?: Pick<Scenario, 'route' | 'viewport' | 'steps' | 'readySelector'>;
+}
 async function availablePreviewPort(): Promise<number> {
   const server = createSocketServer();
   return new Promise((resolve, reject) => {
@@ -30,6 +35,8 @@ export class BrowserRuntime {
   browser!: Browser; page!: Page; server!: ViteDevServer;
   private index = new Map<string,Awaited<ReturnType<typeof indexSources>> extends Map<string,infer V>? V:never>();
   private revision = ''; private queue:Promise<unknown>=Promise.resolve();
+  private scenarioContext?: { view: RuntimeViewContext; sessionId: string; sourceNodeIds: string[] };
+  private pendingReloadContext?: RuntimeViewContext;
   lastFrame:RuntimeFrame|null=null;status:RuntimeFrame['status']='connecting';private needsReload=false;
   constructor(public root:string, public repoRoot:string, public kind:'live'|'candidate'='live', public port=0,public privateDirectory?:string) { this.root=realpathSync(root); }
   config() { return {configFile:false as const,cacheDir:path.join(this.repoRoot,`node_modules/.vite/runtime-${digest(this.root).slice(0,16)}-${this.port}`),publicDir:false as const,root:this.root,define:{'import.meta.env.VITE_RDESIGN_RUNTIME':'"true"'},plugins:[fileBoundary({root:this.root,allow:[this.root,path.join(this.repoRoot,'packages/runtime-web'),path.join(this.repoRoot,'packages/protocol'),path.join(this.repoRoot,'node_modules')],privateRoots:this.privateDirectory&&(path.resolve(this.privateDirectory)===this.root||path.resolve(this.privateDirectory).startsWith(this.root+path.sep))?[this.privateDirectory]:[]}),runtimeDependencies(this.repoRoot),rdesignSourceIds({root:this.root}),react()],resolve:{alias:{'@rdesign/runtime-web':path.join(this.repoRoot,'packages/runtime-web/src/index.ts'),'@rdesign/protocol':path.join(this.repoRoot,'packages/protocol/src/index.ts'),'react':path.join(this.repoRoot,'node_modules/react'),'react-dom':path.join(this.repoRoot,'node_modules/react-dom')}},server:{host:'127.0.0.1',port:this.port,strictPort:this.port>0,hmr:false,ws:false as const,fs:{strict:true,allow:[this.root,path.join(this.repoRoot,'packages/runtime-web'),path.join(this.repoRoot,'packages/protocol'),path.join(this.repoRoot,'node_modules')],deny:['**/.git/**','**/.env','**/.env.*','**/*.{crt,pem,key}','**/change-meta.json',path.join(this.root,'**/.rdesign/**'),...(this.privateDirectory&&(path.resolve(this.privateDirectory)===this.root||path.resolve(this.privateDirectory).startsWith(this.root+path.sep))?[path.join(path.resolve(this.privateDirectory),'**')]:[])]}},logLevel:'error' as const}; }
@@ -41,10 +48,82 @@ export class BrowserRuntime {
     this.page=await this.browser.newPage({viewport:{width:1200,height:820},deviceScaleFactor:1});await this.page.goto(this.url(),{waitUntil:'networkidle'});await this.page.waitForFunction(()=>Boolean((window as any).__RDESIGN__),undefined,{timeout:15000});await this.refreshSources();this.status='live';return this;
   }
   url() {const address=this.server.httpServer?.address();if(!address||typeof address==='string')throw new Error('Preview server unavailable');return `http://127.0.0.1:${address.port}`;}
+  private currentRoute() {
+    const current = new URL(this.page.url());
+    if (current.origin !== this.url()) throw new DomainError('VIEW_ORIGIN', '目标页面已离开授权预览源', 409);
+    return current.pathname + current.search + current.hash;
+  }
+  assertPreviewOrigin() { this.currentRoute(); }
+  hasScenarioPage() {
+    return Boolean(this.page && !this.page.isClosed() && this.browser?.isConnected() &&
+      this.server?.httpServer?.listening && ['live', 'build-failed'].includes(this.status));
+  }
+  async beginScenarioNavigation(route: string) {
+    if (typeof route !== 'string' || !route.startsWith('/') || route.startsWith('//') || route.includes('\\'))
+      throw new DomainError('SCENARIO_ROUTE', '场景路由必须位于授权预览源', 400);
+    // Explicit scene selection supersedes a failed automatic recovery recipe.
+    this.scenarioContext = undefined; this.pendingReloadContext = undefined;
+    // Enter the chosen route before reloading changed source: the old route may
+    // now redirect or fail while this registered destination remains usable.
+    this.server.moduleGraph.invalidateAll();
+    await this.page.goto(this.url() + route, { waitUntil: 'networkidle' }); this.assertPreviewOrigin();
+    await this.refreshSources();
+  }
+  async performScenarioStep(step: Scenario['steps'][number]) {
+    this.assertPreviewOrigin();
+    if (!/^[a-zA-Z0-9_-]{1,128}$/.test(step.target)) throw new DomainError('SCENARIO_TARGET', '非法场景目标', 400);
+    // Locator auto-waiting can follow a delayed navigation. Pin the acquired
+    // element to its document, then check origin before performing any input.
+    const target = await this.page.locator(`[data-rdesign-id="${step.target}"]`).elementHandle();
+    try {
+      this.assertPreviewOrigin();
+      if (!target) throw new DomainError('SCENARIO_TARGET', '场景目标不可用', 409);
+      if (step.action === 'click') await target.click(); else await target.fill(step.value ?? '');
+      this.assertPreviewOrigin();
+    } finally { await target?.dispose(); }
+  }
+  async viewContext(sourceNodeId?: string): Promise<RuntimeViewContext> {
+    const route = this.currentRoute(), viewport = this.page.viewportSize()!;
+    const remembered = this.scenarioContext;
+    const sessionId = await this.page.evaluate(() => (window as any).__RDESIGN__?.health().runtimeSessionId);
+    if (remembered && remembered.sessionId === sessionId && remembered.view.route === route &&
+      remembered.view.viewport.width === viewport.width && remembered.view.viewport.height === viewport.height &&
+      (!sourceNodeId || remembered.sourceNodeIds.includes(sourceNodeId))) return structuredClone(remembered.view);
+    return { route, viewport: { ...viewport } };
+  }
+  async rememberScenario(scenario: Scenario, frame: RuntimeFrame) {
+    const route = this.currentRoute();
+    const view: RuntimeViewContext = { route, viewport: { width: frame.width, height: frame.height },
+      scenario: structuredClone({ route: scenario.route, viewport: scenario.viewport, steps: scenario.steps, readySelector: scenario.readySelector }) };
+    this.scenarioContext = { view, sessionId: frame.runtimeSessionId,
+      sourceNodeIds: frame.nodes.flatMap(node => node.sourceNodeId ? [node.sourceNodeId] : []) };
+  }
+  private async restorePageContext(context: RuntimeViewContext) {
+    const route = context.scenario?.route ?? context.route;
+    for (const value of [route, context.route]) if (typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//') || value.includes('\\'))
+      throw new DomainError('SCENARIO_ROUTE', '场景路由必须位于授权预览源', 400);
+    this.scenarioContext = undefined;
+    await this.page.setViewportSize(context.viewport);
+    await this.page.goto(this.url() + route, { waitUntil: 'networkidle' });
+    this.assertPreviewOrigin();
+    for (const step of context.scenario?.steps ?? []) {
+      await this.performScenarioStep(step);
+    }
+    if (context.scenario) await this.page.locator(context.scenario.readySelector).waitFor({ state: 'visible', timeout: 5000 });
+    await this.page.waitForFunction(() => Boolean((window as any).__RDESIGN__), undefined, { timeout: 5000 });
+    await this.page.evaluate(() => document.fonts.ready);
+    if (this.currentRoute() !== context.route) throw new DomainError('VIEW_NAVIGATION', '恢复期间页面发生导航，目标上下文未恢复', 409);
+    if (context.scenario) {
+      const sampled = await this.sample();
+      this.scenarioContext = { view: structuredClone(context), sessionId: sampled.health.runtimeSessionId,
+        sourceNodeIds: sampled.tree.nodes.flatMap(node => node.sourceNodeId ? [node.sourceNodeId] : []) };
+    }
+  }
+  async restoreViewContext(context: RuntimeViewContext) { return this.serial(() => this.restorePageContext(context)); }
   async refreshSources() {
     const next=await codeHash(this.root);
-    try {if((this.needsReload||this.revision&&this.revision!==next)&&this.page){this.status='resyncing';this.needsReload=true;this.server.moduleGraph.invalidateAll();await this.page.reload({waitUntil:'networkidle',timeout:8000});await this.page.waitForFunction(()=>Boolean((window as any).__RDESIGN__),undefined,{timeout:5000});}
-      this.index=await indexSources(this.root);this.revision=next;this.needsReload=false;this.status='live';
+    try {if((this.needsReload||this.revision&&this.revision!==next)&&this.page){const context=this.pendingReloadContext??await this.viewContext();this.pendingReloadContext=structuredClone(context);this.status='resyncing';this.needsReload=true;this.assertPreviewOrigin();this.server.moduleGraph.invalidateAll();await this.page.reload({waitUntil:'networkidle',timeout:8000});this.assertPreviewOrigin();await this.page.waitForFunction(()=>Boolean((window as any).__RDESIGN__),undefined,{timeout:5000});if(context.scenario)await this.restorePageContext(context);}
+      this.index=await indexSources(this.root);this.revision=next;this.needsReload=false;this.pendingReloadContext=undefined;this.status='live';
     }catch(error){this.needsReload=true;this.status='build-failed';throw new DomainError('BUILD_FAILED',`源码更新未能产生可用运行实例：${(error as Error).message}`,503,true);}
   }
   async build() {await build({...this.config(),build:{outDir:path.join(this.root,'dist'),emptyOutDir:true}});}
@@ -68,8 +147,8 @@ export class BrowserRuntime {
   async viewport(width:number,height:number) {if(!Number.isInteger(width)||!Number.isInteger(height)||width<320||width>2560||height<400||height>1800)throw new DomainError('INVALID_VIEWPORT','视口范围为 320–2560 × 400–1800',400);await this.serial(async()=>{await this.page.setViewportSize({width,height});await this.page.evaluate(()=>document.fonts.ready);});return this.capture();}
   async input(input:{version:RuntimeVersion;action:string;x?:number;y?:number;key?:string;deltaY?:number}) {return this.serial(async()=>{
     await this.checkVersion(input.version);const viewport=this.page.viewportSize()!;
-    if(input.action==='click'){if(!Number.isFinite(input.x)||!Number.isFinite(input.y)||input.x!<0||input.y!<0||input.x!>viewport.width||input.y!>viewport.height)throw new DomainError('INVALID_COORDINATES','点击坐标超出源视口',400);const hit=await this.page.evaluate(({x,y})=>(window as any).__RDESIGN__.hitTest(x,y),{x:input.x,y:input.y});if(!hit)throw new DomainError('HIT_MISSING','当前画面没有可确认的目标');await this.page.mouse.click(input.x!,input.y!);}
-    else if(input.action==='key'){const key=input.key;if(typeof key!=='string'||!key||key.length>1000)throw new DomainError('INVALID_KEY','键盘输入无效',400);if(/^(Enter|Escape|Tab|Backspace|Delete|ArrowUp|ArrowDown|ArrowLeft|ArrowRight|Space|Home|End|Control\+A|Meta\+A|Shift\+Tab)$/.test(key))await this.page.keyboard.press(key);else await this.page.keyboard.insertText(key);}
+    if(input.action==='click'){if(!Number.isFinite(input.x)||!Number.isFinite(input.y)||input.x!<0||input.y!<0||input.x!>viewport.width||input.y!>viewport.height)throw new DomainError('INVALID_COORDINATES','点击坐标超出源视口',400);const hit=await this.page.evaluate(({x,y})=>(window as any).__RDESIGN__.hitTest(x,y),{x:input.x,y:input.y});if(!hit)throw new DomainError('HIT_MISSING','当前画面没有可确认的目标');this.scenarioContext=undefined;await this.page.mouse.click(input.x!,input.y!);}
+    else if(input.action==='key'){const key=input.key;if(typeof key!=='string'||!key||key.length>1000)throw new DomainError('INVALID_KEY','键盘输入无效',400);this.scenarioContext=undefined;if(/^(Enter|Escape|Tab|Backspace|Delete|ArrowUp|ArrowDown|ArrowLeft|ArrowRight|Space|Home|End|Control\+A|Meta\+A|Shift\+Tab)$/.test(key))await this.page.keyboard.press(key);else await this.page.keyboard.insertText(key);}
     else if(input.action==='scroll'){if(!Number.isFinite(input.deltaY)||Math.abs(input.deltaY!)>3000)throw new DomainError('INVALID_SCROLL','滚动超出单次范围',400);await this.page.mouse.wheel(0,input.deltaY!);}
     else throw new DomainError('INVALID_ACTION','未知输入动作',400);
   });}
