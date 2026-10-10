@@ -17,7 +17,7 @@ export const REVIEWED_RUNTIME_DEPENDENCIES: Readonly<Record<string, string>> = O
   // Separate import name preserves the existing icon version for other projects.
   'lucide-react-v0487': '0.487.0',
   'framer-motion': '12.43.0',
-  recharts: '2.15.4',
+  recharts: '2.15.4', // Host pins this package's react-is to 19.3.0 for React 19 fragments.
   sonner: '2.0.8',
   xterm: '5.3.0',
   'xterm-addon-fit': '0.8.0',
