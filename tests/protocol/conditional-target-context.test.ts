@@ -3,6 +3,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import { randomUUID } from 'node:crypto';
+import { createServer } from 'node:http';
 import { BrowserRuntime } from '../../apps/bridge/src/runtime';
 import { ChangeEngine } from '../../packages/change-engine/src/index';
 import { DocumentStore } from '../../packages/document-core/src/index';
@@ -26,10 +27,10 @@ const settings: Scenario = { id: 'conditional-settings', name: 'Conditional sett
   steps: [{ action: 'click', target: 'open-settings' }, { action: 'click', target: 'show-details' }], readySelector: '[data-rdesign-id="settings-title"]', dependencies: ['src/main.tsx'], status: 'unverified' };
 const overview: Scenario = { id: 'overview', name: 'Overview', route: '/', viewport: { width: 1200, height: 820 }, steps: [], readySelector: '[data-rdesign-id="overview"]', dependencies: ['src/main.tsx'], status: 'unverified' };
 
-async function fixture() {
+async function fixture(sourceText = source) {
   const directory = await mkdtemp(path.join(os.tmpdir(), 'rd-conditional-target-')); roots.push(directory);
   const root = path.join(directory, 'frontend'), data = path.join(directory, 'data'); await mkdir(path.join(root, 'src'), { recursive: true });
-  await writeFile(path.join(root, 'src/main.tsx'), source); await writeFile(path.join(root, 'package.json'), JSON.stringify(projectPackage()));
+  await writeFile(path.join(root, 'src/main.tsx'), sourceText); await writeFile(path.join(root, 'package.json'), JSON.stringify(projectPackage()));
   await writeFile(path.join(root, 'index.html'), '<div id="root"></div><script type="module" src="/src/main.tsx"></script>');
   const store = await new DocumentStore(data).load(await codeHash(root)); store.project.scenarios = structuredClone([settings, overview]);
   const runtime = new BrowserRuntime(root, host, 'live', 0, data); await runtime.start();
@@ -108,6 +109,81 @@ describe('conditional page target verification', () => {
       expect(change.candidateFrame?.nodes.find(node => node.sourceNodeId === 'settings-title')?.text).toBe('Verified settings');
       await f.runtime.page.goto(f.runtime.url() + '/#interrupted', { waitUntil: 'networkidle' });
       expect((await f.runtime.viewContext('settings-title')).scenario).toBeUndefined();
+    } finally { await f.runtime.close(); }
+  }, 120000);
+
+  it('retains a failed live reload recipe through repeated automatic captures and cancels it only for explicit scene navigation', async () => {
+    const interruptible = source.replace('<button data-rdesign-id="open-settings"', '<button disabled={sessionStorage.getItem("blockReplay")==="yes"} data-rdesign-id="open-settings"');
+    const f = await fixture(interruptible);
+    try {
+      const initial = await captureScenario(f.runtime, settings); f.runtime.page.setDefaultTimeout(400); f.runtime.page.setDefaultNavigationTimeout(10000);
+      await f.runtime.page.evaluate(() => sessionStorage.setItem('blockReplay', 'yes'));
+      const updated = interruptible.replace('Original settings', 'Reloaded settings');
+      await writeFile(path.join(f.root, 'src/main.tsx'), updated);
+      await expect(f.runtime.capture()).rejects.toMatchObject({ code: 'BUILD_FAILED' });
+      expect(f.runtime.status).toBe('build-failed'); expect(f.runtime.lastFrame?.id).toBe(initial.id);
+      await expect(f.runtime.currentVersion()).rejects.toMatchObject({ code: 'RUNTIME_UNAVAILABLE' });
+      await expect(f.runtime.capture()).rejects.toMatchObject({ code: 'BUILD_FAILED' });
+      expect(f.runtime.status).toBe('build-failed'); expect(await f.runtime.page.locator('[data-rdesign-id="settings-title"]').count()).toBe(0);
+      await f.runtime.page.evaluate(() => sessionStorage.removeItem('blockReplay'));
+      const recovered = await f.runtime.capture();
+      expect(recovered.status).toBe('live'); expect(recovered.codeRevision).toBe(await codeHash(f.root));
+      expect(recovered.nodes.find(node => node.sourceNodeId === 'settings-title')?.text).toBe('Reloaded settings');
+      expect((await f.runtime.viewContext('settings-title')).scenario?.steps).toEqual(settings.steps);
+      expect(f.runtime.page.viewportSize()).toEqual(settings.viewport);
+
+      await f.runtime.page.evaluate(() => sessionStorage.setItem('blockReplay', 'yes'));
+      await writeFile(path.join(f.root, 'src/main.tsx'), updated.replace('Reloaded settings', 'Newer settings'));
+      await expect(f.runtime.capture()).rejects.toMatchObject({ code: 'BUILD_FAILED' });
+      const navigated = await captureScenario(f.runtime, overview);
+      expect(navigated.status).toBe('frozen'); expect(navigated.nodes.some(node => node.sourceNodeId === 'overview')).toBe(true);
+      expect(navigated.nodes.some(node => node.sourceNodeId === 'settings-title')).toBe(false);
+      expect((await f.runtime.viewContext('overview')).scenario?.steps).toEqual([]);
+      expect(f.runtime.page.url()).toBe(f.runtime.url() + '/');
+    } finally { await f.runtime.close(); }
+  }, 120000);
+
+  it('rejects redirects before any following fill or click in both restoration and scene capture', async () => {
+    const outside = createServer((_request, response) => { response.setHeader('Content-Type', 'text/html'); response.end('<input data-rdesign-id="outside-input"><button data-rdesign-id="outside-button" onclick="window.outsideClicks=(window.outsideClicks||0)+1">Outside button</button>'); });
+    await new Promise<void>(resolve => outside.listen(0, '127.0.0.1', resolve));
+    const address = outside.address(); if (!address || typeof address === 'string') throw new Error('Missing synthetic outside origin');
+    const outsideUrl = `http://127.0.0.1:${address.port}/outside`;
+    const redirecting = source.replace('function App(){', `function App(){if(new URLSearchParams(location.search).get('redirect')==='before')location.replace(${JSON.stringify(outsideUrl)});`)
+      .replace("onClick={()=>setTab('settings')}", `onClick={()=>{if(new URLSearchParams(location.search).get('redirect')==='after')location.assign(${JSON.stringify(outsideUrl)});else setTab('settings')}}`);
+    let f: Awaited<ReturnType<typeof fixture>> | undefined;
+    try {
+      f = await fixture(redirecting);
+      for (const action of ['restore', 'capture'] as const) for (const redirect of ['before', 'after'] as const) {
+        await f.runtime.page.goto(f.runtime.url(), { waitUntil: 'networkidle' });
+        const scene: Scenario = { ...structuredClone(settings), route: `/?redirect=${redirect}#workspace`,
+          steps: [...(redirect === 'after' ? [{ action: 'click' as const, target: 'open-settings' }] : []),
+            { action: 'fill', target: 'outside-input', value: 'Synthetic test text' }, { action: 'click', target: 'outside-button' }], readySelector: '[data-rdesign-id="outside-input"]' };
+        const work = action === 'restore' ? f.runtime.restoreViewContext({ route: scene.route, viewport: scene.viewport, scenario: scene }) : captureScenario(f.runtime, scene);
+        await expect(work).rejects.toMatchObject({ code: 'VIEW_ORIGIN' });
+        expect(new URL(f.runtime.page.url()).origin).toBe(new URL(outsideUrl).origin);
+        expect(await f.runtime.page.locator('[data-rdesign-id="outside-input"]').inputValue()).toBe('');
+        expect(await f.runtime.page.evaluate(() => (window as any).outsideClicks ?? 0)).toBe(0);
+      }
+    } finally { await f?.runtime.close(); await new Promise<void>((resolve, reject) => outside.close(error => error ? reject(error) : resolve())); }
+  }, 120000);
+
+  it('refreshes externally edited source before selecting a different recipe at the same route and viewport', async () => {
+    const alternate = source.replace('<button data-rdesign-id="open-settings"', '<button data-rdesign-id="open-alternate" onClick={()=>setTab("alternate")}>Alternate panel</button><button data-rdesign-id="open-settings"')
+      .replace("{tab==='settings'&&", "{tab==='alternate'&&<h2 data-rdesign-id=\"alternate-title\">Original alternate</h2>}{tab==='settings'&&");
+    const f = await fixture(alternate);
+    try {
+      await captureScenario(f.runtime, settings);
+      const changed = alternate.replace('Original alternate', 'Updated alternate'); await writeFile(path.join(f.root, 'src/main.tsx'), changed);
+      const other: Scenario = { ...structuredClone(settings), id: 'alternate', steps: [{ action: 'click', target: 'open-alternate' }], readySelector: '[data-rdesign-id="alternate-title"]' };
+      const frame = await captureScenario(f.runtime, other);
+      expect(frame.nodes.find(node => node.sourceNodeId === 'alternate-title')?.text).toBe('Updated alternate');
+      expect(frame.nodes.some(node => node.sourceNodeId === 'settings-title')).toBe(false);
+      expect(frame.codeRevision).toBe(await codeHash(f.root)); expect((await f.runtime.viewContext('alternate-title')).scenario?.steps).toEqual(other.steps);
+      await writeFile(path.join(f.root, 'src/main.tsx'), changed.replace('Updated alternate', 'Newest alternate'));
+      const reloaded = await f.runtime.capture();
+      expect(reloaded.nodes.find(node => node.sourceNodeId === 'alternate-title')?.text).toBe('Newest alternate');
+      expect(reloaded.nodes.some(node => node.sourceNodeId === 'settings-title')).toBe(false);
+      expect((await f.runtime.viewContext('alternate-title')).scenario?.steps).toEqual(other.steps);
     } finally { await f.runtime.close(); }
   }, 120000);
 });
