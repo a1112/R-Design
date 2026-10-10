@@ -44,6 +44,15 @@ export const REVIEWED_RUNTIME_DEPENDENCIES: Readonly<Record<string, string>> = O
   'zustand': '5.0.15',
   'lucide-react-v116': '1.16.0',
   'monaco-editor': '0.57.0',
+  // Separate preview imports retain the existing Markdown and icon profiles.
+  '@reduxjs/toolkit': '2.13.0',
+  'react-redux': '9.3.0',
+  '@tauri-apps/plugin-notification': '2.5.1',
+  'lucide-react-v152': '1.52.0',
+  'pdfjs-dist-v6': '6.4.299',
+  'prismjs': '1.30.0',
+  'react-markdown-v10': '10.1.0',
+  'rehype-sanitize': '6.0.0',
 });
 
 export const CORE_PROJECT_DEPENDENCIES = new Set([

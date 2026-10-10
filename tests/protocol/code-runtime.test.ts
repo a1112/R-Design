@@ -61,6 +61,27 @@ async function fixture() {
   return { root, prepared, config };
 }
 
+async function assertEditorWorkers(runtime: BrowserRuntime) {
+  const page = runtime.page;
+  await page.waitForFunction(() => Boolean((window as any).__CODE_FIXTURE__?.diagnostics.results || (window as any).__CODE_FIXTURE__?.diagnostics.error));
+  const diagnostic = await page.evaluate(() => (window as any).__CODE_FIXTURE__.diagnostics);
+  expect(diagnostic.error).toBeNull();
+  for (const label of ['json', 'css', 'html', 'typescript']) expect(diagnostic.results[label].count).toBeGreaterThan(0);
+  expect(diagnostic.results.typescript.result).toContainEqual({ code: 2322 });
+  await page.waitForFunction(() => (window as any).__CODE_FIXTURE__.diff.getLineChanges()?.length > 0);
+  const workers = await page.evaluate(() => (window as any).__CODE_FIXTURE__.diagnostics.workers);
+  expect(workers.every((worker: any) => worker.errors.length === 0)).toBe(true);
+  for (const label of ['editorWorkerService', 'json', 'css', 'html', 'typescript']) expect(workers.some((worker: any) => worker.label === label && worker.sent > 0 && worker.received > 0)).toBe(true);
+  expect(await page.evaluate(() => (window as any).__CODE_FIXTURE__.monaco.editor.tokenize('const answer = 1;', 'typescript')[0].some((token: any) => token.type.includes('keyword')))).toBe(true);
+  await page.evaluate(() => (window as any).__CODE_FIXTURE__.editor.focus());
+  await page.keyboard.press('ControlOrMeta+A'); await page.keyboard.type('const edited = 42;');
+  await expect.poll(() => page.getByTestId('draft').textContent()).toBe('const edited = 42;');
+  await page.getByTestId('readonly').click();
+  await page.evaluate(() => (window as any).__CODE_FIXTURE__.editor.focus());
+  await page.keyboard.press('ControlOrMeta+A'); await page.keyboard.type('blocked');
+  expect(await page.getByTestId('draft').textContent()).toBe('const edited = 42;');
+}
+
 describe('pinned editor browser runtime', () => {
   it('accepts the ten exact versions and rejects ranges/install aliases', () => {
     expect(projectPackage(versions).dependencies).toMatchObject(versions);
@@ -85,17 +106,7 @@ describe('pinned editor browser runtime', () => {
     const store = await new DocumentStore(source.dataDirectory).load(await codeHash(source.sourceDirectory)), runtime = new BrowserRuntime(source.sourceDirectory, host, 'live', 0, source.dataDirectory);
     try {
       await runtime.build(); await runtime.start(); const page = runtime.page, errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
-      await page.waitForFunction(() => Boolean((window as any).__CODE_FIXTURE__?.diagnostics.results || (window as any).__CODE_FIXTURE__?.diagnostics.error));
-      const diagnostic = await page.evaluate(() => (window as any).__CODE_FIXTURE__.diagnostics);
-      expect(diagnostic.error).toBeNull(); for (const label of ['json', 'css', 'html', 'typescript']) expect(diagnostic.results[label].count).toBeGreaterThan(0);
-      expect(diagnostic.results.typescript.result).toContainEqual({ code: 2322 });
-      await page.waitForFunction(() => (window as any).__CODE_FIXTURE__.diff.getLineChanges()?.length > 0);
-      const workers = await page.evaluate(() => (window as any).__CODE_FIXTURE__.diagnostics.workers);
-      for (const label of ['editorWorkerService', 'json', 'css', 'html', 'typescript']) expect(workers.some((worker: any) => worker.label === label && worker.sent > 0 && worker.received > 0 && !worker.errors.length)).toBe(true);
-      await page.evaluate(() => (window as any).__CODE_FIXTURE__.editor.focus()); await page.keyboard.press('ControlOrMeta+A'); await page.keyboard.type('const edited = 42;');
-      await expect.poll(() => page.getByTestId('draft').textContent()).toBe('const edited = 42;');
-      expect(await page.evaluate(() => (window as any).__CODE_FIXTURE__.monaco.editor.tokenize('const answer = 1;', 'typescript')[0].some((token: any) => token.type.includes('keyword')))).toBe(true);
-      await page.getByTestId('readonly').click(); await page.evaluate(() => (window as any).__CODE_FIXTURE__.editor.focus()); await page.keyboard.press('ControlOrMeta+A'); await page.keyboard.type('blocked'); expect(await page.getByTestId('draft').textContent()).toBe('const edited = 42;');
+      await assertEditorWorkers(runtime);
       await page.getByTestId('counter').click(); expect(await page.getByTestId('counter').textContent()).toBe('Count 1');
       await page.getByText('Enable fixture', { exact: true }).click(); expect(await page.getByTestId('checked').textContent()).toBe('true');
       await page.getByRole('switch', { name: 'Synthetic switch' }).click(); expect(await page.getByTestId('enabled').textContent()).toBe('true');
@@ -112,8 +123,16 @@ describe('pinned editor browser runtime', () => {
       const frame = await runtime.capture(), target = frame.nodes.find(node => node.sourceNodeId === 'code-fixture-title')!; expect(target.binding?.reliability).toBe('exact');
       const engine = new ChangeEngine(store, runtime, host), candidate = await engine.prepare({ projectId: store.project.id, expectedRevision: store.project.revision, operationId: randomUUID(), nodeId: target.runtimeNodeId, sourceNodeId: target.sourceNodeId!, version: frame, intent: 'Synthetic editor heading', properties: { text: 'Editor controls checked' }, scope: 'instance' });
       await engine.verify(candidate.id); expect(candidate.status, JSON.stringify(candidate.evidence)).toBe('verified'); expect(candidate.evidence.every(item => item.passed)).toBe(true);
+      const candidateRuntime = new BrowserRuntime(engine.candidateRoot(candidate.id), host, 'candidate', 0, source.dataDirectory);
+      try {
+        await candidateRuntime.start();
+        expect(await candidateRuntime.page.locator('h1').textContent()).toBe('Editor controls checked');
+        await assertEditorWorkers(candidateRuntime);
+      } finally { await candidateRuntime.close(); }
       await engine.apply(candidate.id, candidate.diffHash); await runtime.capture(); expect(await page.locator('h1').textContent()).toBe('Editor controls checked');
-      await engine.revert(candidate.id); await runtime.capture(); expect(await page.locator('h1').textContent()).toBe('Synthetic editor controls'); expect(errors).toEqual([]);
+      await assertEditorWorkers(runtime);
+      await engine.revert(candidate.id); await runtime.capture(); expect(await page.locator('h1').textContent()).toBe('Synthetic editor controls');
+      await assertEditorWorkers(runtime); expect(errors).toEqual([]);
     } finally { await runtime.close(); }
   }, 180000);
 });
