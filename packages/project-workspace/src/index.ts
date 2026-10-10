@@ -4,6 +4,7 @@ import path from 'node:path';
 import type { Project, ChangeSet, RuntimeFrame, ProjectSummary as SharedProjectSummary, EngineeringBundle } from '../../protocol/src/index.js';
 import { createProject, digest, DomainError } from '../../document-core/src/index.js';
 import { codeHash } from '../../source-binding/src/index.js';
+import { CORE_PROJECT_DEPENDENCIES, REVIEWED_RUNTIME_DEPENDENCIES, reviewedDependency } from './runtime-dependencies.js';
 
 export type ProjectTemplate = 'blank' | 'react-monitor';
 export interface ProjectSummary extends SharedProjectSummary { template: ProjectTemplate; lastOpenedAt: string }
@@ -29,6 +30,16 @@ const BINARY_EXTENSION = /\.(?:png|jpe?g|webp|gif|avif|ico|woff2?|ttf|otf)$/i;
 const EXECUTABLE_CONFIG = /^(?:vite|vitest|webpack|rollup|next|nuxt|babel|eslint|postcss|tailwind)\.config\.|^(?:\.npmrc|\.yarnrc|Makefile|Dockerfile)$/i;
 const CREDENTIAL = /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|\bAKIA[0-9A-Z]{16}\b|\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{50,}|sk-(?:proj-|ant-)?[A-Za-z0-9_-]{24,})\b|\b(?:api[_-]?key|access[_-]?token|client[_-]?secret|password)\s*[:=]\s*["'](?!fixture|demo|example|test|placeholder|your[_-]|\$\{|process\.env)[A-Za-z0-9_+/=-]{16,}["']/i;
 const PACKAGE = { name: '@rdesign/project', version: '0.1.0', private: true, type: 'module', scripts: { dev: 'vite --host 127.0.0.1', build: 'vite build' }, dependencies: { '@rdesign/runtime-web': '*', react: '^19.1.0', 'react-dom': '^19.1.0' } };
+/** Rebuild executable metadata, retaining only dependencies already shipped by the host. */
+export function projectPackage(dependencies: Record<string, unknown> = {}) {
+  const extra: Record<string, string> = {};
+  for (const [name, version] of Object.entries(dependencies)) {
+    if (CORE_PROJECT_DEPENDENCIES.has(name)) continue;
+    if (!reviewedDependency(name, version)) throw new DomainError('IMPORT_CONFIG', `工程依赖未受支持或版本未登记: ${name}`, 400);
+    extra[name] = REVIEWED_RUNTIME_DEPENDENCIES[name];
+  }
+  return { ...PACKAGE, dependencies: { ...PACKAGE.dependencies, ...extra } };
+}
 const VITE_CONFIG = "import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';\nimport { rdesignSourceIds } from '@rdesign/runtime-web/vite';\nexport default defineConfig({ plugins: [rdesignSourceIds(), react()], server: { host: '127.0.0.1' } });\n";
 const HTML = '<!doctype html>\n<html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>R-Design 项目</title></head><body style="margin:0"><div id="root"></div><script type="module" src="/src/main.tsx"></script></body></html>\n';
 const BLANK_MAIN = `import React, { useState } from 'react';
@@ -67,6 +78,7 @@ function assertPortableLayout(paths:string[]){
   const entries=new Map<string,{path:string;kind:'file'|'directory'}>();
   for(const file of paths){portablePath(file);const parts=file.split('/');for(let length=1;length<parts.length;length++){const directory=parts.slice(0,length).join('/');const key=portableKey(directory);const previous=entries.get(key);if(previous&&(previous.kind==='file'||previous.path!==directory))throw new DomainError('IMPORT_PATH','工程文件路径归一化后重叠或目录别名冲突',400);entries.set(key,{path:directory,kind:'directory'});}const key=portableKey(file);if(entries.has(key))throw new DomainError('IMPORT_PATH','工程文件路径归一化后重复或与目录重叠',400);entries.set(key,{path:file,kind:'file'});}
 }
+export function assertPortableSourcePaths(paths: string[]): void { assertPortableLayout(paths); }
 function validateSource(file: string, content: unknown): string {
   portablePath(file);
   if (BINARY_EXTENSION.test(file)) throw new DomainError('IMPORT_FILE', '二进制资产必须声明 base64 编码', 400);
@@ -76,7 +88,7 @@ function validateSource(file: string, content: unknown): string {
     let config: any; try { config = JSON.parse(content); } catch { throw new DomainError('IMPORT_CONFIG', '无效 package.json', 400); }
     const scripts = config.scripts ?? {};
     if (Object.entries(scripts).some(([key, value]) => !['dev', 'build'].includes(key) || typeof value !== 'string' || !/^vite(?: build)?(?: --host 127\.0\.0\.1)?(?: --port \d+)?$/.test(value)) || config.bin || config.workspaces || config.packageManager || config.overrides || config.resolutions) throw new DomainError('IMPORT_CONFIG', '项目包配置包含未授权的执行入口', 400);
-    for (const dependencies of [config.dependencies, config.devDependencies, config.optionalDependencies]) for (const [name, version] of Object.entries(dependencies ?? {})) if (!['react', 'react-dom', '@rdesign/runtime-web', 'vite', '@vitejs/plugin-react', 'typescript', '@types/react', '@types/react-dom'].includes(name) || typeof version !== 'string' || !/^(?:\*|[\^~]?[0-9]+(?:\.[0-9x*]+){0,2})$/.test(version)) throw new DomainError('IMPORT_CONFIG', '仅允许受支持的 React 工程依赖', 400);
+    for (const dependencies of [config.dependencies, config.devDependencies, config.optionalDependencies]) for (const [name, version] of Object.entries(dependencies ?? {})) if (!(CORE_PROJECT_DEPENDENCIES.has(name) && typeof version === 'string' && /^(?:\*|[\^~]?[0-9]+(?:\.[0-9x*]+){0,2})$/.test(version)) && !reviewedDependency(name, version)) throw new DomainError('IMPORT_CONFIG', '仅允许受支持且已登记版本的 React 工程依赖', 400);
   }
   return content;
 }
@@ -140,6 +152,43 @@ function assertDocument(value: unknown): asserts value is PortableProjectDocumen
   }; visit(value);
 }
 
+export async function readPortableSourceFiles(root: string): Promise<PortableProjectBundle['sourceFiles']> {
+  const actualRoot = await realpath(root); if ((await lstat(root)).isSymbolicLink()) throw new DomainError('PROJECT_PATH_FORBIDDEN', '源码根目录不允许符号链接', 403);
+  const files: PortableProjectBundle['sourceFiles'] = []; let total = 0;
+  const visit = async (directory: string) => {
+    for (const name of (await readdir(path.join(root, directory))).sort()) {
+      if (OMIT_NAMES.has(name) || SECRET_NAME.test(name)) continue;
+      const relative = directory ? `${directory}/${name}` : name; const absolute = path.join(root, relative); const stat = await lstat(absolute);
+      if (stat.isSymbolicLink()) continue;
+      const resolved = await realpath(absolute); if (!resolved.startsWith(actualRoot + path.sep)) throw new DomainError('PROJECT_PATH_FORBIDDEN', '源码文件越界', 403);
+      if (stat.isDirectory()) { if (directory || ['src', 'assets', 'public'].includes(name)) await visit(relative); continue; }
+      if (!stat.isFile() || EXECUTABLE_CONFIG.test(name) || !(SOURCE_EXTENSION.test(relative) || BINARY_EXTENSION.test(relative)) || (!directory && !['index.html', 'package.json'].includes(name))) continue;
+      if (stat.size > MAX_FILE_BYTES) throw new DomainError('EXPORT_FILE_TOO_LARGE', `${relative} 超过 1 MiB 文件上限`, 400);
+      const buffer = await readFile(absolute); const binary = BINARY_EXTENSION.test(relative);
+      const content = binary ? buffer.toString('base64') : validateSource(relative, buffer.toString('utf8'));
+      if (binary) binaryFile(relative, content);
+      total += buffer.length; if (total > MAX_BUNDLE_BYTES || files.length >= MAX_SOURCE_FILES) throw new DomainError('EXPORT_TOO_LARGE', '工程源文件超出便携包上限', 400);
+      files.push({ path: relative, content, sha256: digest(buffer), ...(binary ? { encoding: 'base64' as const } : {}) });
+    }
+  }; await visit('');assertPortableLayout(files.map(file=>file.path));return files.sort((a, b) => a.path.localeCompare(b.path));
+}
+export function validatePortableProjectBundle(bundle: unknown): asserts bundle is PortableProjectBundle {
+  if (!bundle || typeof bundle !== 'object' || (bundle as any).format !== 'rdesign-project' || (bundle as any).schemaVersion !== 1) throw new DomainError('IMPORT_SCHEMA', '不支持的工程便携包', 400);
+  const incoming = bundle as PortableProjectBundle;
+  if (!incoming.manifest || incoming.manifest.schemaVersion !== 1 || !Array.isArray(incoming.sourceFiles) || !incoming.sourceFiles.length || incoming.sourceFiles.length > MAX_SOURCE_FILES || typeof incoming.checksum !== 'string') throw new DomainError('IMPORT_SCHEMA', '工程便携包缺少必填字段', 400);
+  const { checksum, ...payload } = incoming;
+  const encoded = JSON.stringify(payload); if (Buffer.byteLength(encoded) > MAX_BUNDLE_BYTES) throw new DomainError('IMPORT_TOO_LARGE', '工程便携包超出大小上限', 400);
+  if (digest(encoded) !== checksum) throw new DomainError('IMPORT_INTEGRITY', '工程便携包校验失败', 400);
+  assertDocument(incoming.document); const name = validName(incoming.manifest.name); const template = incoming.manifest.template;
+  if (!['blank', 'react-monitor'].includes(template)) throw new DomainError('PROJECT_TEMPLATE_INVALID', '不支持的项目模板', 400);
+  const paths=incoming.sourceFiles.map(file=>{if(!file||typeof file.path!=='string')throw new DomainError('IMPORT_PATH','工程文件路径无效',400);return file.path;});assertPortableLayout(paths);
+  const names = new Set<string>();
+  for (const file of incoming.sourceFiles) {
+    if (!file || typeof file.path !== 'string' || names.has(portableKey(file.path))) throw new DomainError('IMPORT_PATH', '工程文件路径重复或无效', 400);
+    const bytes = fileBytes(file); if (digest(bytes) !== file.sha256) throw new DomainError('IMPORT_INTEGRITY', '工程源文件校验失败', 400); names.add(portableKey(file.path));
+  }
+  if (!names.has('index.html') || !names.has('src/main.tsx')) throw new DomainError('IMPORT_SOURCE', '工程缺少 index.html 或 src/main.tsx 入口', 400);
+}
 export class ProjectWorkspace {
   private state!: Registry;
   private queue: Promise<unknown> = Promise.resolve();
@@ -266,7 +315,7 @@ export class ProjectWorkspace {
     await this.safeDirectory(directory); await this.safeDirectory(path.join(directory, 'src'));
     if (template === 'react-monitor') {
       const source = path.join(this.repoRoot, 'fixtures', 'react-monitor');
-      for (const file of await this.sourceBundle(source)) await this.atomic(path.join(directory, file.path), fileBytes(file));
+      for (const file of await readPortableSourceFiles(source)) await this.atomic(path.join(directory, file.path), fileBytes(file));
     } else { await this.atomic(path.join(directory, 'src/main.tsx'), BLANK_MAIN); await this.atomic(path.join(directory, 'index.html'), HTML); }
     await this.atomic(path.join(directory, 'package.json'), JSON.stringify(PACKAGE, null, 2) + '\n');
     await this.atomic(path.join(directory, 'vite.config.ts'), VITE_CONFIG);
@@ -311,55 +360,25 @@ export class ProjectWorkspace {
     await this.save();
   }
   async syncDocument(project: Project): Promise<void> { await this.refresh(project.id, project); }
-  private async sourceBundle(root: string): Promise<PortableProjectBundle['sourceFiles']> {
-    const actualRoot = await realpath(root); if ((await lstat(root)).isSymbolicLink()) throw new DomainError('PROJECT_PATH_FORBIDDEN', '源码根目录不允许符号链接', 403);
-    const files: PortableProjectBundle['sourceFiles'] = []; let total = 0;
-    const visit = async (directory: string) => {
-      for (const name of (await readdir(path.join(root, directory))).sort()) {
-        if (OMIT_NAMES.has(name) || SECRET_NAME.test(name)) continue;
-        const relative = directory ? `${directory}/${name}` : name; const absolute = path.join(root, relative); const stat = await lstat(absolute);
-        if (stat.isSymbolicLink()) continue;
-        const resolved = await realpath(absolute); if (!resolved.startsWith(actualRoot + path.sep)) throw new DomainError('PROJECT_PATH_FORBIDDEN', '源码文件越界', 403);
-        if (stat.isDirectory()) { if (directory || ['src', 'assets', 'public'].includes(name)) await visit(relative); continue; }
-        if (!stat.isFile() || EXECUTABLE_CONFIG.test(name) || !(SOURCE_EXTENSION.test(relative) || BINARY_EXTENSION.test(relative)) || (!directory && !['index.html', 'package.json'].includes(name))) continue;
-        if (stat.size > MAX_FILE_BYTES) throw new DomainError('EXPORT_FILE_TOO_LARGE', `${relative} 超过 1 MiB 文件上限`, 400);
-        const buffer = await readFile(absolute); const binary = BINARY_EXTENSION.test(relative);
-        const content = binary ? buffer.toString('base64') : validateSource(relative, buffer.toString('utf8'));
-        if (binary) binaryFile(relative, content);
-        total += buffer.length; if (total > MAX_BUNDLE_BYTES || files.length >= MAX_SOURCE_FILES) throw new DomainError('EXPORT_TOO_LARGE', '工程源文件超出便携包上限', 400);
-        files.push({ path: relative, content, sha256: digest(buffer), ...(binary ? { encoding: 'base64' as const } : {}) });
-      }
-    }; await visit('');assertPortableLayout(files.map(file=>file.path));return files.sort((a, b) => a.path.localeCompare(b.path));
-  }
   async export(id: string, document: PortableProjectDocument): Promise<PortableProjectBundle> {
     const entry = await this.validate(id); assertDocument(document);
     if (document.project.id !== id) throw new DomainError('PROJECT_MISMATCH', '导出文档身份不匹配', 400);
-    const sourceFiles = await this.sourceBundle(entry.sourceDirectory);
+    const sourceFiles = await readPortableSourceFiles(entry.sourceDirectory);
     const manifest = { ...entry.manifest, source: { kind: 'owned' as const, directory: 'source' }, kind: 'owned' as const, documentRevision: document.project.revision, codeRevision: document.project.codeRevision };
     const portable = { format: 'rdesign-project' as const, schemaVersion: 1 as const, manifest, document: structuredClone(document), sourceFiles };
     if (Buffer.byteLength(JSON.stringify(portable)) > MAX_BUNDLE_BYTES) throw new DomainError('EXPORT_TOO_LARGE', '工程源文件与证据超出便携包上限', 400);
     return { ...portable, checksum: digest(JSON.stringify(portable)) };
   }
   async import(bundle: unknown): Promise<ProjectSummary> {
-    if (!bundle || typeof bundle !== 'object' || (bundle as any).format !== 'rdesign-project' || (bundle as any).schemaVersion !== 1) throw new DomainError('IMPORT_SCHEMA', '不支持的工程便携包', 400);
-    const incoming = bundle as PortableProjectBundle;
-    if (!incoming.manifest || incoming.manifest.schemaVersion !== 1 || !Array.isArray(incoming.sourceFiles) || !incoming.sourceFiles.length || incoming.sourceFiles.length > MAX_SOURCE_FILES || typeof incoming.checksum !== 'string') throw new DomainError('IMPORT_SCHEMA', '工程便携包缺少必填字段', 400);
-    const { checksum, ...payload } = incoming;
-    const encoded = JSON.stringify(payload); if (Buffer.byteLength(encoded) > MAX_BUNDLE_BYTES) throw new DomainError('IMPORT_TOO_LARGE', '工程便携包超出大小上限', 400);
-    if (digest(encoded) !== checksum) throw new DomainError('IMPORT_INTEGRITY', '工程便携包校验失败', 400);
-    assertDocument(incoming.document); const name = validName(incoming.manifest.name); const template = incoming.manifest.template;
-    if (!['blank', 'react-monitor'].includes(template)) throw new DomainError('PROJECT_TEMPLATE_INVALID', '不支持的项目模板', 400);
-    const paths=incoming.sourceFiles.map(file=>{if(!file||typeof file.path!=='string')throw new DomainError('IMPORT_PATH','工程文件路径无效',400);return file.path;});assertPortableLayout(paths);
-    const names = new Set<string>();
-    for (const file of incoming.sourceFiles) {
-      if (!file || typeof file.path !== 'string' || names.has(portableKey(file.path))) throw new DomainError('IMPORT_PATH', '工程文件路径重复或无效', 400);
-      const bytes = fileBytes(file); if (digest(bytes) !== file.sha256) throw new DomainError('IMPORT_INTEGRITY', '工程源文件校验失败', 400); names.add(portableKey(file.path));
-    }
-    if (!names.has('index.html') || !names.has('src/main.tsx')) throw new DomainError('IMPORT_SOURCE', '工程缺少 index.html 或 src/main.tsx 入口', 400);
+    validatePortableProjectBundle(bundle);
+    const incoming = bundle;
+    const name = validName(incoming.manifest.name); const template = incoming.manifest.template;
     const id = `project_${randomUUID()}`; const directory = this.projectDirectory(id); const source = path.join(directory, 'source');
     await this.safeDirectory(source);
     for (const file of incoming.sourceFiles) await this.atomic(path.join(source, file.path), fileBytes(file));
-    await this.atomic(path.join(source, 'package.json'), JSON.stringify(PACKAGE, null, 2) + '\n'); await this.atomic(path.join(source, 'vite.config.ts'), VITE_CONFIG);
+    const config = JSON.parse(incoming.sourceFiles.find(file => file.path === 'package.json')?.content ?? '{}');
+    const dependencies = { ...config.dependencies, ...config.devDependencies, ...config.optionalDependencies };
+    await this.atomic(path.join(source, 'package.json'), JSON.stringify(projectPackage(dependencies), null, 2) + '\n'); await this.atomic(path.join(source, 'vite.config.ts'), VITE_CONFIG);
     await this.atomic(path.join(source, 'src/runtime-module.d.ts'), "declare module '@rdesign/runtime-web';\n");
     const revision = await codeHash(source); const now = new Date().toISOString();
     const document = structuredClone(incoming.document); const formerId = document.project.id;

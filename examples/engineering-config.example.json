@@ -1,0 +1,25 @@
+{
+  "repositoryRoot": "/absolute/path/to/isolated-repository",
+  "repositoryUrl": "https://github.com/owner/repository",
+  "commit": "REPLACE_WITH_40_CHARACTER_COMMIT_SHA",
+  "frontendDirectory": "apps/web",
+  "name": "现有前端 · R-Design 工程",
+  "limitations": [
+    "这里列出实际无法在浏览器复现的原生或外部服务能力",
+    "原始项目的业务限制也应保留，不能把 UI 就绪视作完整业务验收"
+  ],
+  "relocations": [
+    { "from": "public/fonts", "to": "src/assets/fonts" }
+  ],
+  "copies": [
+    { "from": "LICENSE", "to": "src/reference/LICENSE.txt" }
+  ],
+  "edits": [
+    { "file": "src/style.css", "find": "/fonts/ui.woff2", "replace": "./assets/fonts/ui.woff2" },
+    { "file": "src/App.tsx", "find": "<main>", "replace": "<main data-rdesign-id=\"app-main\" data-rdesign-ready=\"true\">" }
+  ],
+  "scenarios": [
+    { "id": "desktop", "name": "首页 · 桌面", "route": "/", "viewport": { "width": 1200, "height": 820 }, "steps": [], "readySelector": "[data-rdesign-ready=\"true\"]", "dependencies": ["src/main.tsx", "src/App.tsx"], "status": "unverified" },
+    { "id": "narrow", "name": "首页 · 窄屏", "route": "/", "viewport": { "width": 390, "height": 844 }, "steps": [], "readySelector": "[data-rdesign-ready=\"true\"]", "dependencies": ["src/main.tsx", "src/App.tsx"], "status": "unverified" }
+  ]
+}
