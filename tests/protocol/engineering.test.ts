@@ -53,6 +53,42 @@ async function commitFixture(root: string, files: string[]) {
 }
 
 describe('committed frontend engineering', () => {
+  it('exports only controlled runtime dependency metadata and never original authenticated URL specs', async () => {
+    const { root, config } = await sourceFixture();
+    const original = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
+    const syntheticMarker = 'SYNTHETIC_CREDENTIAL_NOT_REAL';
+    const specifications = [
+      `https://synthetic-user:${syntheticMarker}@registry.example.invalid/tool.tgz`,
+      `git+https://synthetic-user:${syntheticMarker}@example.invalid/tool.git`,
+      `git+ssh://synthetic-user:${syntheticMarker}@example.invalid/tool.git`,
+    ];
+    original.dependencies.vite = specifications[0];
+    original.devDependencies = { 'unused-private-tool': specifications[1] };
+    original.optionalDependencies = { 'unused-optional-tool': specifications[2] };
+    await writeFile(path.join(root, 'package.json'), JSON.stringify(original));
+    config.commit = await commitFixture(root, ['package.json']);
+    const bundle = await generateEngineeringBundle(config);
+    expect(preflightEngineeringBundle(bundle).passed).toBe(true);
+    const serialized = JSON.stringify(bundle);
+    // Boolean assertions avoid displaying even synthetic credential values in failure reports.
+    expect(serialized.includes(syntheticMarker)).toBe(false);
+    for (const specification of specifications) expect(serialized.includes(specification)).toBe(false);
+    expect(serialized.includes('unused-private-tool')).toBe(false);
+    expect(serialized.includes('unused-optional-tool')).toBe(false);
+    const origin = JSON.parse(bundle.sourceFiles.find(file => file.path === 'src/rdesign-origin.json')!.content);
+    expect(origin).not.toHaveProperty('originalDependencies');
+    expect(origin).not.toHaveProperty('originalDependencyDeclarations');
+    expect(origin.runtimeDependencies).toEqual(JSON.parse(bundle.sourceFiles.find(file => file.path === 'package.json')!.content).dependencies);
+    original.dependencies.three = specifications[1];
+    await writeFile(path.join(root, 'package.json'), JSON.stringify(original));
+    config.commit = await commitFixture(root, ['package.json']);
+    let rejection: any;
+    try { await generateEngineeringBundle(config); } catch (error) { rejection = error; }
+    expect(rejection?.code).toBe('ENGINEERING_DEPENDENCY');
+    expect(String(rejection?.message).includes(syntheticMarker)).toBe(false);
+    expect(String(rejection?.message).includes(specifications[1])).toBe(false);
+  });
+
   it('reads the original commit tree and blobs when replacement refs are active', async () => {
     const { root, config } = await sourceFixture();
     const main = await readFile(path.join(root, 'src/main.tsx'), 'utf8');

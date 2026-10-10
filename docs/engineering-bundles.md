@@ -28,6 +28,8 @@ These packages are preserved when importing and resolved through the host for bo
 
 All Git object reads disable replacement objects without changing repository settings, so provenance refers to the requested commit's actual tree and blobs. Registered browser dependencies used by value imports, re-exports or literal dynamic imports are retained even when declared in optional or development dependencies; unused build tooling is not copied. CSS imports such as `@import "theme.css"` resolve as local stylesheet resources.
 
+Dependency provenance contains only the controlled runtime dependency versions used by the generated package. Original dependency specifications and unused declarations are omitted, including core tooling declarations that the host replaces. Required browser packages must match the reviewed versions; URL/Git specifications fail without echoing the original specification. The original package's committed Git blob identity remains available for provenance without exporting its dependency URLs or scripts.
+
 Controlled previews explicitly set the existing `VITE_RDESIGN_RUNTIME=true` flag, so a preceding build or a production Node environment cannot silently disable the observation SDK. Runtime port `0` allocates a temporary loopback port rather than occupying Vite's default `5173`; explicitly requested preview ports remain strict.
 
 `publicDir` remains disabled. Move public resources into `src/assets` through explicit relocation rules, then update CSS/HTML/code references. Keeping resources under `src` also includes them in `codeHash` and candidate conflict checks. Tailwind source directives need an explicit compiled CSS adapter; the generator does not execute the source project's build tooling or drop its stylesheet.

@@ -199,7 +199,7 @@ export async function generateEngineeringBundle(config: EngineeringConfig): Prom
   change('src/main.tsx', Buffer.from("import { installRuntime as installRDesignRuntime } from '@rdesign/runtime-web';\n" + entry.bytes.toString('utf8') + '\nif (import.meta.env.DEV || import.meta.env.VITE_RDESIGN_RUNTIME === \'true\') installRDesignRuntime({ maxNodes: 2500 });\n'), '在根 React 渲染入口后安装开发观察 SDK');
   const origin = { schemaVersion: 1, repositoryUrl: config.repositoryUrl, commit: config.commit, frontendDirectory: config.frontendDirectory,
     sourceFiles: [...selected].map(([file, item]) => ({ file, original: item.original, gitBlobSha: item.sha })),
-    originalDependencies: originalPackage.dependencies, originalDependencyDeclarations: { dependencies: originalPackage.dependencies ?? {}, optionalDependencies: originalPackage.optionalDependencies ?? {}, devDependencies: originalPackage.devDependencies ?? {} }, originalScriptNames: Object.keys(originalPackage.scripts ?? {}),
+    runtimeDependencies: projectPackage(dependencies).dependencies,
     relocations: config.relocations ?? [], adaptations, limitations: config.limitations, verification: '运行、业务、原生与外部后端验收须另附证据' };
   const directory = await mkdtemp(path.join(os.tmpdir(), 'rd-engineering-'));
   try {
