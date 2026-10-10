@@ -47,6 +47,8 @@ Version ranges, other versions and npm install aliases for these packages remain
 
 These packages are preserved when importing and resolved through the host for both live and candidate previews, including export subpaths such as `three/addons/...`. A browser import of the Tauri API does not provide native IPC. Other dependencies or versions require an explicit host compatibility change and execution evidence. Workspaces, `file:` dependencies, aliases, JSX-only entry points, React 18, Vue and Next are not automatically adapted. Core tool dependency declarations use the existing importer policy; the controlled host still selects its React/tool versions.
 
+Font-oriented browser previews additionally register `react-dnd` 16.0.1, `react-dnd-html5-backend` 16.0.1 and `react-syntax-highlighter` 16.1.2. Formal prepared packages and portable imports require those exact versions; ranges and install aliases are rejected. Source generation retains its existing normalization and emits controlled exact versions without installing or resolving the source package. The synthetic `tests/protocol/font-runtime.test.ts` fixture exercises an actual HTML5 drag/drop state transition, Prism's rendered inline keyword color, theme CSS variables, official pack/import/build, and a static text candidate across desktop and narrow scenes with apply and semantic revert. These checks establish controlled browser compatibility; actual font loading, installation, analysis and external services require separate application evidence.
+
 All Git object reads disable replacement objects without changing repository settings, so provenance refers to the requested commit's actual tree and blobs. Registered browser dependencies used by value imports, re-exports or literal dynamic imports are retained even when declared in optional or development dependencies; unused build tooling is not copied. CSS imports such as `@import "theme.css"` resolve as local stylesheet resources.
 
 Dependency provenance contains only the controlled runtime dependency versions used by the generated package. Original dependency specifications and unused declarations are omitted, including core tooling declarations that the host replaces. Required browser packages must match the reviewed versions; URL/Git specifications fail without echoing the original specification. The original package's committed Git blob identity remains available for provenance without exporting its dependency URLs or scripts.
@@ -83,6 +85,25 @@ Each staged record compares original bytes from the pinned Git commit with the r
 Git paths use NUL-separated records, so Unicode original filenames work without changing `core.quotePath`. Split resources are limited to the same supported image/font extensions and content headers as portable binary assets. Reconstructed bytes also receive the existing private-content check before output; base64 does not exempt text or binary assets from that check. A synthetic private marker is rejected identically when supplied directly or through resource chunks, without echoing its contents.
 
 The prepared tree passes the same path, file, dependency and bundle limits as import. The packer seals its captured bytes, records every prepared file hash in reserved `src/rdesign-prepared-origin.json`, and runs the existing v1 validator/preflight. It does not prove that the ledger lists every original frontend file or that an adapter preserves application semantics. Those require separate source review, resource coverage, browser scenes, business assertions and candidate tests. Private source text, authenticated dependency URLs and production data must not be placed in public recipes or bundles.
+
+### Explicit unchanged theme module
+
+An optional `themeStyleModule` profile admits one original React frontend color module whose filename would otherwise be protected. It applies only during prepared provenance verification; generic file capture and portable import retain their existing private-path policy.
+
+```json
+{
+  "themeStyleModule": {
+    "frontendDirectory": "web",
+    "sourceSha256": "64-character-lowercase-hex-SHA256"
+  }
+}
+```
+
+`frontendDirectory` is a canonical repository-relative directory (`.` is allowed). Its committed `package.json` must declare React and React DOM. Exactly one staged ledger record must have `sourceRole: "theme-style-module"`, original `sourcePath: "web/src/theme/tokens.ts"`, prepared `path: "src/theme/design-style.ts"`, and identical original, prepared and configured SHA256 values. The prepared module must preserve the original bytes. The original must be a regular Git blob at the exact source commit, at most 1 MiB, with no private ancestor. Renaming a different private file, modifying the module, supplying an unused or duplicate profile, or admitting it as a split resource fails. Nothing automatically upgrades the source frontend or creates this adapter.
+
+The packer parses TypeScript without running the module. The `theme-color-css-v1` proof accepts the named `getThemePresetById` import from `./registry`, restricted type imports from `./types`, bounded local arrow helpers, the exact exports `clamp`, `isHexColor`, `buildThemeTokens` and `applyThemeToDOM`, and restricted color/string calculations. DOM statements must match the fixed document-root theme class/attribute operations and a bounded table of unique literal CSS custom properties applied through `root.style.setProperty`. Unknown globals, network/storage/native imports, dynamic imports, top-level execution, computed property access, prototype capabilities, altered DOM targets and credential content are rejected. Raw and decoded string content both receive private-content checks. The proof and original/prepared paths are recorded in reserved provenance metadata.
+
+This is a narrow structural admission rule, not a JavaScript sandbox or proof of the imported registry, helper termination, complete frontend coverage, or application behavior. Review the original module and its dependency closure separately, preserve the recorded source commit and hashes, and attach actual application scenes, browser state assertions and candidate evidence. The synthetic tests cover dirty source worktrees and Git replacement refs, exact byte/hash/path/role gates, protected generic capture/import, symlinks, size limits, private content and capability rejection without publishing private application source.
 
 ```text
 { format: "rdesign-project", schemaVersion: 1,

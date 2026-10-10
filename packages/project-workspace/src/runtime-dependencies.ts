@@ -30,6 +30,9 @@ export const REVIEWED_RUNTIME_DEPENDENCIES: Readonly<Record<string, string>> = O
   'xterm-addon-fit': '0.8.0',
   'xterm-addon-web-links': '0.9.0',
   motion: '12.23.24',
+  'react-dnd': '16.0.1',
+  'react-dnd-html5-backend': '16.0.1',
+  'react-syntax-highlighter': '16.1.2',
 });
 
 export const CORE_PROJECT_DEPENDENCIES = new Set([
