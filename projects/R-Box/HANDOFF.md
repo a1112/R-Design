@@ -66,6 +66,11 @@ explicit blocked states. Imported scenarios must become `unverified`.
 All seven complete private v1 bundles were generated with embedded frontend source,
 resource hashes and real screenshots. Acceptance below was repeated against the
 parent-confirmed frozen tool `fd563274e0add377460ec537729675af9b52a3ac`.
+The integration review subsequently identified four shared-tool boundaries: Git
+replace refs, relative CSS imports, optional/dev dependency coverage, and root
+assets revision hashing. Final acceptance now awaits its patch SHA and retest.
+This group's isolated clones have no replace refs or grafts, and every application
+resource is under `src`. No shared tool was changed or bypassed.
 
 | Project | Scenes | Temporary host compatibility | Frozen schema/preflight/import | Actual imported host runtime/build/mapping/interaction |
 | --- | ---: | --- | --- | --- |
