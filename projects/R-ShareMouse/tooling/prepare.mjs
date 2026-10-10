@@ -56,7 +56,7 @@ export async function prepare(name, sourceRoot = path.resolve(repoRoot, '../sour
   const committedBytes = file => execFileSync('git', ['--no-replace-objects', 'show', `${sha}:${file}`], { cwd: sourceRoot, maxBuffer: 16 * 1024 * 1024 });
   const output = path.join(repoRoot, '.rdesign', 'desktop-prepared', name);
   await rm(output, { recursive: true, force: true }); await mkdir(output, { recursive: true });
-  const mappings = [], omitted = [], renames = new Map(), assetSegments = [], textFiles = new Map();
+  const mappings = [], omitted = [], renames = new Map(), assetSegments = [], textFiles = new Map(), embeddedDependencies = {}, embeddedDependencySources = [];
   const scopes = [...config.copy];
   for (const scope of scopes) {
     const base = path.resolve(frontend, scope.from);
@@ -97,6 +97,19 @@ export async function prepare(name, sourceRoot = path.resolve(repoRoot, '../sour
   for (const [file, original] of textFiles) {
     let source = original;
     if (/\.[cm]?[jt]sx?$/.test(file)) {
+      // Some committed Figma UI modules declare exact versions in their import
+      // specifiers without listing them in the upstream package.json. Preserve
+      // those declarations before normalizing the executable import syntax.
+      const ast = parse(original, { sourceType: 'module', plugins: ['typescript', 'jsx'] });
+      for (const node of ast.program.body) if (node.source?.type === 'StringLiteral' && node.importKind !== 'type' && node.exportKind !== 'type') {
+        const versioned = /^((?:@[^/]+\/)?[^@]+)@([0-9][^/]*)$/.exec(node.source.value);
+        if (versioned) {
+          const [, dependency, version] = versioned;
+          if (embeddedDependencies[dependency] && embeddedDependencies[dependency] !== version) throw new Error(`Conflicting embedded dependency versions for ${dependency}`);
+          embeddedDependencies[dependency] = version;
+          embeddedDependencySources.push({ file, dependency, requestedVersion: version });
+        }
+      }
       source = source.replace(/(['"])([^'"\n]+)\1/g, (all, quote, specifier) => {
         let target = specifier;
         const negated = target.startsWith('!.');
@@ -180,11 +193,11 @@ export async function prepare(name, sourceRoot = path.resolve(repoRoot, '../sour
   }
   const sourcePackage = JSON.parse(committedBytes(normalized(path.relative(sourceRoot, path.join(frontend, 'package.json')))).toString('utf8'));
   const originalFramework = { react: sourcePackage.dependencies?.react, 'react-dom': sourcePackage.dependencies?.['react-dom'] };
-  sourcePackage.dependencies = { ...sourcePackage.dependencies, ...config.extraDependencies };
+  sourcePackage.dependencies = { ...embeddedDependencies, ...sourcePackage.dependencies, ...config.extraDependencies };
   const requestedDependencies = await runtimeDependencies(output, sourcePackage);
   const dependencies = await normalizeDependencies(name, requestedDependencies);
   await writeFile(path.join(output, 'package.json'), JSON.stringify({ name: `@rdesign/preview-${name.toLowerCase()}`, private: true, type: 'module', scripts: { dev: 'vite --host 127.0.0.1', build: 'vite build' }, dependencies }, null, 2) + '\n');
-  const provenance = { adapterVersion: 1, name, source: config.source, readMode: 'pinned committed Git objects only', originalFramework, mappings, omitted, assetSegments, nonBrowserSourceArchives, limitations: config.limitations, requestedRuntimeDependencies: requestedDependencies, runtimeDependencies: dependencies };
+  const provenance = { adapterVersion: 1, name, source: config.source, readMode: 'pinned committed Git objects only', originalFramework, mappings, omitted, assetSegments, nonBrowserSourceArchives, embeddedDependencySources, limitations: config.limitations, requestedRuntimeDependencies: requestedDependencies, runtimeDependencies: dependencies };
   await writeFile(path.join(output, 'src/rdesignProvenance.json'), JSON.stringify(provenance, null, 2) + '\n');
   await writeFile(path.join(projectRoot, 'prepared-summary.json'), JSON.stringify({ name, source: config.source, readMode: provenance.readMode, originalFramework, copiedFiles: mappings.length, omittedFiles: omitted.length, nonBrowserSourceArchives, losslessSegmentedAssets: assetSegments.map(x => ({ path: x.path, sha256: x.sha256, bytes: x.bytes })), requestedRuntimeDependencies: requestedDependencies, runtimeDependencies: dependencies, validation: { schema: 'pending frozen tooling', checksum: 'pending generation', import: 'pending', runtime: 'pending', sourceMapping: 'pending', interactions: 'pending' } }, null, 2) + '\n');
   return { output, config, dependencies, provenance };

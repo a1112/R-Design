@@ -20,8 +20,16 @@
     ],
     "compiler": "@tailwindcss/node@4.1.12"
   },
-  "toolBaseline": "fd563274e0add377460ec537729675af9b52a3ac",
-  "runtimeMode": "isolated compatibility rehearsal with explicit dependency aliases; this is not a frozen-host import acceptance",
+  "packing": {
+    "recipe": "projects/R-ShareMouse/prepared-packing.config.json",
+    "provenanceFile": "src/rdesignPackingLedger.json",
+    "committedBytesAndAdaptedHashes": "passed independent check; official packer has a separate result",
+    "stagedFiles": 89,
+    "splitResources": 2,
+    "generatedFiles": 8
+  },
+  "toolBaseline": "d4f41d0e7ab552129a82d91648ecd3dade692de9",
+  "runtimeMode": "isolated compatibility rehearsal using the frozen runtime with explicit project dependency overrides; not official import acceptance",
   "scenarios": [
     {
       "id": "layout-desktop",
@@ -72,8 +80,9 @@
       "assertion": "No native globals; service request rejected; original error UI shown"
     }
   ],
+  "navigation": "domcontentloaded + declared UI readiness + font readiness; separate from the official scenario runner",
   "nativeCapabilities": "unavailable; no native operations accepted",
-  "import": "blocked IMPORT_CONFIG at fd563274e0add377460ec537729675af9b52a3ac",
+  "import": "blocked by frozen host dependency policy",
   "installedDependencies": {
     "@radix-ui/react-accordion": "1.2.3",
     "@radix-ui/react-alert-dialog": "1.1.23",
@@ -119,7 +128,6 @@
     "tailwind-merge": "3.7.0",
     "vaul": "1.1.2"
   },
-  "productionBuild": "passed",
   "sourceMapping": {
     "passed": true,
     "file": "src/app/components/MonitorManager.tsx",
@@ -159,19 +167,7 @@
     "passed": true,
     "losslessSegmentedAssets": 2
   },
-  "candidate": {
-    "preparation": "passed actual frozen ChangeEngine.prepare",
-    "frozenVerification": "blocked",
-    "frozenError": "[vite]: Rollup failed to resolve import \"qrcode-generator\" from \"<local-workspace>/.rdesign/desktop-candidate/R-ShareMouse/5495ee45-6cc6-4ab0-8b30-55875f7a3ff0/candidates/change_02af968e-9fb6-45b4-8011-d8dcdbae938b/src/app/desktop-model.mjs\".",
-    "compatibilityPreview": "passed actual changed DOM property",
-    "property": "text",
-    "sourceFile": "src/app/components/MonitorManager.tsx",
-    "originalSourceUnchanged": true,
-    "accept": "not run because official verification failed",
-    "revert": "not run; original source was never changed",
-    "screenshot": "candidate-preview.png"
-  },
   "pageErrors": [],
   "runtime": "passed isolated headless Chromium; ephemeral loopback port",
-  "narrowLayoutLimitation": "390px original desktop monitor layout clips seven controls."
+  "productionBuild": "passed"
 }

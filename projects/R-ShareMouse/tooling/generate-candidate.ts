@@ -3,12 +3,11 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { readFile, readdir, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { codeHash } from '../../../packages/source-binding/src/index.js';
-import { createProject, digest } from '../../../packages/document-core/src/index.js';
-import { ProjectWorkspace } from '../../../packages/project-workspace/src/index.js';
 import { repoRoot } from './prepare.mjs';
 import { preflightBundle } from './preflight.js';
 import { frozenRoot, frozenSha, hostModule } from './frozen-host.mjs';
+const { codeHash } = await hostModule('packages/source-binding/src/index.ts');
+const { createProject, digest } = await hostModule('packages/document-core/src/index.ts');
 
 const name = process.argv[2] ?? 'R-ShareMouse';
 const root = path.join(repoRoot, '.rdesign/desktop-prepared', name);

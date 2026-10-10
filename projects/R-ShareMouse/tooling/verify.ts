@@ -2,34 +2,24 @@ import assert from 'node:assert/strict';
 import { readFile, mkdir, writeFile, symlink, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { BrowserRuntime } from '../../../apps/bridge/src/runtime.js';
-import { fileBoundary } from '../../../apps/bridge/src/vite-security.js';
-import { rdesignSourceIds } from '../../../packages/runtime-web/src/vite.js';
-import { codeHash, indexSources, transform } from '../../../packages/source-binding/src/index.js';
 import { repoRoot, prepare } from './prepare.mjs';
 import { compileStyles } from './compile-styles.mjs';
 import { dependencyRoot, dependencyAliases } from './dependencies.mjs';
 import { frozenRoot, frozenSha, hostModule } from './frozen-host.mjs';
 import { PreviewRuntime as FrozenPreviewRuntime } from './preview-runtime.mjs';
-
-class PreviewRuntime extends BrowserRuntime {
-  config() {
-    const config = super.config();
-    const allow = [this.root, path.join(repoRoot, 'packages/runtime-web'), path.join(repoRoot, 'packages/protocol'), path.join(repoRoot, 'node_modules'), dependencyRoot];
-    const aliases = Object.fromEntries(Object.entries(dependencyAliases[name] ?? {}).map(([requested, installed]) => [requested, path.join(dependencyRoot, installed)]));
-    return { ...config, resolve: { ...config.resolve, alias: { ...config.resolve?.alias, ...aliases } }, optimizeDeps: { exclude: ['pdfjs-dist', 'pdfjs-dist-v5'] }, plugins: [fileBoundary({ root: this.root, allow, privateRoots: [] }), ...config.plugins.slice(1)], server: { ...config.server, fs: { ...config.server.fs, allow } }, worker: { format: 'es' as const }, build: { minify: false } };
-  }
-}
+import { preparePackingRecipe } from './prepare-packing.mjs';
+const { codeHash, indexSources, transform } = await hostModule('packages/source-binding/src/index.ts');
 
 const name = process.argv[2] ?? 'R-ShareMouse';
 const { output, config, provenance, dependencies } = await prepare(name);
 await symlink(dependencyRoot, path.join(output, 'node_modules'), 'dir');
 const styles = await compileStyles(output, config);
+const packing = await preparePackingRecipe(output, config);
 const destination = path.join(repoRoot, '.rdesign/desktop-evidence', name);
 await mkdir(destination, { recursive: true });
 const runtime = new FrozenPreviewRuntime(name, output);
 const errors: string[] = [];
-const results: any = { name, source: config.source, styles, toolBaseline: frozenSha, runtimeMode: 'isolated compatibility rehearsal using the frozen runtime with explicit project dependency overrides; not official import acceptance', scenarios: [], interactions: [], nativeCapabilities: 'unavailable; no native operations accepted', import: 'blocked by frozen host dependency policy' };
+const results: any = { name, source: config.source, styles, packing, toolBaseline: frozenSha, runtimeMode: 'isolated compatibility rehearsal using the frozen runtime with explicit project dependency overrides; not official import acceptance', scenarios: [], interactions: [], navigation: 'domcontentloaded + declared UI readiness + font readiness; separate from the official scenario runner', nativeCapabilities: 'unavailable; no native operations accepted', import: 'blocked by frozen host dependency policy' };
 results.installedDependencies = Object.fromEntries(await Promise.all(Object.keys(dependencies).filter(key => !key.startsWith('@rdesign/')).map(async key => {
   const dependencyPath = ['react', 'react-dom', '@tauri-apps/api'].includes(key) ? path.join(frozenRoot, 'node_modules', key) : path.join(dependencyRoot, dependencyAliases[name]?.[key] ?? key);
   return [key, JSON.parse(await readFile(path.join(dependencyPath, 'package.json'), 'utf8')).version];
@@ -43,23 +33,27 @@ try {
   assert.equal(await runtime.page.locator('[data-rdesign-boot-error]').count(), 0, 'The source application import must succeed');
   for (const scenario of config.scenarios) {
     await runtime.page.setViewportSize(scenario.viewport);
-    await runtime.page.goto(runtime.url() + scenario.route, { waitUntil: 'networkidle' });
+    await runtime.page.goto(runtime.url() + scenario.route, { waitUntil: 'domcontentloaded' });
     for (const step of scenario.steps) {
       const target = runtime.page.locator(`[data-rdesign-id="${step.target}"]`);
       if (step.action === 'click') await target.click();
       else await target.fill(step.value ?? '');
     }
     await runtime.page.waitForSelector(scenario.readySelector, { timeout: 15000 });
+    await runtime.page.evaluate(() => document.fonts.ready);
+    if (scenario.readySelector.includes('pdf-preview')) await runtime.page.waitForFunction(() => [...document.querySelectorAll<HTMLCanvasElement>('[data-testid="pdf-preview"] canvas')].some(canvas => canvas.width > 300 && canvas.height > 300), undefined, { timeout: 15000 });
     await runtime.page.waitForTimeout(150);
+    const pdfCanvas = scenario.readySelector.includes('pdf-preview') ? await runtime.page.evaluate(() => { const canvas = document.querySelector<HTMLCanvasElement>('[data-testid="pdf-preview"] canvas')!; const pixels = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height).data; let nonWhitePixels = 0; for (let i = 0; i < pixels.length; i += 4) if (pixels[i + 3] > 0 && Math.min(pixels[i], pixels[i + 1], pixels[i + 2]) < 230) nonWhitePixels++; return { width: canvas.width, height: canvas.height, nonWhitePixels }; }) : undefined;
+    if (pdfCanvas) assert(pdfCanvas.nonWhitePixels > 100, 'The real PDF canvas must contain rendered page pixels');
     const frame = await runtime.capture('snapshot');
     await writeFile(path.join(destination, `${scenario.id}.png`), Buffer.from(frame.image.split(',')[1], 'base64'));
     await writeFile(path.join(destination, `${scenario.id}.frame.json`), JSON.stringify(frame));
     const mapped = frame.nodes.filter(node => node.binding?.reliability === 'exact' && node.binding.file !== 'src/main.tsx');
     assert(mapped.length > 10, `Original UI must have source mappings, got ${mapped.length}`);
-    results.scenarios.push({ id: scenario.id, passed: true, viewport: scenario.viewport, nodes: frame.nodes.length, exactSourceNodes: mapped.length, clippedControls: await runtime.page.evaluate(() => [...document.querySelectorAll('button,input,select')].filter(element => { const rect = element.getBoundingClientRect(); return rect.width > 0 && (rect.x < 0 || rect.right > innerWidth); }).length), snapshot: `${scenario.id}.png` });
+    results.scenarios.push({ id: scenario.id, passed: true, viewport: scenario.viewport, nodes: frame.nodes.length, exactSourceNodes: mapped.length, clippedControls: await runtime.page.evaluate(() => [...document.querySelectorAll('button,input,select')].filter(element => { const rect = element.getBoundingClientRect(); return rect.width > 0 && (rect.x < 0 || rect.right > innerWidth); }).length), snapshot: `${scenario.id}.png`, ...(pdfCanvas ? { pdfCanvas } : {}) });
   }
   await runtime.page.setViewportSize({ width: 1440, height: 900 });
-  await runtime.page.goto(runtime.url() + config.scenarios[0].route, { waitUntil: 'networkidle' });
+  await runtime.page.goto(runtime.url() + config.scenarios[0].route, { waitUntil: 'domcontentloaded' });
   if (name === 'R-ShareMouse') {
     await runtime.page.getByRole('button', { name: '设置', exact: true }).click();
     await runtime.page.getByText('界面风格', { exact: true }).waitFor();
@@ -86,7 +80,7 @@ try {
     results.interactions.push({ name: 'Native window helper is unavailable', passed: true, assertion: 'Browser helper rejects instead of returning a simulated native success' });
   }
   await runtime.page.goto('about:blank');
-  await runtime.page.goto(runtime.url() + config.scenarios[0].route, { waitUntil: 'networkidle' });
+  await runtime.page.goto(runtime.url() + config.scenarios[0].route, { waitUntil: 'domcontentloaded' });
   await runtime.page.waitForSelector(config.scenarios[0].readySelector, { timeout: 15000 });
   const index = await indexSources(output);
   const visibleFrame = await runtime.capture('snapshot');
@@ -124,7 +118,7 @@ try {
     try {
       await candidate.start();
       await candidate.page.setViewportSize(config.scenarios[0].viewport);
-      await candidate.page.goto(candidate.url() + config.scenarios[0].route, { waitUntil: 'networkidle' });
+      await candidate.page.goto(candidate.url() + config.scenarios[0].route, { waitUntil: 'domcontentloaded' });
       await candidate.page.waitForSelector(config.scenarios[0].readySelector, { timeout: 15000 });
       const locator = candidate.page.locator(`[data-rdesign-id="${sample.binding.sourceNodeId}"]`);
       if ('text' in edit) assert.equal((await locator.textContent())?.trim(), edit.text);

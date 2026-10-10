@@ -1,9 +1,16 @@
 {
-  "testedHostSha": "fd563274e0add377460ec537729675af9b52a3ac",
+  "testedHostSha": "d4f41d0e7ab552129a82d91648ecd3dade692de9",
   "registry": {
     "lucide-react": "0.468.0",
     "three": "0.180.0",
-    "@tauri-apps/api": "2.8.0"
+    "@tauri-apps/api": "2.8.0",
+    "react-markdown": "9.0.3",
+    "remark-gfm": "4.0.1",
+    "i18next": "25.10.0",
+    "react-i18next": "16.3.5",
+    "react-router-dom": "7.9.3",
+    "uplot": "1.6.32",
+    "zod": "3.25.76"
   },
   "dependencies": [
     {
@@ -474,7 +481,7 @@
     {
       "package": "@tauri-apps/api",
       "versions": [
-        "2.12.2"
+        "2.8.0"
       ],
       "projects": [
         "R-Link"
@@ -532,5 +539,5 @@
       ]
     }
   ],
-  "note": "This is an explicit compatibility request, not a whitelist change or a claim that unused optional components ran."
+  "note": "Public two-project compatibility request only; no host allowlist changes or unsupported-component acceptance."
 }
