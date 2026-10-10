@@ -72,9 +72,22 @@ describe('committed frontend engineering', () => {
     const packageJson = JSON.parse(await readFile(path.join(imported.sourceDirectory, 'package.json'), 'utf8'));
     expect(packageJson.dependencies).toMatchObject({ three: '0.180.0', 'lucide-react': '0.468.0', '@tauri-apps/api': '2.8.0' });
     const runtime = new BrowserRuntime(imported.sourceDirectory, repoRoot);
-    await runtime.build();
-    expect((await readFile(path.join(imported.sourceDirectory, 'dist/index.html'), 'utf8'))).toContain('/assets/');
-  }, 20000);
+    const environment = process.env.NODE_ENV;
+    try {
+      await runtime.build();
+      expect((await readFile(path.join(imported.sourceDirectory, 'dist/index.html'), 'utf8'))).toContain('/assets/');
+      // A preceding build or production host must not disable the controlled preview's SDK.
+      process.env.NODE_ENV = 'production';
+      await runtime.start();
+      expect(runtime.port).toBeGreaterThan(0); expect(runtime.port).not.toBe(5173);
+      const frame = await runtime.capture();
+      expect(frame.nodes.find(node => node.sourceNodeId === 'view')).toMatchObject({ binding: { reliability: 'exact', file: 'src/main.tsx' } });
+      expect(await runtime.page.locator('[data-rdesign-id="view"]').textContent()).toContain('Committed');
+    } finally {
+      await runtime.close();
+      if (environment === undefined) delete process.env.NODE_ENV; else process.env.NODE_ENV = environment;
+    }
+  }, 45000);
 
   it('detects a missing relative import even with valid hashes, and rejects tampered bytes', async () => {
     const { config } = await sourceFixture(); const bundle = await generateEngineeringBundle(config);

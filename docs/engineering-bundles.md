@@ -26,6 +26,8 @@ The host provides React/React DOM, the SDK, and these reviewed browser packages 
 
 These packages are preserved when importing and resolved through the host for both live and candidate previews, including export subpaths such as `three/addons/...`. A browser import of the Tauri API does not provide native IPC. Other dependencies or versions require an explicit host compatibility change and execution evidence. Workspaces, `file:` dependencies, aliases, JSX-only entry points, React 18, Vue and Next are not automatically adapted. Core tool dependency declarations use the existing importer policy; the controlled host still selects its React/tool versions.
 
+Controlled previews explicitly set the existing `VITE_RDESIGN_RUNTIME=true` flag, so a preceding build or a production Node environment cannot silently disable the observation SDK. Runtime port `0` allocates a temporary loopback port rather than occupying Vite's default `5173`; explicitly requested preview ports remain strict.
+
 `publicDir` remains disabled. Move public resources into `src/assets` through explicit relocation rules, then update CSS/HTML/code references. Keeping resources under `src` also includes them in `codeHash` and candidate conflict checks. Tailwind source directives need an explicit compiled CSS adapter; the generator does not execute the source project's build tooling or drop its stylesheet.
 
 ## Format and evidence
@@ -37,6 +39,8 @@ These packages are preserved when importing and resolved through the host for bo
 ```
 
 Each file digest covers UTF-8 bytes or decoded base64 bytes. The bundle digest covers `JSON.stringify(payload)` with `checksum` omitted, preserving property order; it is not a digest of pretty-printed bytes. Limits remain 1 MiB per file, 1,000 source files and 24 MiB of serialized payload. The importer creates a new project identity, reuses controlled executable metadata, marks scenarios unverified and makes imported change history read-only.
+
+Imported scenarios with historical snapshots display “待重新验证”. Their images remain historical evidence; a new live instance must recapture the scene before it is current.
 
 Preflight shares the importer's integrity, path and dependency checks, then checks source imports, common CSS resource references, standard entry/SDK references and registered scene dependencies. Its report is **structural evidence**. It does not prove browser execution, business transitions, dynamically computed assets, backend connectivity or native capabilities.
 
