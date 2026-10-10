@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFile, writeFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { digest } from '../../packages/document-core/src/index';
@@ -34,6 +35,9 @@ for (const name of names) {
   assert.equal(digest(JSON.stringify(payload)), checksum);
   assert.equal(compatibility.checksum, checksum);
   assert.equal(host.checksum, checksum);
+  assert.equal(compatibility.toolchainCommit, host.toolchainCommit);
+  assert.equal(compatibility.generation.command, 'pack-prepared');
+  assert.equal(compatibility.generation.provenanceVerified, true);
   assert.ok(bytes.length <= 24 * 1024 * 1024);
   assert.ok(bundle.sourceFiles.length <= 1000);
   for (const file of bundle.sourceFiles) {
@@ -45,19 +49,37 @@ for (const name of names) {
   for (const status of ['runtime', 'build', 'mapping', 'interaction', 'integrity']) assert.equal(compatibility[status], 'passed', name + ':' + status);
   assert.ok(compatibility.scenes.every((scene: any) => scene.passed));
   assert.equal(compatibility.candidateEdit?.status, 'passed', name + ': isolated candidate edit');
-  if (host.import === 'passed') assert.equal(host.candidateEdit?.status, 'passed', name + ': actual host candidate edit');
+  if (host.import === 'passed') {
+    assert.equal(host.candidateEdit?.status, 'passed', name + ': actual host candidate edit');
+    for (const step of ['prepare', 'verify', 'apply', 'revert']) assert.equal(host.candidateEdit[step], 'passed', name + ': candidate ' + step);
+    assert.equal(host.candidateEdit.bundleUnchanged, true);
+  }
+  const sourceRoot = path.resolve(ownRoot, '../sources', name);
+  assert.equal(execFileSync('git', ['rev-parse', 'HEAD'], { cwd: sourceRoot, encoding: 'utf8' }).trim(), config.source.commit);
+  assert.equal(execFileSync('git', ['status', '--porcelain'], { cwd: sourceRoot, encoding: 'utf8' }).trim(), '');
+  assert.equal(execFileSync('git', ['for-each-ref', '--format=%(refname)', 'refs/replace'], { cwd: sourceRoot, encoding: 'utf8' }).trim(), '');
+  assert.equal(existsSync(path.join(sourceRoot, '.git/info/grafts')), false);
+  const originFile = bundle.sourceFiles.find((file: any) => file.path === 'src/rdesign-prepared-origin.json');
+  const origin = JSON.parse(originFile.content); assert.equal(origin.commit, config.source.commit);
+  for (const file of origin.preparedFileHashes) assert.equal(bundle.sourceFiles.find((item: any) => item.path === file.path)?.sha256, file.sha256);
+  assert.equal(bundle.sourceFiles.find((file: any) => file.path === origin.provenanceFile)?.sha256, origin.provenanceSha256);
+  assert.ok(bundle.sourceFiles.every((file: any) => file.path.startsWith('src/') || ['package.json', 'index.html'].includes(file.path)));
   for (const dependency of ['react', 'react-dom', ...Object.keys(config.dependencies)]) {
     dependencies[dependency] = JSON.parse(await readFile(path.join(ownRoot, 'node_modules', dependency, 'package.json'), 'utf8')).version;
   }
   const narrow = compatibility.scenes.find((scene: any) => scene.id === 'narrow');
   projects.push({ name, source: config.source, file, sha256: digest(bytes), checksum, sourceFileCount: bundle.sourceFiles.length, sourceBytes: bundle.sourceFiles.reduce((total: number, file: any) => total + Buffer.from(file.content, file.encoding === 'base64' ? 'base64' : 'utf8').length, 0), sceneCount: compatibility.scenes.length,
     integrity: 'passed', schema: host.schema, preflight: host.preflight, import: host.import,
-    compatibility: { runtime: compatibility.runtime, build: compatibility.build, mapping: compatibility.mapping, interaction: compatibility.interaction, candidateEdit: compatibility.candidateEdit.status, mode: 'explicit temporary dependency aliases, default host build target', report: 'evidence/' + name + '/report.json' },
+    generation: { command: 'pack-prepared', rawChecksum: compatibility.generation.rawChecksum, provenanceVerified: true, originFile: originFile.path, repositoryUnchanged: true, originPreparedHashesMatch: true },
+    preparedCapture: { runtime: compatibility.runtime, build: compatibility.build, mapping: compatibility.mapping, interaction: compatibility.interaction, mode: 'official packed source, actual host runtime, no alias override', report: 'evidence/' + name + '/report.json' },
     importedHost: { runtime: host.runtime, build: host.build, mapping: host.mapping, interaction: host.interaction, candidateEdit: host.candidateEdit.status, mode: 'actual imported source, actual host runtime, no alias override', report: 'toolchain-evidence/' + name + '/report.json', failure: host.failure ?? null },
     requiredRuntimeDependencies: config.dependencies,
     bridge: { guiImport: bridge.guiImport, runtime: bridge.runtime, mapping: bridge.mapping, restart: bridge.restart, report: host.import === 'passed' ? 'bridge-evidence/' + name + '/report.json' : null },
+    candidateAcceptance: { prepare: host.candidateEdit.prepare, verify: host.candidateEdit.verify, apply: host.candidateEdit.apply, revert: host.candidateEdit.revert,
+      revertSemantics: host.candidateEdit.revertSemantics, importedBytesRestored: host.candidateEdit.disposableImportedByteRestored,
+      codeRevisionRestored: host.candidateEdit.revertCodeRevisionMatchesBefore, bundleUnchanged: host.candidateEdit.bundleUnchanged, limitation: host.candidateEdit.revertLimitation ?? null },
     narrow: { viewportWidth: narrow.viewport.width, documentWidth: narrow.documentWidth, horizontalOverflow: narrow.documentWidth > narrow.viewport.width },
-    sourceMappingScope: 'Exact static text transformed, rendered and built in an isolated candidate copy; original source unchanged; dynamic or repeated nodes remain read-only or ambiguous',
+    sourceMappingScope: 'Exact static text verified, accepted, rendered and semantically reverted in an isolated imported copy; pinned repositories and delivery bundle unchanged; dynamic or repeated nodes remain read-only or ambiguous',
     previewNotice: config.notice,
   });
   sums.push(digest(bytes) + '  ' + file);
@@ -71,16 +93,22 @@ const acceptance = {
   format: 'rdesign-small-tools-checkpoint', schemaVersion: 1, generatedAt: new Date().toISOString(),
   adapterBranch: 'codex/small-tool-engineering-bundles', adapterCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ownRoot, encoding: 'utf8' }).trim(),
   baseline: 'ffaba7c22b7d027e78ebccbbae17f2c5d4ba1ab7', observedToolchain, frozenToolchain: frozenCommit ?? null,
-  toolchainState: frozenCommit ? 'Parent-confirmed frozen tool; project acceptance and remaining dependency blockers are reported separately' : 'No frozen SHA confirmed',
-  temporaryInstalledDependencies: dependencies,
+  toolchainState: frozenCommit ? 'Parent-specified exact PR2 draft candidate; verification applies to this SHA, not current main' : 'No candidate SHA confirmed',
+  main: { sha: '4711119ade3c534ecd261c51792cecbe49a6f8ff', preparedPacking: false, newSevenDependencies: false },
+  verifiedHostDependencies: dependencies,
   completedSceneCaptures: projects.reduce((total, project) => total + project.sceneCount, 0),
   importedHostSceneCaptures: projects.filter(project => project.importedHost.runtime === 'passed').reduce((total, project) => total + project.sceneCount, 0),
-  candidateEdits: { actualImportedHostPassed: projects.filter(project => project.importedHost.candidateEdit === 'passed').length, compatibilityHostPassed: projects.filter(project => project.importedHost.candidateEdit === 'blocked' && project.compatibility.candidateEdit === 'passed').length, originalSourceUnchanged: true },
+  candidateEdits: { actualImportedHostPassed: projects.filter(project => project.importedHost.candidateEdit === 'passed').length, temporaryAliasesUsed: false,
+    semanticsRestored: projects.filter(project => project.candidateAcceptance.revertSemantics === 'passed').length,
+    originalBytesRestored: projects.filter(project => project.candidateAcceptance.importedBytesRestored).length,
+    immutableRepositoriesAndBundlesUnchanged: true },
   workbenchImportsAndRestartsPassed: projects.filter(project => project.bridge.restart === 'passed').length,
   adapterContractTests: { passed: 5, failed: 0, includesLosslessResourceReconstruction: true },
   visualLimitations: ['R-Alpha: original minimum width 1060px; horizontal overflow at 390px', 'ModelBase: original minimum width 1080px; horizontal overflow at 390px', 'ToolBox: narrow hardware-specification row can clip long values'],
   sourcePolicy: 'Exact clean remote commits only; complete frontend runtime source and referenced resources; no env, credentials, real private user data, node_modules, Git history, native/backend builds or executable upstream hooks',
-  blockers: ['ModelBase and ToolBox: IMPORT_CONFIG until the parent registers the listed exact browser dependencies', 'The parent generator needs a controlled prepared-source/overlay interface for the recipes'],
+  boundaryChecks: { pinnedClonesClean: true, replaceRefsAbsent: true, graftsAbsent: true, allAppResourcesUnderSrc: true, packPreparedLedgerAndResourceHashesVerified: true },
+  blockers: ['PR2 candidate requires exact-head independent review and authorized normal merge before main supports this group completely'],
+  hostLimitations: projects.filter(project => !project.candidateAcceptance.importedBytesRestored).map(project => ({ name: project.name, issue: project.candidateAcceptance.limitation, semanticRevert: 'passed', exactByteRevert: 'failed', report: project.importedHost.report })),
   projects,
 };
 await writeFile(path.join(deliveryRoot, 'acceptance.json'), JSON.stringify(acceptance, null, 2));

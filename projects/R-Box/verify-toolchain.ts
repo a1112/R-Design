@@ -17,7 +17,7 @@ const { BrowserRuntime } = await moduleAt('apps/bridge/src/runtime.ts');
 const { DocumentStore, digest } = await moduleAt('packages/document-core/src/index.ts');
 const { captureScenario } = await moduleAt('packages/scenario-runner/src/index.ts');
 const { indexSources, transform } = await moduleAt('packages/source-binding/src/index.ts');
-const toolFiles = ['packages/project-workspace/src/index.ts', 'packages/project-workspace/src/engineering.ts', 'packages/project-workspace/src/runtime-dependencies.ts', 'apps/bridge/src/runtime.ts', 'apps/bridge/src/runtime-dependencies.ts'];
+const toolFiles = ['packages/project-workspace/src/index.ts', 'packages/project-workspace/src/engineering.ts', 'packages/project-workspace/src/prepared-engineering.ts', 'packages/project-workspace/src/runtime-dependencies.ts', 'packages/change-engine/src/index.ts', 'packages/source-binding/src/index.ts', 'apps/bridge/src/runtime.ts', 'apps/bridge/src/runtime-dependencies.ts'];
 const moduleHashes = Object.fromEntries(await Promise.all(toolFiles.map(async file => [file, digest(await readFile(path.join(toolRoot, file)))])));
 const names = requested.length ? requested : ['R-Box', 'R-Vault', 'R-Clip', 'R-Alpha', 'ModelBase', 'ToolBox', 'SaveDock'];
 
@@ -63,7 +63,7 @@ for (const name of names) {
       preserved++;
     }
     report.import = 'passed';
-    report.importEvidence = { identitiesDistinct: true, incomingId: bundle.document.project.id, importedIds: [one.id, two.id], scenariosResetToUnverified: true, sourceFilesPreserved: preserved, sourceDirectory: entry.sourceDirectory };
+    report.importEvidence = { identitiesDistinct: true, incomingId: bundle.document.project.id, importedIds: [one.id, two.id], scenariosResetToUnverified: true, sourceFilesPreserved: preserved, sourceDirectory: entry.sourceDirectory, dataDirectory: entry.dataDirectory };
     report.previewPort = await independentPort();
     // The actual host runtime and imported source are used without package aliases or build-target overrides.
     runtime = new BrowserRuntime(entry.sourceDirectory, toolRoot, 'live', report.previewPort);
@@ -93,7 +93,7 @@ for (const name of names) {
     const index = await indexSources(entry.sourceDirectory);
     const mapped = frames.flatMap(frame => frame.nodes).find((node: any) => node.binding?.file.startsWith('src/upstream/') && node.binding.reliability === 'exact' && node.binding.editableProperties.includes('text'));
     const target = mapped?.sourceNodeId && index.get(mapped.sourceNodeId)?.[0];
-    if (target) report.mappingProof = { file: target.binding.file, line: target.binding.line, property: 'text', transformedInMemory: transform(target, { text: 'R-Design 验证（未写入）' }).after !== target.source, writesPerformed: false };
+    if (target) report.mappingProof = { file: target.binding.file, line: target.binding.line, sourceNodeId: target.binding.sourceNodeId, property: 'text', transformedInMemory: transform(target, { text: 'R-Design 验证（未写入）' }).after !== target.source, writesPerformed: false };
     report.mapping = report.mappingProof?.transformedInMemory ? 'passed' : 'failed';
     try { await runtime.build(); report.build = 'passed'; } catch (error) { report.build = 'failed'; report.buildError = String(error); }
     report.runtime = report.scenes.every((item: any) => item.passed) && report.errors.length === 0 ? 'passed' : 'failed';
@@ -107,4 +107,6 @@ for (const name of names) {
   } finally { await runtime?.close(); }
   await writeFile(path.join(directory, 'report.json'), JSON.stringify(report, null, 2));
   console.log(JSON.stringify({ name, toolchain: commit, checksum: bundle.checksum, schema: report.schema, preflight: report.preflight, import: report.import, runtime: report.runtime, build: report.build, interaction: report.interaction, failure: report.failure }));
+  for (const status of ['schema', 'preflight', 'import', 'runtime', 'build', 'mapping', 'interaction']) assert.equal(report[status], 'passed', name + ': ' + status);
+  assert.deepEqual(report.externalRequests, [], name + ': external requests');
 }

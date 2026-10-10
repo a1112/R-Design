@@ -12,7 +12,7 @@ const deliveryRoot = path.resolve(ownRoot, '../deliverables');
 const [toolDirectory, commit, ...requested] = process.argv.slice(2);
 assert.ok(toolDirectory && /^[0-9a-f]{40}$/.test(commit ?? ''), 'Usage: verify-bridge.ts <tool-checkout-or-archive> <exact-tool-sha> [projects...]');
 const toolRoot = path.resolve(toolDirectory);
-const names = requested.length ? requested : ['R-Box', 'R-Vault', 'R-Clip', 'R-Alpha', 'SaveDock'];
+const names = requested.length ? requested : ['R-Box', 'R-Vault', 'R-Clip', 'R-Alpha', 'ModelBase', 'ToolBox', 'SaveDock'];
 await mkdir(path.join(deliveryRoot, 'bridge-evidence'), { recursive: true });
 
 for (const name of names) {
@@ -96,4 +96,5 @@ for (const name of names) {
   finally { await browser?.close(); await stop(); }
   await writeFile(path.join(output, 'report.json'), JSON.stringify(report, null, 2));
   console.log(JSON.stringify({ name, guiImport: report.guiImport, runtime: report.runtime, mapping: report.mapping, restart: report.restart, failures: report.failures }));
+  for (const status of ['guiImport', 'runtime', 'mapping', 'restart']) assert.equal(report[status], 'passed', name + ': bridge ' + status);
 }

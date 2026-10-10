@@ -2,15 +2,12 @@
 
 These recipes own only `projects/R-Box`, `projects/R-Vault`, `projects/R-Clip`,
 `projects/R-Alpha`, `projects/ModelBase`, `projects/ToolBox`, and `projects/SaveDock`.
-They do not change the host package, project workspace, runtime, or engineering CLI.
-The original repositories and all private source bundles stay outside this public
-checkout. No source working tree is edited. Preparation reads Git objects and fails
-when the requested checkout is not the pinned clean commit.
-Private-source edit anchors and JSX matching fragments are stored only as SHA256
-and UTF-16 lengths. No original source text or business assets are committed here.
-All seven hashed recipes were replayed and produced byte-identical staged files.
+They do not change host packages, the project workspace, runtime or engineering CLI.
+Private repositories, complete source bundles and screenshots stay outside this
+public checkout. Edit anchors and JSX matching fragments are SHA256 plus UTF-16
+lengths. No original business source or assets are committed here.
 
-| Source | Ref | Commit |
+| Source | Ref | Exact committed source |
 | --- | --- | --- |
 | a1112/R-Box | main | 3cb991174ba925982cba5a1332e7d3df1570262d |
 | a1112/R-Vault | main | 4608bf58af4021df49e4378892317b5bf5fcad8c |
@@ -20,102 +17,98 @@ All seven hashed recipes were replayed and produced byte-identical staged files.
 | a1112/ToolBox | main | 4b04f8dc59766e9c899c4a9deb976ae6cf2d4c37 |
 | a1112/SaveDock | main | cf5802cbec5121519905ba108e26d9a21278e954 |
 
+## Tool checkpoint and result
+
+All seven full `rdesign-project` v1 bundles were regenerated with the official
+`pack-prepared` CLI at **d4f41d0e7ab552129a82d91648ecd3dade692de9**. The packer
+checks committed Git bytes, adapted file hashes and lossless resource chunks,
+then embeds `src/rdesign-prepared-origin.json`. The helper subsequently captures
+real scene frames with this exact host, adds those frames to the document, and
+revalidates the complete schema, preflight and payload checksum. The raw official
+pack and generation report are retained privately.
+
+This is the [PR2 draft candidate](https://github.com/a1112/R-Design/pull/2), awaiting
+independent exact-head review and an authorized normal merge. Main at
+**4711119ade3c534ecd261c51792cecbe49a6f8ff** contains the merged first tool changes,
+but has neither `pack-prepared` nor the seven additional controlled dependencies.
+Acceptance below applies to the candidate SHA. It is not a claim about main.
+
+| Project | Scenes | Schema / checksum / preflight / import | Imported runtime / build / mapping / interactions | Workbench import / restart | Candidate verify / accept / semantic revert |
+| --- | ---: | --- | --- | --- | --- |
+| R-Box | 6 | Passed | Passed | Passed | Passed |
+| R-Vault | 6 | Passed | Passed | Passed | Passed |
+| R-Clip | 4 | Passed | Passed | Passed | Passed |
+| R-Alpha | 10 | Passed | Passed | Passed | Passed |
+| ModelBase | 7 | Passed | Passed | Passed | Passed |
+| ToolBox | 12 | Passed | Passed | Passed | Passed |
+| SaveDock | 5 | Passed | Passed | Passed | Passed |
+
+There are 50 fresh packed-source captures, 50 imported-host scene checks and seven
+actual Workbench file-chooser imports followed by isolated Bridge restarts.
+Imported scenario badges reset to `unverified`; screenshots remain historical
+evidence until recaptured. Imported identities are distinct, source hashes are
+preserved except the importer's controlled root package, and restarted frames have
+fresh runtime sessions. Five meaningful adapter/asset contract tests pass.
+
+**Shared-host rollback limitation:** controlled text revert restores the original
+rendered text and exact mapping, but rewrites plain JSX text as a string expression.
+For example `<h1>R-Box</h1>` becomes `<h1>{"R-Box"}</h1>`. All seven selected
+targets passed semantic revert; none restored the original file bytes or code
+revision. This is recorded separately as `importedBytesRestored: false` and
+`codeRevisionRestored: false`, rather than treating semantic revert as byte-exact
+undo. Only disposable imported test copies are changed. Pinned repositories,
+prepared sources and delivery bundles remain unchanged. No shared tool was fixed
+or bypassed here.
+
+The archive's 109 tracked files were compared byte-for-byte to the stated Git
+commit; the private `toolchain-manifest.json` records their SHA256 values and tree.
+Each bundle carries file hashes and its v1 payload checksum. `acceptance.json`
+records exact source and tool SHAs, every status, rollback limits and report paths;
+`SHA256SUMS` records hashes of the delivery files themselves.
+
 ## Reproduction
 
-`engineering.json` in each directory is an adapter recipe, rather than a file
-accepted directly by the first host engineering CLI. `scenarios.json` is the
-actual version 1 scenario schema. The helper preserves the full committed frontend
-runtime source and referenced resources under `src/upstream`, then records every
-original and adapted SHA256 in `src/rdesign-preview/provenance.json`.
+`engineering.json` is an adapter recipe. `scenarios.json` uses the actual v1
+scenario schema. Preparation reads committed Git objects, refuses a dirty or
+incorrect source checkout, preserves the complete frontend runtime source and
+referenced resources under `src/upstream`, and writes the original/adapted hashes
+to `src/rdesign-preview/provenance.json`. All seven hashed recipes were replayed
+and produced byte-identical staged files.
+
+Run from this R-Design checkout with authorized clean source clones at the table's
+SHAs, an exact archive of the candidate, and the candidate's reviewed dependencies.
+Each staging directory must initially be empty. Packing exclusively creates its
+output files and refuses to overwrite an existing bundle.
 
 ```sh
 for project in R-Box R-Vault R-Clip R-Alpha ModelBase ToolBox SaveDock; do
   node projects/R-Box/prepare.mjs "$project" "../sources/$project" "../deliverables/staged/$project"
 done
 node --import tsx --test projects/R-Box/preview-contracts.test.ts
-node --import tsx projects/R-Box/verify.ts R-Box R-Vault
-node --import tsx projects/R-Box/verify-toolchain.ts ../toolchain-fd56327 fd563274e0add377460ec537729675af9b52a3ac
-node --import tsx projects/R-Box/verify-candidate.ts ../toolchain-fd56327 fd563274e0add377460ec537729675af9b52a3ac
-node --import tsx projects/R-Box/verify-bridge.ts ../toolchain-fd56327 fd563274e0add377460ec537729675af9b52a3ac
-node --import tsx projects/R-Box/summarize.ts --frozen fd563274e0add377460ec537729675af9b52a3ac
+node --import tsx projects/R-Box/pack.ts ../toolchain-d4f41d d4f41d0e7ab552129a82d91648ecd3dade692de9
+node --import tsx projects/R-Box/verify-toolchain.ts ../toolchain-d4f41d d4f41d0e7ab552129a82d91648ecd3dade692de9
+node --import tsx projects/R-Box/verify-candidate.ts ../toolchain-d4f41d d4f41d0e7ab552129a82d91648ecd3dade692de9
+node --import tsx projects/R-Box/verify-bridge.ts ../toolchain-d4f41d d4f41d0e7ab552129a82d91648ecd3dade692de9
+node --import tsx projects/R-Box/summarize.ts --frozen d4f41d0e7ab552129a82d91648ecd3dade692de9
 ```
 
-Run from the R-Design checkout. Source clones must be clean at the commits above;
-each staging directory must be empty for preparation. The provided private bundles
-are ready for direct import testing without preparing them again. The toolchain
-verifiers accept either a Git checkout or a byte-exact archive of the stated SHA.
-The frozen archive is `task-8/toolchain-fd56327`, with shared host dependencies.
+The old baseline compatibility generator has been removed. Current capture and
+verification use the actual candidate runtime and default build target, without
+dependency aliases or an alternate importer. Browser checks use new headless
+contexts and independent loopback ports. Workbench verification owns its Bridge
+process and data directory, consumes bootstrap tokens without printing/storing
+them, and restarts only that process. Existing windows and ports are untouched.
 
-The verifier uses a new headless browser and an operating-system-assigned free
-loopback port. It never attaches to a user's existing browser or window. Temporary
-frontend dependency aliases allow compatibility checks before the shared host
-dependency registry is extended; this mode is recorded in the evidence. A passing
-runtime test is not a claim that the baseline importer supports those dependencies.
-The toolchain verifier imports two independent copies, verifies the preserved
-source hashes, checks reset scenario status, and then uses the actual host runtime
-on imported source without dependency aliases or build-target overrides. Both
-verifiers use the host's default build target. Build output is removed from the
-owned staging directory before capture and portable bundling.
+## Dependencies and retained UI limits
 
-Each private delivery contains the full v1 bundle, real scenario PNGs, checksum,
-file hashes, import identity checks, mapping evidence, business assertions and
-explicit blocked states. Imported scenarios must become `unverified`.
+The installed host's React/React DOM 19.3.0 and all additions match the candidate
+lockfile. ModelBase and SaveDock originally declare React 18; their complete UI is
+explicitly adapted and tested on the controlled React 19 host. ToolBox expects Zod
+4, so its import explicitly uses the v4 export of the registered Zod 3 package.
 
-## Verified checkpoint
-
-All seven complete private v1 bundles were generated with embedded frontend source,
-resource hashes and real screenshots. Acceptance below was repeated against the
-parent-confirmed frozen tool `fd563274e0add377460ec537729675af9b52a3ac`.
-The integration review subsequently identified four shared-tool boundaries: Git
-replace refs, relative CSS imports, optional/dev dependency coverage, and root
-assets revision hashing. Final acceptance now awaits its patch SHA and retest.
-This group's isolated clones have no replace refs or grafts, and every application
-resource is under `src`. No shared tool was changed or bypassed.
-
-| Project | Scenes | Temporary host compatibility | Frozen schema/preflight/import | Actual imported host runtime/build/mapping/interaction |
-| --- | ---: | --- | --- | --- |
-| R-Box | 6 | Passed | Passed | Passed |
-| R-Vault | 6 | Passed | Passed | Passed |
-| R-Clip | 4 | Passed | Passed | Passed |
-| R-Alpha | 10 | Passed | Passed | Passed |
-| ModelBase | 7 | Passed | Blocked: IMPORT_CONFIG | Blocked by dependency registry |
-| ToolBox | 12 | Passed | Blocked: IMPORT_CONFIG | Blocked by dependency registry |
-| SaveDock | 5 | Passed | Passed | Passed |
-
-Compatibility means actual browser scenes, default Vite build, static source
-mapping and business assertions on the temporary host. It does not bypass the
-import registry. There are 50 captured scenes, 31 reverified through imported
-source and five passing adapter/asset contract tests. Native hardware start/stop,
-report export and directory opening all reject. Browser assertions also prove
-that failed export does not create a successful export receipt. The five accepted
-projects also passed actual Workbench file-chooser import, live frame/mapping,
-unverified historical scenarios and restart of their own isolated Bridge process
-with the same active project and a fresh runtime session.
-
-The installed host uses React/React DOM 19.3.0, matching the frozen lockfile.
-Per-file SHA256 and the v1
-payload checksum are in each bundle; the private `deliverables/acceptance.json`
-provides the precise checksum and separate states for every project.
-
-Visual inspection preserves the committed UI. R-Alpha and ModelBase have original
-minimum widths of 1060 and 1080 px, so their 390 px scenes have horizontal overflow.
-ToolBox fits the narrow viewport, but its original hardware-specification row can
-clip long values. These are source UI limitations, not complete mobile usability
-claims. Dynamic/repeated JSX nodes remain read-only or ambiguous; mapping proof
-establishes a static text transform, visible edited text with an exact source
-binding, and a passing build in a separate candidate copy. Five candidates use the
-actual imported host and two use the explicitly temporary compatibility host.
-The original source files are checked byte-for-byte after candidate execution.
-
-## Required host interfaces
-
-The frozen tool is `fd563274e0add377460ec537729675af9b52a3ac`. Its
-existing importer supports R-Box/R-Vault/R-Clip after their package declarations
-use the exact reviewed `lucide-react` version `0.468.0`. The remaining packages
-need the following controlled browser dependencies before import can pass:
-
-| Package | Tested version | Consumer |
+| Package | Reviewed version | Consumer |
 | --- | --- | --- |
+| lucide-react | 0.468.0 | R-Box, R-Vault, R-Clip |
 | react-markdown | 9.0.3 | ModelBase |
 | remark-gfm | 4.0.1 | ModelBase |
 | i18next | 25.10.0 | ToolBox |
@@ -124,47 +117,40 @@ need the following controlled browser dependencies before import can pass:
 | uplot | 1.6.32 | ToolBox |
 | zod | 3.25.76, `/v4` export | ToolBox |
 
-ModelBase and SaveDock originally use React 18. Their complete original UI is
-tested with the controlled React 19 host; the recipe explicitly records the
-adaptation rather than pretending the original dependency declaration was 19.
-ToolBox originally expects Zod 4. Its import is explicitly redirected to the v4
-export provided by the host's Zod 3.25.76 package, preserving v4 schema behavior.
-
-The first generator supports literal edits and committed copies but has no
-controlled overlay input, no replacement entry point, no dependency override for
-a verified React 18 adaptation, and no lossless large-resource split. Either a
-trusted prepared-source bundle function or explicit adapter-file inputs are needed
-to ingest these recipes. `readPortableSourceFiles` and
-`validatePortableProjectBundle` already provide the common strict source and schema
-boundary needed by such an interface. No shared file was changed here.
+The original design is retained. R-Alpha and ModelBase have original minimum widths
+of 1060 and 1080px; their 390px scenes overflow horizontally. ToolBox's narrow
+hardware specification row can clip long values. Dynamic/repeated JSX remains
+read-only or ambiguous. Static text has been mapped, changed, rendered, built,
+accepted and semantically reverted through the actual ChangeEngine.
 
 ## Preview scope
 
-All projects show a persistent `设计预览 / 未授权` notice. Browser local/session
-storage is replaced by per-page memory before any upstream module executes.
-External fetches, external windows, system clipboard access and native IPC reject
-explicitly. The adapters never return successful native effect receipts.
+Every project shows `设计预览 / 未授权`. Browser local/session storage becomes
+per-page memory before upstream modules run. External fetches/windows, system
+clipboard access and native IPC reject explicitly. Native effect receipts are
+never reported as successful.
 
-R-Box retains its upstream read-only catalog and disabled unified login. R-Vault
-retains its disposable synthetic card model and rejects trusted native
-authorization. Its fixed internal fixture token has an explicit `fixture-` prefix
-and does not authenticate a person. R-Clip reads owned synthetic snippets only.
-R-Alpha retains its deterministic demo markets and locked real trading actions.
-ModelBase remains offline. ToolBox reads synthetic hardware/telemetry and rejects
-hardware runs, native report export and directory opening. SaveDock reads synthetic
-game/history models and rejects every file or sync mutation.
-ToolBox's method named `runDiagnostics` only returns the upstream static diagnostic
-fixture in this provider. Settings updates only modify the provider's per-page
-memory and do not save native settings.
+R-Box retains its committed read-only catalog and disabled unified login. R-Vault
+uses disposable synthetic cards and rejects trusted native authorization. Its
+fixed internal `fixture-` token does not authenticate a person; there is no real
+credential read or password entry. R-Clip uses owned synthetic snippets. R-Alpha
+retains deterministic demo markets and locked real trading. ModelBase remains
+offline without API credentials, deployment, inference or benchmarks.
 
-ToolBox's original 1,597,505-byte PNG is retained losslessly as JSON chunks smaller
-than 1 MiB and reconstructed into a Blob URL. The original SHA256, byte length and
-chunk paths are recorded. Its original logo stays inside the source boundary.
-CSS design-token files are renamed explicitly for compatibility with the original
-baseline path policy, without changing their bytes.
+ToolBox uses synthetic hardware/telemetry and rejects hardware start/stop, native
+report export and directory opening. Failed export creates no successful receipt.
+Its `runDiagnostics` method returns an upstream static fixture; settings change
+only per-page memory. SaveDock uses synthetic game/history models and rejects all
+file and sync mutations. Fixture data does not establish backend connectivity,
+encryption, hardware measurements, authentication or actual game compatibility.
 
-Upstream development test runners, native/backend code, executable configurations,
-credentials, environment files, Git history and node_modules are excluded. Runtime
-fixture contract JSON referenced by ToolBox is included. Fixture records do not
-establish backend connectivity, encryption, actual hardware measurements, real
-authentication, game compatibility or native IPC support.
+ToolBox's original 1,597,505-byte PNG is retained losslessly in JSON chunks under
+1 MiB and decoded into a Blob URL. The original digest, byte length and chunk paths
+are recorded and checked against Git by the official packer and the asset test.
+The original logo is included. CSS design-token files have explicit compatibility
+renames with unchanged bytes. Every application resource is under `src`.
+
+No `.env`, credentials, real private user data, Git history, node_modules, native
+or backend build is bundled. Executable upstream configuration/hooks and upstream
+development test runners are excluded. Referenced ToolBox fixture-contract JSON
+is included. The seven clean pinned clones have no Git replace refs or grafts.
