@@ -36,6 +36,30 @@ function relative(value: string): string {
   return value;
 }
 
+function runtimeImports(content: string): { specifiers: string[]; dynamic: boolean } {
+  const ast = parse(content, { sourceType: 'module', plugins: ['typescript', 'jsx'] });
+  const specifiers: string[] = []; let dynamic = false;
+  for (const node of ast.program.body) if ('source' in node && node.source?.type === 'StringLiteral') {
+    if ('importKind' in node && node.importKind === 'type' || 'exportKind' in node && node.exportKind === 'type') continue;
+    const items = 'specifiers' in node ? node.specifiers : null;
+    if (items?.length && items.every(item => 'importKind' in item && item.importKind === 'type' || 'exportKind' in item && item.exportKind === 'type')) continue;
+    specifiers.push(node.source.value);
+  }
+  const visit = (node: any) => {
+    if (!node || typeof node !== 'object') return;
+    if (node.type === 'CallExpression' && node.callee?.type === 'Import') {
+      if (node.arguments[0]?.type === 'StringLiteral') specifiers.push(node.arguments[0].value);
+      else dynamic = true;
+    }
+    for (const [key, item] of Object.entries(node)) if (!['loc', 'start', 'end', 'extra'].includes(key)) {
+      if (Array.isArray(item)) item.forEach(visit); else if (item && typeof item === 'object') visit(item);
+    }
+  }; visit(ast.program);
+  return { specifiers, dynamic };
+}
+
+const dependencyName = (specifier: string) => specifier.startsWith('@') ? specifier.split('/').slice(0, 2).join('/') : specifier.split('/')[0];
+
 /** A structural/source check. Browser execution and business assertions remain separate evidence. */
 export function preflightEngineeringBundle(value: unknown) {
   validatePortableProjectBundle(value);
@@ -43,7 +67,9 @@ export function preflightEngineeringBundle(value: unknown) {
   const errors: string[] = [], warnings: string[] = [];
   const config = JSON.parse(files.get('package.json')?.content ?? '{}');
   const dependencies = { ...config.dependencies, ...config.devDependencies, ...config.optionalDependencies };
-  const resolve = (from: string, specifier: string) => {
+  const resolve = (from: string, specifier: string, css = false) => {
+    if (css && specifier.startsWith('#')) return;
+    if (css && !/^[./]|^data:|^https?:/.test(specifier)) specifier = './' + specifier;
     const withoutQuery = specifier.split(/[?#]/)[0];
     if (!withoutQuery || withoutQuery.startsWith('#') || /^data:|^https?:|^\/\//.test(specifier)) return;
     if (specifier.startsWith('.') || specifier.startsWith('/')) {
@@ -52,7 +78,7 @@ export function preflightEngineeringBundle(value: unknown) {
       if (!variants.some(file => files.has(file))) errors.push(`${from}: 缺少应用资源或源码 ${specifier}`);
       return;
     }
-    const name = specifier.startsWith('@') ? specifier.split('/').slice(0, 2).join('/') : specifier.split('/')[0];
+    const name = dependencyName(specifier);
     if (!['react', 'react-dom', '@rdesign/runtime-web', ...Object.keys(REVIEWED_RUNTIME_DEPENDENCIES)].includes(name)) errors.push(`${from}: 浏览器依赖或路径别名未受支持 ${specifier}`);
     else if (!(name in dependencies)) errors.push(`${from}: 依赖没有声明 ${name}`);
   };
@@ -61,28 +87,14 @@ export function preflightEngineeringBundle(value: unknown) {
     if (file.encoding === 'base64') continue;
     if (/\.[cm]?[jt]sx?$/.test(file.path) && !file.path.endsWith('.d.ts')) {
       try {
-        const ast = parse(file.content, { sourceType: 'module', plugins: ['typescript', 'jsx'] });
-        for (const node of ast.program.body) if ('source' in node && node.source && node.source.type === 'StringLiteral') {
-          // Type-only dependencies do not reach the browser.
-          if ('importKind' in node && node.importKind === 'type') continue;
-          if ('exportKind' in node && node.exportKind === 'type') continue;
-          resolve(file.path, node.source.value);
-        }
-        const visit = (node: any) => {
-          if (!node || typeof node !== 'object') return;
-          if (node.type === 'CallExpression' && node.callee?.type === 'Import') {
-            if (node.arguments[0]?.type === 'StringLiteral') resolve(file.path, node.arguments[0].value);
-            else warnings.push(`${file.path}: 动态 import 路径需运行验收`);
-          }
-          for (const [key, item] of Object.entries(node)) if (!['loc', 'start', 'end', 'extra'].includes(key)) {
-            if (Array.isArray(item)) item.forEach(visit); else if (item && typeof item === 'object') visit(item);
-          }
-        }; visit(ast.program);
+        const imports = runtimeImports(file.content);
+        imports.specifiers.forEach(specifier => resolve(file.path, specifier));
+        if (imports.dynamic) warnings.push(`${file.path}: 动态 import 路径需运行验收`);
       } catch (error) { errors.push(`${file.path}: ${(error as Error).message}`); }
     }
     if (/\.css$/.test(file.path)) {
-      for (const match of file.content.matchAll(/url\(\s*["']?([^"')\s]+)["']?\s*\)/g)) resolve(file.path, match[1].startsWith('/') || match[1].startsWith('.') || /^data:|^https?:/.test(match[1]) ? match[1] : './' + match[1]);
-      for (const match of file.content.matchAll(/@import\s+["']([^"']+)["']/g)) resolve(file.path, match[1]);
+      for (const match of file.content.matchAll(/url\(\s*["']?([^"')\s]+)["']?\s*\)/g)) resolve(file.path, match[1], true);
+      for (const match of file.content.matchAll(/@import\s+["']([^"']+)["']/g)) resolve(file.path, match[1], true);
       if (/@tailwind\b|@import\s+["']tailwindcss/.test(file.content)) errors.push(`${file.path}: Tailwind 源样式需先转换为可运行 CSS`);
     }
   }
@@ -104,7 +116,7 @@ export function preflightEngineeringBundle(value: unknown) {
 export async function generateEngineeringBundle(config: EngineeringConfig): Promise<PortableProjectBundle> {
   if (!/^[0-9a-f]{40}$/i.test(config.commit) || !/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+(?:\.git)?$/.test(config.repositoryUrl)) throw new DomainError('ENGINEERING_ORIGIN', '必须提供精确提交 SHA 和不含凭据的 GitHub 仓库地址', 400);
   const frontend = config.frontendDirectory === '.' ? '' : relative(config.frontendDirectory) + '/';
-  const git = async (args: string[], maximum = 1024 * 1024 + 1) => (await execute('git', ['-C', path.resolve(config.repositoryRoot), ...args], { encoding: 'buffer', maxBuffer: maximum })).stdout;
+  const git = async (args: string[], maximum = 1024 * 1024 + 1) => (await execute('git', ['--no-replace-objects', '-C', path.resolve(config.repositoryRoot), ...args], { encoding: 'buffer', maxBuffer: maximum })).stdout;
   const actualCommit = (await git(['rev-parse', '--verify', `${config.commit}^{commit}`])).toString('utf8').trim();
   if (actualCommit !== config.commit) throw new DomainError('ENGINEERING_ORIGIN', '提交身份不匹配', 400);
   const tree = (await git(['ls-tree', '-r', '-z', '--full-tree', config.commit, '--', frontend || '.'], 8 * 1024 * 1024)).toString('utf8').split('\0').filter(Boolean);
@@ -145,12 +157,13 @@ export async function generateEngineeringBundle(config: EngineeringConfig): Prom
   const packageFile = selected.get('package.json');
   if (!packageFile || !selected.has('src/main.tsx') || !selected.has('index.html')) throw new DomainError('ENGINEERING_ENTRY', '首版生成器需要 package.json、index.html、src/main.tsx', 400);
   const originalPackage = JSON.parse(packageFile.bytes.toString('utf8'));
+  const declared = { ...originalPackage.devDependencies, ...originalPackage.dependencies, ...originalPackage.optionalDependencies };
   if (!originalPackage.dependencies?.react || !originalPackage.dependencies?.['react-dom']) throw new DomainError('ENGINEERING_FRAMEWORK', '首版生成器仅支持已登记依赖的 React 前端', 400);
-  if (![originalPackage.dependencies.react, originalPackage.dependencies['react-dom']].every(version => typeof version === 'string' && /^[\^~]?19(?:\.|$)/.test(version))) throw new DomainError('ENGINEERING_FRAMEWORK', '宿主使用 React 19；其他主版本须先完成兼容验收', 400);
+  if (![declared.react, declared['react-dom']].every(version => typeof version === 'string' && /^[\^~]?19(?:\.|$)/.test(version))) throw new DomainError('ENGINEERING_FRAMEWORK', '宿主使用 React 19；其他主版本须先完成兼容验收', 400);
   const dependencies: Record<string, string> = {};
-  for (const [name, value] of Object.entries(originalPackage.dependencies ?? {})) {
+  for (const name of Object.keys(originalPackage.dependencies ?? {})) {
     if (CORE_PROJECT_DEPENDENCIES.has(name)) continue;
-    const version = typeof value === 'string' ? value.replace(/^[\^~]/, '') : '';
+    const value = declared[name], version = typeof value === 'string' ? value.replace(/^[\^~]/, '') : '';
     if (REVIEWED_RUNTIME_DEPENDENCIES[name] !== version) throw new DomainError('ENGINEERING_DEPENDENCY', `需要先登记并验证依赖及版本: ${name}`, 400);
     dependencies[name] = version;
   }
@@ -166,12 +179,27 @@ export async function generateEngineeringBundle(config: EngineeringConfig): Prom
     if (matches !== (edit.expectedMatches ?? 1)) throw new DomainError('ENGINEERING_EDIT', `${edit.file}: 原文匹配数不符合明确适配配置`, 400);
     change(edit.file, Buffer.from(before.split(edit.find).join(edit.replace)), '明确配置的源码或资源引用适配');
   }
+  for (const [file, item] of selected) if (/\.[cm]?[jt]sx?$/.test(file) && !file.endsWith('.d.ts')) {
+    for (const specifier of runtimeImports(item.bytes.toString('utf8')).specifiers) {
+      if (/^[./#]|^data:|^https?:/.test(specifier)) continue;
+      const name = dependencyName(specifier);
+      if (CORE_PROJECT_DEPENDENCIES.has(name) || !(name in declared)) continue;
+      const value = declared[name], version = typeof value === 'string' ? value.replace(/^[\^~]/, '') : '';
+      if (REVIEWED_RUNTIME_DEPENDENCIES[name] !== version) throw new DomainError('ENGINEERING_DEPENDENCY', `需要先登记并验证依赖及版本: ${name}`, 400);
+      dependencies[name] = version;
+    }
+  }
+  const adaptedPackage = JSON.parse(packageFile.bytes.toString('utf8'));
+  if (Object.keys(dependencies).some(name => !(name in (adaptedPackage.dependencies ?? {})))) {
+    adaptedPackage.dependencies = { ...dependencies, ...adaptedPackage.dependencies };
+    change('package.json', Buffer.from(JSON.stringify(adaptedPackage, null, 2) + '\n'), '保留实际浏览器导入的受控辅助声明依赖');
+  }
   const entry = selected.get('src/main.tsx')!;
   if (entry.bytes.toString('utf8').includes('@rdesign/runtime-web')) throw new DomainError('ENGINEERING_SDK', '入口已接入 SDK，需先核对安装生命周期，不能重复注入', 400);
   change('src/main.tsx', Buffer.from("import { installRuntime as installRDesignRuntime } from '@rdesign/runtime-web';\n" + entry.bytes.toString('utf8') + '\nif (import.meta.env.DEV || import.meta.env.VITE_RDESIGN_RUNTIME === \'true\') installRDesignRuntime({ maxNodes: 2500 });\n'), '在根 React 渲染入口后安装开发观察 SDK');
   const origin = { schemaVersion: 1, repositoryUrl: config.repositoryUrl, commit: config.commit, frontendDirectory: config.frontendDirectory,
     sourceFiles: [...selected].map(([file, item]) => ({ file, original: item.original, gitBlobSha: item.sha })),
-    originalDependencies: originalPackage.dependencies, originalScriptNames: Object.keys(originalPackage.scripts ?? {}),
+    originalDependencies: originalPackage.dependencies, originalDependencyDeclarations: { dependencies: originalPackage.dependencies ?? {}, optionalDependencies: originalPackage.optionalDependencies ?? {}, devDependencies: originalPackage.devDependencies ?? {} }, originalScriptNames: Object.keys(originalPackage.scripts ?? {}),
     relocations: config.relocations ?? [], adaptations, limitations: config.limitations, verification: '运行、业务、原生与外部后端验收须另附证据' };
   const directory = await mkdtemp(path.join(os.tmpdir(), 'rd-engineering-'));
   try {

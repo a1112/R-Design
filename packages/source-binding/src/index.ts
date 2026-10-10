@@ -16,7 +16,8 @@ export async function safePath(root: string, relative: string) {
 export async function trackedFiles(root: string): Promise<string[]> {
   const result:string[]=[];
   async function visit(directory:string) { for (const name of await readdir(path.join(root,directory))) { if (name === 'node_modules' || name.startsWith('.')) continue; const rel=path.join(directory,name); const stat=await lstat(path.join(root,rel)); if (stat.isSymbolicLink()) continue; if (stat.isDirectory()) await visit(rel); else result.push(rel); } }
-  await visit('src'); for(const name of ['index.html','package.json','vite.config.ts','tsconfig.json']) { try { const stat=await lstat(path.join(root,name));if(stat.isFile()&&!stat.isSymbolicLink())result.push(name); } catch(error) {if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;} } return result.sort();
+  await visit('src'); for(const directory of ['assets','public']) {try {const stat=await lstat(path.join(root,directory));if(stat.isDirectory()&&!stat.isSymbolicLink())await visit(directory);}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}}
+  for(const name of ['index.html','package.json','vite.config.ts','tsconfig.json']) { try { const stat=await lstat(path.join(root,name));if(stat.isFile()&&!stat.isSymbolicLink())result.push(name); } catch(error) {if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;} } return result.sort();
 }
 export async function sourceFiles(root:string) {return (await trackedFiles(root)).filter(file=>file.startsWith('src/')&&/\.[jt]sx?$/.test(file));}
 function walk(node: unknown, visitor: (element:t.JSXElement)=>void) { if (!node || typeof node !== 'object') return; if (Array.isArray(node)) {node.forEach(n=>walk(n,visitor));return;} if ((node as any).type === 'JSXElement') visitor(node as t.JSXElement); for(const [key,value] of Object.entries(node)) if (!['loc','start','end','extra'].includes(key)) walk(value,visitor); }
