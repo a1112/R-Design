@@ -36,6 +36,7 @@ export class BrowserRuntime {
   private index = new Map<string,Awaited<ReturnType<typeof indexSources>> extends Map<string,infer V>? V:never>();
   private revision = ''; private queue:Promise<unknown>=Promise.resolve();
   private scenarioContext?: { view: RuntimeViewContext; sessionId: string; sourceNodeIds: string[] };
+  private pendingReloadContext?: RuntimeViewContext;
   lastFrame:RuntimeFrame|null=null;status:RuntimeFrame['status']='connecting';private needsReload=false;
   constructor(public root:string, public repoRoot:string, public kind:'live'|'candidate'='live', public port=0,public privateDirectory?:string) { this.root=realpathSync(root); }
   config() { return {configFile:false as const,cacheDir:path.join(this.repoRoot,`node_modules/.vite/runtime-${digest(this.root).slice(0,16)}-${this.port}`),publicDir:false as const,root:this.root,define:{'import.meta.env.VITE_RDESIGN_RUNTIME':'"true"'},plugins:[fileBoundary({root:this.root,allow:[this.root,path.join(this.repoRoot,'packages/runtime-web'),path.join(this.repoRoot,'packages/protocol'),path.join(this.repoRoot,'node_modules')],privateRoots:this.privateDirectory&&(path.resolve(this.privateDirectory)===this.root||path.resolve(this.privateDirectory).startsWith(this.root+path.sep))?[this.privateDirectory]:[]}),runtimeDependencies(this.repoRoot),rdesignSourceIds({root:this.root}),react()],resolve:{alias:{'@rdesign/runtime-web':path.join(this.repoRoot,'packages/runtime-web/src/index.ts'),'@rdesign/protocol':path.join(this.repoRoot,'packages/protocol/src/index.ts'),'react':path.join(this.repoRoot,'node_modules/react'),'react-dom':path.join(this.repoRoot,'node_modules/react-dom')}},server:{host:'127.0.0.1',port:this.port,strictPort:this.port>0,hmr:false,ws:false as const,fs:{strict:true,allow:[this.root,path.join(this.repoRoot,'packages/runtime-web'),path.join(this.repoRoot,'packages/protocol'),path.join(this.repoRoot,'node_modules')],deny:['**/.git/**','**/.env','**/.env.*','**/*.{crt,pem,key}','**/change-meta.json',path.join(this.root,'**/.rdesign/**'),...(this.privateDirectory&&(path.resolve(this.privateDirectory)===this.root||path.resolve(this.privateDirectory).startsWith(this.root+path.sep))?[path.join(path.resolve(this.privateDirectory),'**')]:[])]}},logLevel:'error' as const}; }
@@ -51,6 +52,15 @@ export class BrowserRuntime {
     const current = new URL(this.page.url());
     if (current.origin !== this.url()) throw new DomainError('VIEW_ORIGIN', '目标页面已离开授权预览源', 409);
     return current.pathname + current.search + current.hash;
+  }
+  assertPreviewOrigin() { this.currentRoute(); }
+  async beginScenarioNavigation(route: string) {
+    // Explicit scene selection supersedes a failed automatic recovery recipe.
+    this.scenarioContext = undefined; this.pendingReloadContext = undefined;
+    if (new URL(this.page.url()).origin !== this.url()) {
+      await this.page.goto(this.url() + route, { waitUntil: 'networkidle' }); this.assertPreviewOrigin();
+    }
+    await this.refreshSources();
   }
   async viewContext(sourceNodeId?: string): Promise<RuntimeViewContext> {
     const route = this.currentRoute(), viewport = this.page.viewportSize()!;
@@ -75,10 +85,13 @@ export class BrowserRuntime {
     this.scenarioContext = undefined;
     await this.page.setViewportSize(context.viewport);
     await this.page.goto(this.url() + route, { waitUntil: 'networkidle' });
+    this.assertPreviewOrigin();
     for (const step of context.scenario?.steps ?? []) {
+      this.assertPreviewOrigin();
       if (!/^[a-zA-Z0-9_-]{1,128}$/.test(step.target)) throw new DomainError('SCENARIO_TARGET', '非法场景目标', 400);
       const target = this.page.locator(`[data-rdesign-id="${step.target}"]`);
       if (step.action === 'click') await target.click(); else await target.fill(step.value ?? '');
+      this.assertPreviewOrigin();
     }
     if (context.scenario) await this.page.locator(context.scenario.readySelector).waitFor({ state: 'visible', timeout: 5000 });
     await this.page.waitForFunction(() => Boolean((window as any).__RDESIGN__), undefined, { timeout: 5000 });
@@ -93,8 +106,8 @@ export class BrowserRuntime {
   async restoreViewContext(context: RuntimeViewContext) { return this.serial(() => this.restorePageContext(context)); }
   async refreshSources() {
     const next=await codeHash(this.root);
-    try {if((this.needsReload||this.revision&&this.revision!==next)&&this.page){const context=await this.viewContext();this.status='resyncing';this.needsReload=true;this.server.moduleGraph.invalidateAll();await this.page.reload({waitUntil:'networkidle',timeout:8000});await this.page.waitForFunction(()=>Boolean((window as any).__RDESIGN__),undefined,{timeout:5000});if(context.scenario)await this.restorePageContext(context);}
-      this.index=await indexSources(this.root);this.revision=next;this.needsReload=false;this.status='live';
+    try {if((this.needsReload||this.revision&&this.revision!==next)&&this.page){const context=this.pendingReloadContext??await this.viewContext();this.pendingReloadContext=structuredClone(context);this.status='resyncing';this.needsReload=true;this.assertPreviewOrigin();this.server.moduleGraph.invalidateAll();await this.page.reload({waitUntil:'networkidle',timeout:8000});this.assertPreviewOrigin();await this.page.waitForFunction(()=>Boolean((window as any).__RDESIGN__),undefined,{timeout:5000});if(context.scenario)await this.restorePageContext(context);}
+      this.index=await indexSources(this.root);this.revision=next;this.needsReload=false;this.pendingReloadContext=undefined;this.status='live';
     }catch(error){this.needsReload=true;this.status='build-failed';throw new DomainError('BUILD_FAILED',`源码更新未能产生可用运行实例：${(error as Error).message}`,503,true);}
   }
   async build() {await build({...this.config(),build:{outDir:path.join(this.root,'dist'),emptyOutDir:true}});}
