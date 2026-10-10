@@ -54,13 +54,33 @@ export class BrowserRuntime {
     return current.pathname + current.search + current.hash;
   }
   assertPreviewOrigin() { this.currentRoute(); }
+  hasScenarioPage() {
+    return Boolean(this.page && !this.page.isClosed() && this.browser?.isConnected() &&
+      this.server?.httpServer?.listening && ['live', 'build-failed'].includes(this.status));
+  }
   async beginScenarioNavigation(route: string) {
+    if (typeof route !== 'string' || !route.startsWith('/') || route.startsWith('//') || route.includes('\\'))
+      throw new DomainError('SCENARIO_ROUTE', '场景路由必须位于授权预览源', 400);
     // Explicit scene selection supersedes a failed automatic recovery recipe.
     this.scenarioContext = undefined; this.pendingReloadContext = undefined;
-    if (new URL(this.page.url()).origin !== this.url()) {
-      await this.page.goto(this.url() + route, { waitUntil: 'networkidle' }); this.assertPreviewOrigin();
-    }
+    // Enter the chosen route before reloading changed source: the old route may
+    // now redirect or fail while this registered destination remains usable.
+    this.server.moduleGraph.invalidateAll();
+    await this.page.goto(this.url() + route, { waitUntil: 'networkidle' }); this.assertPreviewOrigin();
     await this.refreshSources();
+  }
+  async performScenarioStep(step: Scenario['steps'][number]) {
+    this.assertPreviewOrigin();
+    if (!/^[a-zA-Z0-9_-]{1,128}$/.test(step.target)) throw new DomainError('SCENARIO_TARGET', '非法场景目标', 400);
+    // Locator auto-waiting can follow a delayed navigation. Pin the acquired
+    // element to its document, then check origin before performing any input.
+    const target = await this.page.locator(`[data-rdesign-id="${step.target}"]`).elementHandle();
+    try {
+      this.assertPreviewOrigin();
+      if (!target) throw new DomainError('SCENARIO_TARGET', '场景目标不可用', 409);
+      if (step.action === 'click') await target.click(); else await target.fill(step.value ?? '');
+      this.assertPreviewOrigin();
+    } finally { await target?.dispose(); }
   }
   async viewContext(sourceNodeId?: string): Promise<RuntimeViewContext> {
     const route = this.currentRoute(), viewport = this.page.viewportSize()!;
@@ -87,11 +107,7 @@ export class BrowserRuntime {
     await this.page.goto(this.url() + route, { waitUntil: 'networkidle' });
     this.assertPreviewOrigin();
     for (const step of context.scenario?.steps ?? []) {
-      this.assertPreviewOrigin();
-      if (!/^[a-zA-Z0-9_-]{1,128}$/.test(step.target)) throw new DomainError('SCENARIO_TARGET', '非法场景目标', 400);
-      const target = this.page.locator(`[data-rdesign-id="${step.target}"]`);
-      if (step.action === 'click') await target.click(); else await target.fill(step.value ?? '');
-      this.assertPreviewOrigin();
+      await this.performScenarioStep(step);
     }
     if (context.scenario) await this.page.locator(context.scenario.readySelector).waitFor({ state: 'visible', timeout: 5000 });
     await this.page.waitForFunction(() => Boolean((window as any).__RDESIGN__), undefined, { timeout: 5000 });
