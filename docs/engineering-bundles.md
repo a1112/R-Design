@@ -23,6 +23,13 @@ The host provides React/React DOM, the SDK, and these reviewed browser packages 
 | lucide-react | 0.468.0 |
 | three | 0.180.0 |
 | @tauri-apps/api | 2.8.0 |
+| react-markdown | 9.0.3 |
+| remark-gfm | 4.0.1 |
+| i18next | 25.10.0 |
+| react-i18next | 16.3.5 |
+| react-router-dom | 7.9.3 |
+| uplot | 1.6.32 |
+| zod | 3.25.76 (including `zod/v4`) |
 
 These packages are preserved when importing and resolved through the host for both live and candidate previews, including export subpaths such as `three/addons/...`. A browser import of the Tauri API does not provide native IPC. Other dependencies or versions require an explicit host compatibility change and execution evidence. Workspaces, `file:` dependencies, aliases, JSX-only entry points, React 18, Vue and Next are not automatically adapted. Core tool dependency declarations use the existing importer policy; the controlled host still selects its React/tool versions.
 
@@ -37,6 +44,29 @@ Controlled previews explicitly set the existing `VITE_RDESIGN_RUNTIME=true` flag
 Root `assets/` and `public/` files also participate in code revisions and candidate file guards. This does not enable serving `publicDir` or grant an agent permission to edit resources outside its approved patches; it prevents rendered assets from changing behind previously verified evidence.
 
 ## Format and evidence
+
+### Explicit prepared adapters
+
+`pack-prepared` accepts an already prepared frontend and a source ledger. It never runs preparation scripts, infers a replacement entry, upgrades React, or installs packages. SDK lifecycle, stylesheet compilation, preview providers and dependency adaptations remain explicit adapter decisions with separate execution evidence.
+
+```sh
+npm run engineering -- pack-prepared /path/to/prepared-config.json /path/to/project.rdesign.json
+```
+
+The configuration uses the same `repositoryRoot`, credential-free `repositoryUrl`, exact `commit`, `name`, `scenarios` and `limitations` fields as generation, plus absolute `preparedDirectory` and its relative `provenanceFile`. The ledger has this shape:
+
+```json
+{
+  "schemaVersion": 1,
+  "source": { "repository": "owner/repository", "commit": "40-character-source-SHA" },
+  "stagedFiles": [{ "sourcePath": "original/file.tsx", "path": "src/upstream/file.tsx", "sourceSha256": "64-character-hex", "sha256": "64-character-hex" }],
+  "splitResources": [{ "file": "original/large.png", "bytes": 1597505, "sha256": "64-character-hex", "chunks": ["src/assets/chunk-0.json", "src/assets/chunk-1.json"] }]
+}
+```
+
+Each staged record compares original bytes from the pinned Git commit with the recorded original SHA256 and captured adapted bytes with the staged SHA256. Split resources use JSON `{ "base64": "canonical-base64" }` chunks in original order. The packer verifies the reconstructed byte length and SHA256 against the original Git blob; it preserves large resources without re-encoding. An empty `splitResources` array is valid.
+
+The prepared tree passes the same path, file, dependency and bundle limits as import. The packer seals its captured bytes, records every prepared file hash in reserved `src/rdesign-prepared-origin.json`, and runs the existing v1 validator/preflight. It does not prove that the ledger lists every original frontend file or that an adapter preserves application semantics. Those require separate source review, resource coverage, browser scenes, business assertions and candidate tests. Private source text, authenticated dependency URLs and production data must not be placed in public recipes or bundles.
 
 ```text
 { format: "rdesign-project", schemaVersion: 1,

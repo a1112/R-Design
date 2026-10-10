@@ -60,6 +60,14 @@ function runtimeImports(content: string): { specifiers: string[]; dynamic: boole
 
 const dependencyName = (specifier: string) => specifier.startsWith('@') ? specifier.split('/').slice(0, 2).join('/') : specifier.split('/')[0];
 
+export async function committedGit(config: Pick<EngineeringConfig, 'repositoryRoot' | 'repositoryUrl' | 'commit'>) {
+  if (!/^[0-9a-f]{40}$/i.test(config.commit) || !/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+(?:\.git)?$/.test(config.repositoryUrl)) throw new DomainError('ENGINEERING_ORIGIN', '必须提供精确提交 SHA 和不含凭据的 GitHub 仓库地址', 400);
+  const git = async (args: string[], maximum = 1024 * 1024 + 1) => (await execute('git', ['--no-replace-objects', '-C', path.resolve(config.repositoryRoot), ...args], { encoding: 'buffer', maxBuffer: maximum })).stdout;
+  const actualCommit = (await git(['rev-parse', '--verify', `${config.commit}^{commit}`])).toString('utf8').trim();
+  if (actualCommit !== config.commit) throw new DomainError('ENGINEERING_ORIGIN', '提交身份不匹配', 400);
+  return git;
+}
+
 /** A structural/source check. Browser execution and business assertions remain separate evidence. */
 export function preflightEngineeringBundle(value: unknown) {
   validatePortableProjectBundle(value);
@@ -114,11 +122,8 @@ export function preflightEngineeringBundle(value: unknown) {
 
 /** Read committed Git objects, never source working-tree bytes, then build the existing v1 format. */
 export async function generateEngineeringBundle(config: EngineeringConfig): Promise<PortableProjectBundle> {
-  if (!/^[0-9a-f]{40}$/i.test(config.commit) || !/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+(?:\.git)?$/.test(config.repositoryUrl)) throw new DomainError('ENGINEERING_ORIGIN', '必须提供精确提交 SHA 和不含凭据的 GitHub 仓库地址', 400);
+  const git = await committedGit(config);
   const frontend = config.frontendDirectory === '.' ? '' : relative(config.frontendDirectory) + '/';
-  const git = async (args: string[], maximum = 1024 * 1024 + 1) => (await execute('git', ['--no-replace-objects', '-C', path.resolve(config.repositoryRoot), ...args], { encoding: 'buffer', maxBuffer: maximum })).stdout;
-  const actualCommit = (await git(['rev-parse', '--verify', `${config.commit}^{commit}`])).toString('utf8').trim();
-  if (actualCommit !== config.commit) throw new DomainError('ENGINEERING_ORIGIN', '提交身份不匹配', 400);
   const tree = (await git(['ls-tree', '-r', '-z', '--full-tree', config.commit, '--', frontend || '.'], 8 * 1024 * 1024)).toString('utf8').split('\0').filter(Boolean);
   const committed = new Map<string, { mode: string; sha: string }>();
   for (const record of tree) {
