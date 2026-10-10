@@ -13,7 +13,8 @@ const sums: string[] = [];
 const dependencies: Record<string, string> = {};
 const observedToolchains = new Set<string>();
 const [freezeFlag, frozenCommit] = process.argv.slice(2);
-assert.ok(!freezeFlag || freezeFlag === '--frozen' && /^[0-9a-f]{40}$/.test(frozenCommit ?? ''), 'Optional argument: --frozen <confirmed-tool-sha>');
+assert.ok(!freezeFlag || ['--frozen', '--main'].includes(freezeFlag) && /^[0-9a-f]{40}$/.test(frozenCommit ?? ''), 'Optional argument: --main|--frozen <confirmed-tool-sha>');
+const mergedMain = freezeFlag === '--main';
 
 for (const name of names) {
   const file = 'bundles/' + name + '.rdesign-project.json';
@@ -93,8 +94,9 @@ const acceptance = {
   format: 'rdesign-small-tools-checkpoint', schemaVersion: 1, generatedAt: new Date().toISOString(),
   adapterBranch: 'codex/small-tool-engineering-bundles', adapterCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ownRoot, encoding: 'utf8' }).trim(),
   baseline: 'ffaba7c22b7d027e78ebccbbae17f2c5d4ba1ab7', observedToolchain, frozenToolchain: frozenCommit ?? null,
-  toolchainState: frozenCommit ? 'Parent-specified exact PR2 draft candidate; verification applies to this SHA, not current main' : 'No candidate SHA confirmed',
-  main: { sha: '4711119ade3c534ecd261c51792cecbe49a6f8ff', preparedPacking: false, newSevenDependencies: false },
+  toolchainState: mergedMain ? 'Parent-confirmed merged main; final verification applies to this exact SHA' : 'Explicit tool checkpoint; no merged-main acceptance claim',
+  main: mergedMain ? { sha: frozenCommit, preparedPacking: true, newSevenDependencies: true } : null,
+  finalAcceptance: mergedMain ? 'passed for the captured frontend scope; shared byte-exact revert limitation is reported separately' : 'checkpoint only',
   verifiedHostDependencies: dependencies,
   completedSceneCaptures: projects.reduce((total, project) => total + project.sceneCount, 0),
   importedHostSceneCaptures: projects.filter(project => project.importedHost.runtime === 'passed').reduce((total, project) => total + project.sceneCount, 0),
@@ -107,7 +109,7 @@ const acceptance = {
   visualLimitations: ['R-Alpha: original minimum width 1060px; horizontal overflow at 390px', 'ModelBase: original minimum width 1080px; horizontal overflow at 390px', 'ToolBox: narrow hardware-specification row can clip long values'],
   sourcePolicy: 'Exact clean remote commits only; complete frontend runtime source and referenced resources; no env, credentials, real private user data, node_modules, Git history, native/backend builds or executable upstream hooks',
   boundaryChecks: { pinnedClonesClean: true, replaceRefsAbsent: true, graftsAbsent: true, allAppResourcesUnderSrc: true, packPreparedLedgerAndResourceHashesVerified: true },
-  blockers: ['PR2 candidate requires exact-head independent review and authorized normal merge before main supports this group completely'],
+  blockers: mergedMain ? [] : ['Final verification against the parent-confirmed merged main remains required'],
   hostLimitations: projects.filter(project => !project.candidateAcceptance.importedBytesRestored).map(project => ({ name: project.name, issue: project.candidateAcceptance.limitation, semanticRevert: 'passed', exactByteRevert: 'failed', report: project.importedHost.report })),
   projects,
 };

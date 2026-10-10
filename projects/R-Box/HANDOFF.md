@@ -20,18 +20,19 @@ lengths. No original business source or assets are committed here.
 ## Tool checkpoint and result
 
 All seven full `rdesign-project` v1 bundles were regenerated with the official
-`pack-prepared` CLI at **d4f41d0e7ab552129a82d91648ecd3dade692de9**. The packer
+`pack-prepared` CLI at merged main **eeffd77924463dcfec05ba1b438e92047d495a23**. The packer
 checks committed Git bytes, adapted file hashes and lossless resource chunks,
 then embeds `src/rdesign-prepared-origin.json`. The helper subsequently captures
 real scene frames with this exact host, adds those frames to the document, and
 revalidates the complete schema, preflight and payload checksum. The raw official
 pack and generation report are retained privately.
 
-This is the [PR2 draft candidate](https://github.com/a1112/R-Design/pull/2), awaiting
-independent exact-head review and an authorized normal merge. Main at
-**4711119ade3c534ecd261c51792cecbe49a6f8ff** contains the merged first tool changes,
-but has neither `pack-prepared` nor the seven additional controlled dependencies.
-Acceptance below applies to the candidate SHA. It is not a claim about main.
+[PR2](https://github.com/a1112/R-Design/pull/2) was normally merged after independent
+review of encoded-resource content and Unicode Git paths. Acceptance below was
+regenerated and rerun on **eeffd77924463dcfec05ba1b438e92047d495a23**, including
+formal imports, preflight, all scenes, business assertions and actual Workbench
+imports/restarts. The old draft candidate's bundles and reports remain a separate
+private archive and do not count toward this final result.
 
 | Project | Scenes | Schema / checksum / preflight / import | Imported runtime / build / mapping / interactions | Workbench import / restart | Candidate verify / accept / semantic revert |
 | --- | ---: | --- | --- | --- | --- |
@@ -48,7 +49,8 @@ actual Workbench file-chooser imports followed by isolated Bridge restarts.
 Imported scenario badges reset to `unverified`; screenshots remain historical
 evidence until recaptured. Imported identities are distinct, source hashes are
 preserved except the importer's controlled root package, and restarted frames have
-fresh runtime sessions. Five meaningful adapter/asset contract tests pass.
+fresh runtime sessions. Five meaningful adapter/asset contract tests and six
+merged-main prepared-engineering regressions pass.
 
 **Shared-host rollback limitation:** controlled text revert restores the original
 rendered text and exact mapping, but rewrites plain JSX text as a string expression.
@@ -76,7 +78,7 @@ to `src/rdesign-preview/provenance.json`. All seven hashed recipes were replayed
 and produced byte-identical staged files.
 
 Run from this R-Design checkout with authorized clean source clones at the table's
-SHAs, an exact archive of the candidate, and the candidate's reviewed dependencies.
+SHAs, an exact archive of merged main, and main's reviewed dependencies.
 Each staging directory must initially be empty. Packing exclusively creates its
 output files and refuses to overwrite an existing bundle.
 
@@ -85,15 +87,15 @@ for project in R-Box R-Vault R-Clip R-Alpha ModelBase ToolBox SaveDock; do
   node projects/R-Box/prepare.mjs "$project" "../sources/$project" "../deliverables/staged/$project"
 done
 node --import tsx --test projects/R-Box/preview-contracts.test.ts
-node --import tsx projects/R-Box/pack.ts ../toolchain-d4f41d d4f41d0e7ab552129a82d91648ecd3dade692de9
-node --import tsx projects/R-Box/verify-toolchain.ts ../toolchain-d4f41d d4f41d0e7ab552129a82d91648ecd3dade692de9
-node --import tsx projects/R-Box/verify-candidate.ts ../toolchain-d4f41d d4f41d0e7ab552129a82d91648ecd3dade692de9
-node --import tsx projects/R-Box/verify-bridge.ts ../toolchain-d4f41d d4f41d0e7ab552129a82d91648ecd3dade692de9
-node --import tsx projects/R-Box/summarize.ts --frozen d4f41d0e7ab552129a82d91648ecd3dade692de9
+node --import tsx projects/R-Box/pack.ts ../toolchain-eeffd77 eeffd77924463dcfec05ba1b438e92047d495a23
+node --import tsx projects/R-Box/verify-toolchain.ts ../toolchain-eeffd77 eeffd77924463dcfec05ba1b438e92047d495a23
+node --import tsx projects/R-Box/verify-candidate.ts ../toolchain-eeffd77 eeffd77924463dcfec05ba1b438e92047d495a23
+node --import tsx projects/R-Box/verify-bridge.ts ../toolchain-eeffd77 eeffd77924463dcfec05ba1b438e92047d495a23
+node --import tsx projects/R-Box/summarize.ts --main eeffd77924463dcfec05ba1b438e92047d495a23
 ```
 
 The old baseline compatibility generator has been removed. Current capture and
-verification use the actual candidate runtime and default build target, without
+verification use the actual merged-main runtime and default build target, without
 dependency aliases or an alternate importer. Browser checks use new headless
 contexts and independent loopback ports. Workbench verification owns its Bridge
 process and data directory, consumes bootstrap tokens without printing/storing
@@ -101,7 +103,7 @@ them, and restarts only that process. Existing windows and ports are untouched.
 
 ## Dependencies and retained UI limits
 
-The installed host's React/React DOM 19.3.0 and all additions match the candidate
+The installed host's React/React DOM 19.3.0 and all additions match the merged-main
 lockfile. ModelBase and SaveDock originally declare React 18; their complete UI is
 explicitly adapted and tested on the controlled React 19 host. ToolBox expects Zod
 4, so its import explicitly uses the v4 export of the registered Zod 3 package.
