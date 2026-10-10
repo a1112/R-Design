@@ -25,6 +25,10 @@ const MAX_SOURCE_FILES = 1000;
 const ID = /^project_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const OMIT_NAMES = new Set(['node_modules', 'dist', 'build', 'coverage', '.git', '.rdesign', '.next']);
 const SECRET_NAME = /(?:^\.|(?:^|[._-])(?:secrets?|credentials?|tokens?|passwords?)(?:[._-]|$)|\.(?:pem|key|crt|p12|pfx|keystore)$)/i;
+/** Stylesheet design tokens are application styling; credential/token data remains private. */
+export function isPrivateSourceName(name: string): boolean {
+  return SECRET_NAME.test(name) && !/^(?:(?:design|theme|macos)[._-])?tokens\.(?:css|scss|sass|less)$/i.test(name);
+}
 const SOURCE_EXTENSION = /\.(?:[cm]?[jt]sx?|css|scss|sass|less|json|svg|html|txt|md|xml|yaml|yml)$/i;
 const BINARY_EXTENSION = /\.(?:png|jpe?g|webp|gif|avif|ico|woff2?|ttf|otf)$/i;
 const EXECUTABLE_CONFIG = /^(?:vite|vitest|webpack|rollup|next|nuxt|babel|eslint|postcss|tailwind)\.config\.|^(?:\.npmrc|\.yarnrc|Makefile|Dockerfile)$/i;
@@ -67,7 +71,7 @@ function validName(value: unknown): string {
   return value.trim();
 }
 function portablePath(value: unknown): string {
-  if (typeof value !== 'string' || !value || value.length > 300 || value.includes('\\') || value.includes('\0') || path.isAbsolute(value) || /^[A-Za-z]:/.test(value) || value.split('/').some(part => !part || part === '.' || part === '..' || SECRET_NAME.test(part) || OMIT_NAMES.has(part))) throw new DomainError('IMPORT_PATH', '项目文件路径无效或包含私密文件', 400);
+  if (typeof value !== 'string' || !value || value.length > 300 || value.includes('\\') || value.includes('\0') || path.isAbsolute(value) || /^[A-Za-z]:/.test(value) || value.split('/').some(part => !part || part === '.' || part === '..' || isPrivateSourceName(part) || OMIT_NAMES.has(part))) throw new DomainError('IMPORT_PATH', '项目文件路径无效或包含私密文件', 400);
   if (value.split('/').some(part => EXECUTABLE_CONFIG.test(part))) throw new DomainError('IMPORT_CONFIG', '禁止导入可执行工具配置', 400);
   if (!(value === 'index.html' || value === 'package.json' || /^(?:src|assets|public)\//.test(value)) || !(SOURCE_EXTENSION.test(value) || BINARY_EXTENSION.test(value))) throw new DomainError('IMPORT_CONFIG', '导入仅允许应用源码与静态资产，禁止可执行工具配置', 400);
   return value;
@@ -157,7 +161,7 @@ export async function readPortableSourceFiles(root: string): Promise<PortablePro
   const files: PortableProjectBundle['sourceFiles'] = []; let total = 0;
   const visit = async (directory: string) => {
     for (const name of (await readdir(path.join(root, directory))).sort()) {
-      if (OMIT_NAMES.has(name) || SECRET_NAME.test(name)) continue;
+      if (OMIT_NAMES.has(name) || isPrivateSourceName(name)) continue;
       const relative = directory ? `${directory}/${name}` : name; const absolute = path.join(root, relative); const stat = await lstat(absolute);
       if (stat.isSymbolicLink()) continue;
       const resolved = await realpath(absolute); if (!resolved.startsWith(actualRoot + path.sep)) throw new DomainError('PROJECT_PATH_FORBIDDEN', '源码文件越界', 403);

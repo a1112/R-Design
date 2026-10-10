@@ -7,13 +7,13 @@ import { parse } from '@babel/parser';
 import type { Scenario } from '../../protocol/src/index.js';
 import { createProject, digest, DomainError } from '../../document-core/src/index.js';
 import { codeHash } from '../../source-binding/src/index.js';
-import { assertPortableSourcePaths, projectPackage, readPortableSourceFiles, validatePortableProjectBundle,
+import { assertPortableSourcePaths, isPrivateSourceName, projectPackage, readPortableSourceFiles, validatePortableProjectBundle,
   type PortableProjectBundle, type ProjectManifest } from './index.js';
 import { CORE_PROJECT_DEPENDENCIES, REVIEWED_RUNTIME_DEPENDENCIES } from './runtime-dependencies.js';
 
 const execute = promisify(execFile);
 const sourceType = /\.(?:[cm]?[jt]sx?|css|scss|sass|less|json|svg|html|txt|md|xml|yaml|yml|png|jpe?g|webp|gif|avif|ico|woff2?|ttf|otf)$/i;
-const excluded = /^(?:\.|node_modules$|dist$|build$|coverage$)|(?:^|[._-])(?:secrets?|credentials?|tokens?|passwords?)(?:[._-]|$)/i;
+const excluded = (name: string) => isPrivateSourceName(name) || /^(?:node_modules|dist|build|coverage)$/.test(name);
 const executable = /^(?:vite|vitest|webpack|rollup|next|nuxt|babel|eslint|postcss|tailwind)\.config\./i;
 
 export interface EngineeringConfig {
@@ -116,7 +116,7 @@ export async function generateEngineeringBundle(config: EngineeringConfig): Prom
   const selected = new Map<string, { original: string; sha: string; bytes: Buffer }>();
   const select = async (original: string, target: string) => {
     relative(original); assertPortableSourcePaths([target]);
-    if (original.split('/').some(part => excluded.test(part) || executable.test(part))) throw new DomainError('ENGINEERING_SOURCE', '不能通过复制规则导出私密文件或可执行配置', 400);
+    if (original.split('/').some(part => excluded(part) || executable.test(part))) throw new DomainError('ENGINEERING_SOURCE', '不能通过复制规则导出私密文件或可执行配置', 400);
     const entry = committed.get(original);
     if (!entry || !['100644', '100755'].includes(entry.mode)) throw new DomainError('ENGINEERING_SOURCE', `缺少常规提交文件或遇到符号链接: ${original}`, 400);
     if (selected.has(target)) throw new DomainError('ENGINEERING_PATH', `生成路径重复: ${target}`, 400);
@@ -125,7 +125,7 @@ export async function generateEngineeringBundle(config: EngineeringConfig): Prom
   for (const [original, entry] of committed) {
     if (!original.startsWith(frontend)) continue;
     const file = original.slice(frontend.length);
-    if (file.split('/').some(part => excluded.test(part) || executable.test(part)) || !sourceType.test(file) || !(file === 'package.json' || file === 'index.html' || /^(?:src|assets|public)\//.test(file))) continue;
+    if (file.split('/').some(part => excluded(part) || executable.test(part)) || !sourceType.test(file) || !(file === 'package.json' || file === 'index.html' || /^(?:src|assets|public)\//.test(file))) continue;
     if (!['100644', '100755'].includes(entry.mode)) throw new DomainError('ENGINEERING_SOURCE', `不能静默省略应用符号链接: ${file}`, 400);
     const relocation = config.relocations?.find(item => file === item.from || file.startsWith(item.from + '/'));
     if (relocation) { relative(relocation.from); relative(relocation.to); }

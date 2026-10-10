@@ -14,6 +14,8 @@ The output uses an exclusive create (`wx`): generating again requires a new outp
 
 The initial generator supports React 19 frontends with `index.html`, `package.json` and `src/main.tsx`. It selects committed application source and static resources under `src`, `assets` and `public`. It rejects application symlinks, private paths, credentials, executable configs, unsupported dependencies, oversized files and colliding paths. It rebuilds the package scripts, adds the observation SDK once after the root entry, and records source Git blob identities and explicit adaptations in `src/rdesign-origin.json`.
 
+Design stylesheet names such as `tokens.css`, `design-tokens.css`, `theme-tokens.css` and `macos-tokens.css` remain application resources. This narrow exception does not permit token JSON/data files or credential files; text credential checks still apply to the stylesheet contents.
+
 The host provides React/React DOM, the SDK, and these reviewed browser packages at fixed versions:
 
 | Package | Version |

@@ -16,7 +16,7 @@
     "test:e2e": "playwright test",
     "mcp": "tsx packages/mcp-server/src/index.ts",
     "worker": "tsx apps/agent-worker/src/index.ts",
-    "engineering": "tsx scripts/engineering.ts"
+    "engineering": "node --import tsx scripts/engineering.ts"
   },
   "dependencies": {
     "@babel/generator": "^7.28.0",
