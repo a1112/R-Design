@@ -73,3 +73,41 @@ export function sameRuntime(a: RuntimeVersion, b: RuntimeVersion) {
 export function sameTargetVersion(a: RuntimeVersion, b: RuntimeVersion) {
   return sameRuntime(a,b) && a.codeRevision === b.codeRevision && a.treeRevision === b.treeRevision && a.viewportRevision === b.viewportRevision && a.geometryRevision === b.geometryRevision;
 }
+
+/** An engineering project owns its document, assets, source binding and change history. */
+export interface ProjectSummary {
+  id: string;
+  name: string;
+  kind: 'owned' | 'linked';
+  template: 'blank' | 'react-monitor' | 'linked';
+  createdAt: string;
+  updatedAt: string;
+  lastOpenedAt?: string | null;
+  favorite: boolean;
+  archived: boolean;
+  documentRevision: number;
+  codeRevision: string;
+  thumbnail?: string;
+  location: string;
+  frameCount?: number;
+  assetCount?: number;
+  changeCount?: number;
+}
+export interface WorkspaceCatalog {
+  revision: number;
+  activeProjectId: string | null;
+  projects: ProjectSummary[];
+  canManage: boolean;
+}
+export interface ProjectCreateRequest {
+  operationId: string;
+  expectedRevision: number;
+  name: string;
+  template: 'blank' | 'react-monitor';
+}
+export interface EngineeringBundle {
+  schemaVersion: 1;
+  manifest: { id?: string; name: string; template?: 'blank' | 'react-monitor' | 'linked'; [key: string]: unknown };
+  document: { schemaVersion: 1; project: Project; changes: ChangeSet[] };
+  sourceFiles: Array<{ path: string; content: string; encoding?: 'utf8' | 'base64' }>;
+}

@@ -5,7 +5,7 @@ Documentation checked 2026-10-08. Product specification targets and native featu
 | Surface | Implemented path | Verification boundary |
 | --- | --- | --- |
 | Desktop browser | Authorized Bridge and full shared workbench | Browser integration acceptance suite |
-| Local MCP stdio | Eleven `rd_*` tools, structured errors, Bridge-only calls | In-memory MCP client suite; actual host installation remains manual |
+| Local MCP stdio | Thirteen `rd_*` tools, structured errors, project listing/opening and Bridge-only calls | In-memory MCP client suite; actual host installation remains manual |
 | Codex plugin | Portable root `plugin.json`, `mcp.json`, three skills | Manifest parsed locally; host plugin installation unverified |
 | Embedded MCP Apps | External workbench fallback returned by `rd_render_workspace` | No claim of embedded UI support; host domain/media capabilities unverified |
 | iPad shell | SwiftUI + WKWebView + PencilKit overlay, raw draft cache and shared samples | Simulator compile; real Pencil/IME/multitasking acceptance is pending |

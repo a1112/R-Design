@@ -12,7 +12,7 @@ test('AT-08 workbench preserves ink while offline, reconnects, and recovers a lo
     sockets.push(route); route.connectToServer();
   });
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto(baseURL);
+  await page.goto(`${baseURL}/editor`);
   const surface = page.getByTestId('canvas-surface');
   await expect(surface).toBeVisible({ timeout: 30_000 });
   await expect(page.locator('.connection')).toContainText('Bridge 已连接');

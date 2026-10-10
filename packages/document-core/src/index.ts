@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { mkdir, readFile, writeFile, rename } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, rename, lstat } from 'node:fs/promises';
 import path from 'node:path';
 import type { Project, ChangeSet, WriteEnvelope, RuntimeFrame } from '../../protocol/src/index.js';
 export const digest = (value: string | Buffer) => createHash('sha256').update(value).digest('hex');
@@ -29,7 +29,8 @@ export class DocumentStore {
   get changes() { return this.state.changes; }
   get health(){return {writable:!this.dirty,pendingOperations:Object.entries(this.state.operations).filter(([,op])=>op.status==='pending').map(([id])=>id)};}
   async load(codeRevision: string) {
-    await mkdir(this.directory, {recursive: true});
+    await mkdir(this.directory, {recursive: true});if((await lstat(this.directory)).isSymbolicLink())throw new DomainError('PROJECT_PATH_FORBIDDEN','工程文档目录不允许符号链接',403);
+    try{if((await lstat(path.join(this.directory,'project.json'))).isSymbolicLink())throw new DomainError('PROJECT_PATH_FORBIDDEN','工程文档不允许符号链接',403);}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}
     try { this.state = JSON.parse(await readFile(path.join(this.directory, 'project.json'),'utf8')); if (this.state.schemaVersion !== 1) throw new Error('不支持的项目格式'); }
     catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; this.state = {schemaVersion:1,project:createProject(codeRevision),changes:[],operations:{}}; await this.save(); }
     if (this.project.codeRevision !== codeRevision) { this.project.codeRevision = codeRevision; this.project.scenarios.forEach(s => s.status = 'stale'); await this.save(); }
@@ -67,7 +68,7 @@ export class DocumentStore {
     });
     this.queue=run.catch(()=>{});return run;
   }
-  export() { return {schemaVersion:1, project:this.project,changes:this.changes}; }
+  export() { return {schemaVersion:1 as const, project:this.project,changes:this.changes}; }
   import(document: unknown) {
     if (!document || typeof document !== 'object' || (document as any).schemaVersion !== 1) throw new DomainError('IMPORT_SCHEMA','不支持的文档格式',400);
     const incoming = (document as any).project as Project;

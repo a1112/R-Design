@@ -1,9 +1,10 @@
 import { createHash } from 'node:crypto';
-import { lstat, mkdir, readFile, readdir, realpath, rename, writeFile } from 'node:fs/promises';
+import { lstat, mkdir, readFile, readdir, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { Codex, type CodexOptions, type ThreadOptions, type ThreadEvent } from '@openai/codex-sdk';
 import type { AgentStartRequest } from '../../../packages/agent-provider/src/index.js';
 import { ProviderError } from '../../../packages/asset-provider/src/index.js';
+import {createCandidateScope} from './candidate-scope.js';
 
 export interface WorkerInput extends AgentStartRequest {runId:string;lease:{generation:number;expiresAt:string}}
 export interface WorkerRecord {
@@ -15,7 +16,6 @@ export interface WorkerRecord {
 export interface WorkerRunner {
   run(input:WorkerInput,signal:AbortSignal,onEvent:(event:ThreadEvent)=>Promise<void>):Promise<{summary:string;threadId?:string;usage?:unknown}>;
 }
-const within=(root:string,target:string)=>target!==root&&path.relative(root,target)!=='..'&&!path.relative(root,target).startsWith('..'+path.sep)&&!path.isAbsolute(path.relative(root,target));
 async function sourceHashes(root:string):Promise<Record<string,string>> {
   const out:Record<string,string>={};
   const visit=async(dir:string)=>{for(const name of await readdir(dir)){if(['node_modules','.git','dist'].includes(name))continue;const file=path.join(dir,name),stat=await lstat(file);if(stat.isSymbolicLink())throw new ProviderError('SYMLINK_FORBIDDEN','Candidate trees cannot contain symbolic links.');if(name==='.codex'||name==='.env'||name.startsWith('.env.'))throw new ProviderError('PRIVATE_CANDIDATE_CONFIG','Candidates cannot include private environment files or Codex configuration.');if(stat.isDirectory())await visit(file);else if(stat.isFile()){if(stat.size>2*1024*1024)throw new ProviderError('SOURCE_SIZE','Candidate source files must be under 2 MB.');out[path.relative(root,file).split(path.sep).join('/')]=createHash('sha256').update(await readFile(file)).digest('hex');}}};
@@ -45,9 +45,9 @@ export function createSdkRunner(env:NodeJS.ProcessEnv,directory:string):WorkerRu
     return {summary,threadId:thread.id??undefined,usage};
   }};
 }
-export async function createWorkerService(options:{candidateRoot:string;directory:string;runner?:WorkerRunner;env?:NodeJS.ProcessEnv;now?:()=>number}) {
+export async function createWorkerService(options:{candidateRoot:string;projectsRoot?:string;directory:string;runner?:WorkerRunner;env?:NodeJS.ProcessEnv;now?:()=>number}) {
   const env=options.env??process.env,now=options.now??Date.now;
-  await mkdir(options.candidateRoot,{recursive:true});const candidateRoot=await realpath(options.candidateRoot);
+  const scope=await createCandidateScope(options.candidateRoot,options.projectsRoot??env.RDESIGN_AGENT_PROJECTS_ROOT??path.join(path.dirname(options.candidateRoot),'projects'));
   const journal=path.join(options.directory,'worker-runs');await mkdir(journal,{recursive:true,mode:0o700});
   const runner=options.runner??createSdkRunner(env,options.directory);
   const maxUsd=Number(env.RDESIGN_AGENT_MAX_BUDGET_USD??'2'),estimate=Number(env.RDESIGN_AGENT_RUN_COST_CEILING_USD);
@@ -64,7 +64,7 @@ export async function createWorkerService(options:{candidateRoot:string;director
     const previous=runs.get(input.runId);const requestHash=createHash('sha256').update(JSON.stringify(input)).digest('hex');
     if(previous){if(previous.requestHash!==requestHash)throw new ProviderError('IDEMPOTENCY_CONFLICT','Worker run ID belongs to another request.');return previous;}
     if(!/^[0-9a-f-]{36}$/.test(input.runId)||!input.projectId||!input.operationId||input.executionMode!=='external-worker'||!input.context?.confirmedIntent?.confirmedAt||!input.context.confirmedIntent.summary)throw new ProviderError('INVALID_INPUT','Confirmed bounded worker request is required.');
-    const candidate=await realpath(input.candidateDirectory);if(!within(candidateRoot,candidate))throw new ProviderError('CANDIDATE_PATH','Candidate is outside the configured candidate root.');
+    const candidate=await scope(input.projectId,input.candidateDirectory);
     if(!Number.isFinite(estimate)||estimate<=0||!Number.isFinite(input.budget?.maxUsd)||input.budget.maxUsd<estimate||input.budget.maxUsd>maxUsd||!Number.isInteger(input.budget.maxIterations)||input.budget.maxIterations<1||input.budget.maxIterations>3)throw new ProviderError('BUDGET_PREFLIGHT','Configure a per-run estimated cost ceiling within the approved maximum.');
     if(!input.lease||!Number.isInteger(input.lease.generation)||input.lease.generation<1||!Number.isFinite(Date.parse(input.lease.expiresAt))||Date.parse(input.lease.expiresAt)<=now()||Date.parse(input.lease.expiresAt)>now()+120000)throw new ProviderError('LEASE_INVALID','Start requires a short-lived valid execution lease.');
     if(!Array.isArray(input.context.allowedFiles)||!input.context.allowedFiles.length||input.context.allowedFiles.some(file=>typeof file!=='string'||path.isAbsolute(file)||file.split(/[\\/]/).includes('..')))throw new ProviderError('FILE_SCOPE','Allowed files must be candidate-relative.');

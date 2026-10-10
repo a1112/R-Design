@@ -21,6 +21,6 @@ export function createWorkerApp(service:Awaited<ReturnType<typeof createWorkerSe
   app.get('/runs/:id',route(async(req,res)=>res.json(service.get(String(req.params.id)))));
   app.post('/runs/:id/heartbeat',route(async(req,res)=>res.json(await service.heartbeat(String(req.params.id),z.object({lease}).parse(req.body).lease))));
   app.post('/runs/:id/cancel',route(async(req,res)=>res.json(await service.cancel(String(req.params.id),z.object({generation:z.number().int().positive()}).parse(req.body).generation))));
-  app.use((error:unknown,_request:Request,response:Response,_next:NextFunction)=>{const value=error as ProviderError;const invalid=error instanceof z.ZodError;const code=invalid?'INVALID_INPUT':value.code??'WORKER_ERROR';const status=code==='AUTH_REQUIRED'?401:code.includes('ORIGIN')?403:code==='RUN_NOT_FOUND'?404:code.includes('CONFLICT')?409:400;response.status(status).json({error:{code,message:invalid?'Worker request schema is invalid.':value.message??'Worker request failed.',retryable:false}});});
+  app.use((error:unknown,_request:Request,response:Response,_next:NextFunction)=>{const value=error as ProviderError;const invalid=error instanceof z.ZodError;const code=invalid?'INVALID_INPUT':value.code??'WORKER_ERROR';const status=code==='AUTH_REQUIRED'?401:(code.includes('ORIGIN')||code==='PROJECT_SCOPE')?403:code==='RUN_NOT_FOUND'?404:code.includes('CONFLICT')?409:400;response.status(status).json({error:{code,message:invalid?'Worker request schema is invalid.':value.message??'Worker request failed.',retryable:false}});});
   return app;
 }

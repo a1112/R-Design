@@ -21,3 +21,30 @@ export function versionOf(v: RuntimeVersion): RuntimeVersion {
   const {runtimeSessionId,epoch,surfaceId,codeRevision,treeRevision,viewportRevision,geometryRevision}=v;
   return {runtimeSessionId,epoch,surfaceId,codeRevision,treeRevision,viewportRevision,geometryRevision};
 }
+
+/** The camera transforms document coordinates, never the controlled runtime viewport. */
+export interface Camera { x: number; y: number; zoom: number }
+export const MIN_CAMERA_ZOOM = 0.05;
+export const MAX_CAMERA_ZOOM = 8;
+export function worldToScreen(camera: Camera, point: {x:number;y:number}) {
+  return { x: camera.x + point.x * camera.zoom, y: camera.y + point.y * camera.zoom };
+}
+export function screenToWorld(camera: Camera, point: {x:number;y:number}) {
+  if (!Number.isFinite(camera.zoom) || camera.zoom <= 0) throw new Error('Invalid camera scale');
+  return { x: (point.x - camera.x) / camera.zoom, y: (point.y - camera.y) / camera.zoom };
+}
+export function panCamera(camera: Camera, delta: {x:number;y:number}): Camera {
+  if (![delta.x, delta.y].every(Number.isFinite)) throw new Error('Invalid camera delta');
+  return {...camera, x: camera.x + delta.x, y: camera.y + delta.y};
+}
+export function zoomCameraAt(camera: Camera, point: {x:number;y:number}, requestedZoom: number): Camera {
+  if (![point.x, point.y, requestedZoom].every(Number.isFinite)) throw new Error('Invalid zoom anchor');
+  const zoom = Math.min(MAX_CAMERA_ZOOM, Math.max(MIN_CAMERA_ZOOM, requestedZoom));
+  const world = screenToWorld(camera, point);
+  return { x: point.x - world.x * zoom, y: point.y - world.y * zoom, zoom };
+}
+export function fitCamera(bounds: Bounds, viewport: {width:number;height:number}, padding=48, maxZoom=1): Camera {
+  if (![bounds.x,bounds.y,bounds.w,bounds.h,viewport.width,viewport.height,padding,maxZoom].every(Number.isFinite) || bounds.w<=0 || bounds.h<=0 || viewport.width<=0 || viewport.height<=0 || maxZoom<=0) throw new Error('Invalid camera bounds');
+  const zoom = Math.max(MIN_CAMERA_ZOOM, Math.min(MAX_CAMERA_ZOOM, maxZoom, Math.max(1,viewport.width-padding*2)/bounds.w, Math.max(1,viewport.height-padding*2)/bounds.h));
+  return { x: (viewport.width-bounds.w*zoom)/2-bounds.x*zoom, y: (viewport.height-bounds.h*zoom)/2-bounds.y*zoom, zoom };
+}

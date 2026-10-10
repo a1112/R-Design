@@ -59,14 +59,14 @@ describe('MCP stdio contract over in-memory transports',()=>{
     const transport=new StdioClientTransport({command:process.execPath,args:[path.resolve('node_modules/tsx/dist/cli.mjs'),path.resolve('packages/mcp-server/src/index.ts')],stderr:'pipe'});
     try {await client.connect(transport);expect((await client.listTools()).tools.map(t=>t.name)).toContain('rd_apply_change');}finally{await client.close();}
   });
-  it('lists all eleven tools, keeps tokens out of results, and returns structured stale-target errors',async()=>{
+  it('lists all thirteen tools, keeps tokens out of results, and returns structured stale-target errors',async()=>{
     const snapshot={project:{id:'p1',name:'Test',revision:1,codeRevision:'base1',annotations:[],scenarios:[],assets:[],snapshots:[],designFrames:[]},frame:{id:'f1',runtimeSessionId:'s1',epoch:1,surfaceId:'surface1',codeRevision:'base1',treeRevision:1,viewportRevision:1,geometryRevision:1,width:1024,height:768,status:'live',nodes:[{runtimeNodeId:'n1',instanceKey:'i1',tag:'button',role:'button',text:'Start',bounds:{x:0,y:0,w:100,h:20},styles:{}}]},changes:[],capabilities:{capture:true,source:false},providerStatus:{agent:'unavailable',assets:'unavailable'},devices:[]};
     const fetcher=vi.fn(async(input:URL|RequestInfo,init?:RequestInit)=>{expect(new Headers(init?.headers).get('Authorization')).toBe('Bearer test-root-token');return new Response(JSON.stringify(snapshot),{status:200});});
     const bridge=createBridgeClient({url:'http://127.0.0.1:4310',token:'test-root-token',fetch:fetcher});
     const server=createRDesignMcpServer(bridge),client=new Client({name:'test-client',version:'1.0'});const [clientTransport,serverTransport]=InMemoryTransport.createLinkedPair();
     await Promise.all([server.connect(serverTransport),client.connect(clientTransport)]);
     try {
-      const tools=await client.listTools();expect(tools.tools).toHaveLength(11);
+      const tools=await client.listTools();expect(tools.tools).toHaveLength(13);
       const context=await client.callTool({name:'rd_get_context',arguments:{nodeId:'n1'}});expect(JSON.stringify(context)).not.toContain('test-root-token');
       const stale=await client.callTool({name:'rd_inspect_element',arguments:{nodeId:'n1',version:{...snapshot.frame,treeRevision:2}}});
       expect(stale.isError).toBe(true);expect(stale.structuredContent).toMatchObject({error:{code:'STALE_TARGET',retryable:false}});

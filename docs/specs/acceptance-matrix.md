@@ -10,15 +10,15 @@ Measured on 2026-10-08: macOS 27.0.1, build 26A434; Node 24.13.0; Playwright 1.6
 
 | Check | Measured result | Evidence |
 | --- | --- | --- |
-| `npm run test:e2e` | **15 passed**, 1.8 minutes | `tests/e2e/`; local HTML report `playwright-report/index.html` |
-| `npm test` | **35 passed**, reported by parent delivery lane after the final HMR fix | Document/source/runtime, coordinate, security, provider and durable operation unit checks; includes 7 canvas transform tests |
+| `npm run test:e2e` | **23 passed**, 2.6 minutes | `tests/e2e/`; local HTML report `playwright-report/index.html` |
+| `npm test` | **95 passed**, reported by parent delivery lane after the engineering workspace update | Document/source/runtime, coordinate, security, provider and durable operation unit checks; includes 7 canvas transform tests |
 | `npm run build` | **Passed**, reported by parent delivery lane after the final HMR fix | Final TypeScript check and production workbench build |
 | Fixture production build | **Passed**, reported by parent delivery lane | Controlled React fixture builds with production runtime instrumentation disabled |
 | `npm audit` (all dependencies) | **0 known vulnerabilities**, reported by parent delivery lane | Dependency advisory audit only; not a comprehensive application security assessment |
 | Provider/MCP targeted unit tests | **11 passed**, reported by integration lane | `tests/unit/agent-worker.test.ts`, `tests/unit/integrations.test.ts`; stdio MCP child lists 11 tools; unavailable/budget, worker scope/lease/auth, persisted replay and restart checks |
 | Native iPad build/simulator | **Build and launch passed**, reported by integration lane | Xcode 26.5 `xcodebuild`, generic iOS Simulator; iPad (A16), iOS 26.5 simulator installed/launched the app and loaded the shared workbench |
 
-The final 15-test run includes the canonical Vite file boundary, durable operation receipts, frozen candidate evidence, native draft changes, local reauthentication on reconnect, and an explicit empty uncaught-page-error assertion for desktop/narrow workbench UI. The native API test simulates serialized drawing transfer into the actual workbench; it does not simulate or claim physical Pencil behavior.
+The final 23-test run includes the canonical Vite file boundary, durable operation receipts, frozen candidate evidence, native draft changes, local reauthentication on reconnect, and an explicit empty uncaught-page-error assertion for desktop/narrow workbench UI. The native API test simulates serialized drawing transfer into the actual workbench; it does not simulate or claim physical Pencil behavior.
 
 The E2E test injects an intentionally invalid TSX statement and denied filesystem requests. Their expected Vite error logs demonstrate rejection and recovery; they are not unresolved failures. The narrow workbench screenshot is `test-results/workbench-narrow.png`. Candidate screenshots and verification JSON are attached to the Playwright report.
 
@@ -55,3 +55,28 @@ The E2E test injects an intentionally invalid TSX statement and denied filesyste
 ## Delivery boundaries
 
 The measured vertical workflow is a local React/TypeScript/Vite fixture with real runtime capture, annotation, deterministic candidate edits, verification, review, accept and revert. It does not establish arbitrary-software editing, Tauri/native capture, public deployment, commercial authorization, paid model/image behavior, physical iPad input or the PDF's P95/30 fps targets. These remain explicit platform/provider/performance acceptance work rather than inferred compatibility.
+
+
+## Infinite canvas and editor chrome update (2026-10-08)
+
+The content area now uses a camera over natural-size artboards, with unbounded translation and 5%–800% local zoom. Cursor-anchored Ctrl/Command wheel, ordinary two-axis wheel pan, Space drag, middle-button drag, hand selection, touch pan/pinch, fit and actual 100% scaling are implemented. Editor chrome uses neutral side panels and a blue selection accent. Camera navigation does not resize the controlled application; source desktop/narrow buttons remain explicit runtime actions.
+
+- Latest full E2E: **19/19 passed**, including four new actual-Bridge canvas cases and all fifteen prior flows.
+- Canvas coordinate unit checks: **13/13 passed**, including cursor anchors at zoom limits, nonzero multiboard bounds and unconstrained panning.
+- Full Node unit suite: **41/41 passed**; TypeScript and production workbench build passed.
+- Actual source controls, pen points and native canvas bounds retain source-space coordinates after pan and zoom. Baseline and candidate artboards share one camera with a fixed 96 source-unit gap.
+- View navigation produces no remote input or new ink. Text field shortcuts remain text input; explicit remote interaction retains source scrolling and typing. Desktop/narrow UI has no uncaught JavaScript errors, and the narrow editor has no document overflow.
+- iPad overlay now clips to the editor viewport while retaining the full artboard coordinate system and cached drawing offscreen. Latest simulator build passed; initial five XCTest cases and final five host geometry/PencilKit probes passed. Later simulator reruns were cancelled before test-host launch under host contention. Physical Pencil, palm rejection and device performance remain unverified.
+
+
+## Engineering homepage and project workspace update (2026-10-08)
+
+The default route is now a real engineering-project homepage. Create, open, rename, favorite, archive/restore, search, grid/list and portable import/export operate on the persisted catalog. The editor route is `/project/<projectId>`; `/editor` remains an active-project compatibility entry. Existing source and document locations are retained as a linked engineering project; new engineering projects own separate manifests, source folders, documents, assets, candidates and change histories.
+
+- Final production build and TypeScript checks passed; **95/95 automatic tests passed**. This includes an actual Bridge-process restart restoring the last owned source/document/runtime, persistent operation receipts, portable source/binary hashes and alias/path checks.
+- Final actual-Bridge browser suite: **23/23 E2E passed** in 2.6 minutes, including all nineteen prior workflows and four engineering-home cases.
+- Project A/B source, documents, local drafts and portable binary assets stay isolated. Delayed A responses and queued A writes cannot redirect or mutate B after A is closed. Rapid tool-mode writes serialize their fresh version reads and lease changes.
+- Paired A devices cannot list/read/export B, mutate the catalog or receive B frames. Foreign embedded annotation identities fail closed, and imported history is read-only until a new candidate is prepared. Object annotation following requires matching runtime session/epoch/surface; old snapshots remain reviewable.
+- Unicode NFC/NFD aliases, case aliases and file/directory overlaps are rejected before writing imported files. Worker legacy and owned candidate paths both require the matching project identity.
+- Homepage desktop/mobile and editor pages have no uncaught JavaScript errors; mobile page width stays within its viewport. Workbench and preview Vite caches are separate for each service/source to support parallel development and tests.
+- MCP has thirteen tools, including explicit project listing/opening. Native caches now include the project identity; latest native app and seven XCTest cases compile, with targeted host cache/geometry checks. Physical Pencil and live paid providers remain unverified.

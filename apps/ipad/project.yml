@@ -19,8 +19,21 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: dev.rdesign.ipad
         INFOPLIST_FILE: Info.plist
         SUPPORTS_MACCATALYST: NO
+  RDesignTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [Tests]
+    dependencies:
+      - target: RDesign
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.rdesign.ipad.tests
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_FILE: ''
 schemes:
   RDesign:
     build:
       targets:
         RDesign: all
+    test:
+      targets: [RDesignTests]

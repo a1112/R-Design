@@ -1,5 +1,19 @@
 import { test, expect } from '@playwright/test';
+import type { RuntimeFrame } from '../../packages/protocol/src/index';
 import { BridgeClient, FrameObserver, baseURL, runtimeVersion } from './bridge-client';
+
+async function inputFromCurrentFrame(client:BridgeClient,input:(frame:RuntimeFrame)=>Record<string,unknown>){
+  for(let attempt=0;attempt<5;attempt++){
+    const state=await client.state();const frame=state.frame!;
+    const response=await client.request.post(`${baseURL}/api/input`,{headers:client.headers,data:{projectId:state.project.id,expectedRevision:state.project.revision,operationId:crypto.randomUUID(),version:runtimeVersion(frame),...input(frame)}});
+    if(response.ok())return response;
+    const error=await response.json();expect(error.error.code).toBe('STALE_RUNTIME');
+    // Exact runtime validation occurs before dispatch; reselect from the next real
+    // frame only for this no-side-effect rejection, never repeat delivered input.
+    await expect.poll(async()=>(await client.state()).frame?.id).not.toBe(frame.id);
+  }
+  throw new Error('Runtime remained stale after five fresh-frame selections');
+}
 
 test('AT-01/02 two clients follow one real surface and live telemetry does not create tasks', async ({ request }) => {
   const client = await new BridgeClient(request).connect();
@@ -29,7 +43,7 @@ test('AT-01/02 two clients follow one real surface and live telemetry does not c
     const { frame } = await client.live();
     const settings = frame.nodes.find(node => node.sourceNodeId === 'settings-button' || node.runtimeNodeId === 'settings-button');
     expect(settings).toBeTruthy();
-    await client.post('/input', { ...(await client.envelope()), version: runtimeVersion(frame), action: 'click', x: settings!.bounds.x + settings!.bounds.w / 2, y: settings!.bounds.y + settings!.bounds.h / 2 });
+    await inputFromCurrentFrame(client,current=>{const target=current.nodes.find(node=>node.sourceNodeId==='settings-button'||node.runtimeNodeId==='settings-button')!;return {action:'click',x:target.bounds.x+target.bounds.w/2,y:target.bounds.y+target.bounds.h/2};});
     await expect.poll(() => observers.every(observer => observer.frames.some(frame => frame.nodes.some(node => node.role === 'dialog' || node.tag === 'dialog')))).toBeTruthy();
     const modal = (await client.live()).frame;
     expect(modal.nodes.some(node => node.role === 'dialog' || node.tag === 'dialog')).toBeTruthy();
@@ -39,7 +53,7 @@ test('AT-01/02 two clients follow one real surface and live telemetry does not c
     expect(structure).not.toContain('fixture-private-token');
     expect(structure).not.toContain('private-fixture-secret');
     expect(modal.nodes.find(node => node.sourceNodeId === 'settings-password')?.text).not.toContain('secret');
-    await client.post('/input', { ...(await client.envelope()), version: runtimeVersion(modal), action: 'key', key: 'Escape' });
+    await inputFromCurrentFrame(client,()=>({action:'key',key:'Escape'}));
     await client.post('/mode', { ...(await client.envelope()), mode: 'observe' });
   } finally {
     observers.forEach(observer => observer.close());
@@ -53,7 +67,7 @@ test('AT-01/02 two clients follow one real surface and live telemetry does not c
 test('workbench uses a real captured image and remains usable at a narrow viewport', async ({ page }) => {
   const pageErrors: string[] = [];
   page.on('pageerror', error => pageErrors.push(error.message));
-  await page.goto(baseURL);
+  await page.goto(`${baseURL}/editor`);
   const surface = page.getByTestId('canvas-surface');
   await expect(surface).toBeVisible({ timeout: 30_000 });
   await expect.poll(async () => surface.locator('img').count()).toBeGreaterThan(0);
@@ -63,9 +77,10 @@ test('workbench uses a real captured image and remains usable at a narrow viewpo
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(surface).toBeVisible();
   await expect(page.getByTestId('mode-annotate')).toBeVisible();
+  await page.getByTestId('canvas-fit').click();
   await expect.poll(async () => {
     const image = await surface.boundingBox();
-    const viewport = await page.locator('.canvas-scroll').boundingBox();
+    const viewport = await page.getByTestId('infinite-viewport').boundingBox();
     return image && viewport ? Math.max(viewport.x - image.x, image.x + image.width - viewport.x - viewport.width) : Infinity;
   }).toBeLessThanOrEqual(1);
   const size = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth }));
@@ -79,7 +94,7 @@ test('mapped property understanding, candidate verification, acceptance and reve
   const client = await new BridgeClient(request).connect();
   const before = await client.live();
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto(baseURL);
+  await page.goto(`${baseURL}/editor`);
   await expect(page.getByTestId('canvas-surface')).toBeVisible({ timeout: 30_000 });
   await expect(page.locator('.connection')).toContainText('Bridge 已连接');
   await page.locator('.sidebar-tabs').getByRole('button', { name: '图层', exact: true }).click();
@@ -90,7 +105,18 @@ test('mapped property understanding, candidate verification, acceptance and reve
   await page.getByTestId('prepare-change').click();
   await expect(page.getByTestId('confirm-change')).toBeVisible();
   expect((await client.state()).changes).toHaveLength(before.changes.length);
-  await page.getByTestId('confirm-change').click();
+  for(let attempt=0;attempt<4;attempt++){
+    const preparation=page.waitForResponse(response=>new URL(response.url()).pathname==='/api/changes/prepare'&&response.request().method()==='POST');
+    await page.getByTestId('confirm-change').click();
+    const response=await preparation;
+    if(response.ok())break;
+    const error=await response.json();expect(error.error.code).toBe('STALE_RUNTIME');
+    // The fixture updates telemetry; an exact-version rejection requires a fresh
+    // displayed frame and explicit reselection before repeating the same intent.
+    const failedFrame=await page.evaluate(()=>(window as unknown as {__RDESIGN_WORKBENCH__:{frame():{id:string}|null}}).__RDESIGN_WORKBENCH__.frame()?.id);
+    await expect.poll(()=>page.evaluate(()=>(window as unknown as {__RDESIGN_WORKBENCH__:{frame():{id:string}|null}}).__RDESIGN_WORKBENCH__.frame()?.id)).not.toBe(failedFrame);
+    await page.getByTestId('node-start-button').click();
+  }
   await expect.poll(async () => (await client.state()).changes.length).toBe(before.changes.length + 1);
   await expect(page.getByTestId('verify-change')).toBeEnabled();
   await expect(page.getByTestId('accept-change')).toBeDisabled();

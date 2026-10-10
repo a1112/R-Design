@@ -20,7 +20,7 @@ test('local workbench reauthenticates a revoked session during reconnect and ret
     } else await route.continue();
   });
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto(baseURL);
+  await page.goto(`${baseURL}/editor`);
   const surface = page.getByTestId('canvas-surface');
   await expect(surface).toBeVisible({ timeout: 30_000 });
   await expect(page.locator('.connection')).toContainText('Bridge 已连接');
@@ -33,12 +33,12 @@ test('local workbench reauthenticates a revoked session during reconnect and ret
   await page.mouse.up();
   const note = 'E2E 会话失效后重新授权：保留完整冻结画面和笔迹草稿。';
   await page.getByTestId('annotation-text').fill(note);
-  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('rd-draft-strokes') ?? '[]').length)).toBe(1);
-  await expect.poll(() => page.evaluate(() => Boolean(JSON.parse(localStorage.getItem('rd-draft-frame') ?? 'null')?.image))).toBeTruthy();
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem(`rdesign.project.${location.pathname.split('/')[2]}.strokes`) ?? '[]').length)).toBe(1);
+  await expect.poll(() => page.evaluate(() => Boolean(JSON.parse(localStorage.getItem(`rdesign.project.${location.pathname.split('/')[2]}.frame`) ?? 'null')?.image))).toBeTruthy();
   const draft = await page.evaluate(() => ({
-    strokes: JSON.parse(localStorage.getItem('rd-draft-strokes') ?? '[]') as Stroke[],
-    frame: JSON.parse(localStorage.getItem('rd-draft-frame') ?? 'null') as RuntimeFrame,
-    note: localStorage.getItem('rd-draft-note'),
+    strokes: JSON.parse(localStorage.getItem(`rdesign.project.${location.pathname.split('/')[2]}.strokes`) ?? '[]') as Stroke[],
+    frame: JSON.parse(localStorage.getItem(`rdesign.project.${location.pathname.split('/')[2]}.frame`) ?? 'null') as RuntimeFrame,
+    note: localStorage.getItem(`rdesign.project.${location.pathname.split('/')[2]}.note`),
   }));
   await expect(page.getByTestId('save-annotation')).toBeEnabled();
   const baselineBootstrap = bootstrapRequests;
@@ -53,9 +53,9 @@ test('local workbench reauthenticates a revoked session during reconnect and ret
   await expect(page.locator('.connection')).toContainText('Bridge 已连接');
   await expect(page.getByTestId('mode-observe')).toHaveClass(/active/);
   const retained = await page.evaluate(() => ({
-    strokes: JSON.parse(localStorage.getItem('rd-draft-strokes') ?? '[]'),
-    frame: JSON.parse(localStorage.getItem('rd-draft-frame') ?? 'null'),
-    note: localStorage.getItem('rd-draft-note'),
+    strokes: JSON.parse(localStorage.getItem(`rdesign.project.${location.pathname.split('/')[2]}.strokes`) ?? '[]'),
+    frame: JSON.parse(localStorage.getItem(`rdesign.project.${location.pathname.split('/')[2]}.frame`) ?? 'null'),
+    note: localStorage.getItem(`rdesign.project.${location.pathname.split('/')[2]}.note`),
   }));
   expect(retained.strokes).toEqual(draft.strokes);
   expect(retained.frame.id).toBe(draft.frame.id);
