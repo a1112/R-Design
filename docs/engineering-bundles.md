@@ -131,6 +131,57 @@ Monaco `editor/editor.api` and the five `editor/editor.worker?worker`, `language
 
 The synthetic editor regression uses official prepared pack, two independent imports and live/candidate directories without local `node_modules`. Initial, candidate, applied and reverted runtimes each wait for worker results, reject diagnostic errors, and check real keyboard input, read-only behavior, TypeScript tokenization/2322, JSON/CSS/HTML results, an editor-worker diff and all five workers' sent/received/error state. It also checks all seven controls, Zustand updates and the icon alias. The existing canonical filesystem boundary remains enabled, including an actual rejection of a synthetic file outside its allowed roots. Application fixtures, offline-service errors and native or authenticated limitations require separate evidence from each real frontend; the synthetic regression is not complete application acceptance.
 
+## Pinned primary reader profile
+
+The reader adds these exact import names. Only the host uses npm aliases; prepared packages and portable imports require the registry version shown, without ranges or install aliases.
+
+| Import name | Version |
+| --- | --- |
+| @tauri-apps/plugin-dialog | 2.8.1 |
+| cmdk | 1.1.1 |
+| dompurify-v3416 | 3.4.16 |
+| github-slugger | 2.0.0 |
+| highlight-js-v1112 | 11.12.0 |
+| katex | 0.16.47 |
+| mermaid | 11.17.2 |
+| pdfjs-dist-v5 | 5.7.284 |
+| rehype-katex | 7.0.1 |
+| rehype-raw | 7.0.0 |
+| rehype-slug | 6.0.0 |
+| rehype-stringify | 10.0.1 |
+| remark-math | 6.0.0 |
+| remark-parse | 11.0.0 |
+| remark-rehype | 11.1.2 |
+| unified | 11.0.5 |
+| yjs | 13.6.32 |
+| zod-v4 | 4.6.5 |
+
+PDF5, Zod4, DOMPurify3.4.16 and Highlight11 use separate names so existing PDF6/Zod3 and editor callers retain their versions. Root DOMPurify3.4.15 and Highlight10.7.3 are explicitly retained. The dialog plugin's nested Tauri API2.12.1 and Mermaid's nested DOMPurify3.4.16 use scoped overrides. Importing a Tauri dialog function or creating a local Yjs document establishes neither native dialogs nor collaborative synchronization.
+
+Project-source workers use ESM output and fresh instances of the same host dependency resolver and canonical file boundary. Worker builds can split dynamic modules; they cannot load source outside their authorized roots. For packages declaring both exact Mermaid11.17.2 and PDF5.7.284, Vite prebundles the declared reviewed dependencies together and disables late discovery, preventing disabled-HMR previews from losing already loaded Mermaid chunks. The optimizer receives explicit aliases into the authorized host modules. When Highlight11.12.0 is declared, the include list covers its regular installed language factories, including extension-bearing deep imports, rather than a selected language subset. Installed version and canonical directory/file checks limit this enumeration to the pinned vendor package. Ruby and Perl imports run in both browser and actual Markdown Worker contexts, including candidate verification. The existing pinned `decode-named-character-reference`1.3.0 and `hast-util-from-html-isomorphic`2.0.0 use their no-DOM Worker exports in this reader profile; their default browser exports require `document`/`DOMParser`. Real worker results, character/entity handling, HTML sanitation and actual application behavior need execution evidence.
+
+Projects declaring exact `pdfjs-dist-v5: "5.7.284"` can fetch that installed profile's CMaps, standard fonts and WASM files under `/__rdesign_resources/pdfjs-v5/{cmaps,standard_fonts,wasm}/<basename>`. The server accepts GET/HEAD, fixed folders and bounded basenames, verifies canonical installed paths and uses `nosniff` with WASM's correct MIME. The production build emits the same vendor files. This endpoint serves vendor resources, not arbitrary project PDFs. Package recognition and a resource HTTP200 do not establish that a particular PDF required or used that resource.
+
+### Explicit unchanged reader fixtures
+
+The optional prepared configuration admits one plain CJK short-word Markdown and an explicit subset of six committed PDF samples. It does not change generic private-path capture/import or add PDF to portable binary extensions.
+
+```json
+{
+  "readerMarkdownFixture": { "sourceSha256": "64-character-lowercase-hex-SHA256" },
+  "readerPdfFixtures": [{
+    "sourcePath": "fixtures/r-md-workspace/09-pdf/sample-report.pdf",
+    "sourceSha256": "64-character-lowercase-hex-SHA256"
+  }]
+}
+```
+
+Exactly one staged Markdown record must declare `sourceRole: "reader-markdown-fixture"`, source `fixtures/r-md-workspace/06-cjk/short-tokens.md`, prepared destination `src/fixtures/r-md-workspace/06-cjk/short-uiTokens.md`, and identical source/prepared/configured digests. The Git source must be a regular blob at the exact commit, no larger than16KiB. The proof accepts UTF-8 plain short-word content with its required heading/CJK/UI/DB/CJK terms, rejecting links, HTML, code fences, encoded payload markers and the existing private-content markers. Only this exact final filename receives the provenance exception; a private ancestor, a different file, adapted bytes or an unused/missing role/profile fails.
+
+PDF source paths are limited to `bookmarked-report`, `chinese`, `encrypted`, `multipage`, `sample-report` and `scanned` under `fixtures/r-md-workspace/09-pdf/`. Each split ledger record must declare `sourceRole: "reader-pdf-fixture"` and match one unique configured path/digest. Canonical base64 chunks must reconstruct the regular committed Git blob unchanged, at most1MiB; role/path/digest/size gates apply before that source is read. Header/EOF and the existing decoded-content checks also apply. Missing, duplicate or unused profiles fail. Reserved provenance records `parsingVerified: false`: origin/header proof is distinct from parser, canvas, text, password, font and Worker evidence.
+
+The synthetic reader test packs/imports/builds its disposable committed fixtures, renders actual Markdown/GFM/math and strict Mermaid, exercises DOMPurify/Highlight/Zod4/local Yjs/PDF5, checks two-page canvas/text and genuine Markdown/PDF workers, compares controlled vendor-resource bytes, and verifies a source-bound candidate/apply/revert. It also rejects a project-worker source escape. Vendor `.js`/`.mjs` responses use `text/javascript` with `nosniff`; WASM retains `application/wasm`, while CMaps/fonts retain `application/octet-stream`. A separate live/candidate test disables WASM, proves real `openjpeg_nowasm_fallback.js` and `jbig2_nowasm_fallback.js` requests and JPEG2000/CCITT pixel decoding, and checks GET/HEAD MIME and exact bytes for those modules and `quickjs-eval.js`. That test does not establish actual JBIG2 image or QuickJS execution. This does not accept a real reader application, authenticated services, disk writes, native dialogs, OCR, or automatic HTTP Range/streaming. Data-URL fixtures load complete bytes; separate Range or vendor-resource checks must never be presented as automatic PDF streaming evidence.
+
 ## Pinned message and document preview dependencies
 
 This browser profile registers Redux Toolkit `2.13.0`, React Redux `9.3.0`, Prism `1.30.0`, rehype-sanitize `6.0.0` and notification module `2.5.1`. Separate import names `lucide-react-v152`, `react-markdown-v10` and `pdfjs-dist-v6` select icons `1.52.0`, Markdown `10.1.0` and PDF.js `6.4.299`; the host alone uses npm install aliases. Prepared packages and portable imports declare those exact version numbers. The original Markdown/icon profiles remain available. Redux `4.2.1` remains pinned under `dnd-core`, while the new profile uses Redux `5.0.1`. The notification module's own Tauri API is scoped to `2.12.1`; the existing host Tauri API stays at `2.8.0`. Browser module loading does not establish native notification permission, delivery or activation.
