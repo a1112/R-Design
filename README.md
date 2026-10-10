@@ -1,5 +1,7 @@
 # R-Design
 
+现有 React 前端可通过 [工程生成与预检工具](docs/engineering-bundles.md) 制作完整便携工程；支持范围、配置样例和运行验收要求见该文档。
+
 面向桌面与 iPad 的实时 UI 设计工作台。真实运行实例提供画面与结构，源码提供长期实现，批注表达设计意图，候选变更保存代码与验证证据。
 
 本仓库依据 [完整设计方案 v1.0](docs/specs/design-v1.0.pdf) 从空仓库实现。当前可用主线是受控 React + TypeScript + Vite 项目的真实画面、控件选择、原始笔迹、精确属性修改、隔离候选、桌面/窄屏验证、审查接受与保护后续编辑的回退。平台和功能验证状态见 [验收矩阵](docs/specs/acceptance-matrix.md)。设计中的 30 fps / P95 指标仍是待测目标，当前传输使用低帧率无损 PNG + WebSocket。
