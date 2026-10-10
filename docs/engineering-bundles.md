@@ -31,6 +31,20 @@ The host provides React/React DOM, the SDK, and these reviewed browser packages 
 | uplot | 1.6.32 |
 | zod | 3.25.76 (including `zod/v4`) |
 
+File-browser controls also support these exact versions through the same host resolver for live and candidate previews:
+
+| Package | Version |
+| --- | --- |
+| @radix-ui/react-dialog | 1.1.23 |
+| @radix-ui/react-dropdown-menu | 2.1.24 |
+| @radix-ui/react-select | 2.3.7 |
+| @radix-ui/react-slot | 1.3.3 |
+| @radix-ui/react-tooltip | 1.2.8 |
+| class-variance-authority | 0.7.1 |
+| date-fns | 3.6.0 |
+
+Version ranges, other versions and npm install aliases for these packages remain rejected. A scoped host override makes Tooltip 1.2.8 use the same DismissableLayer 1.1.19 instance as Dialog, Select and the menus; Tooltip's original 1.1.11 copy would otherwise let Escape dismiss an outer dialog before its tooltip. The synthetic `tests/protocol/file-runtime.test.ts` fixture exercises dialog and dropdown portals, select changes, slot behavior, tooltip visibility and date formatting after official generation/import/build. Three nested Dialog/Tooltip cycles assert that the first Escape closes only the tooltip, the second closes the dialog, focus returns to its trigger, body pointer handling is restored and an outside action remains clickable. The fixture also verifies main and dialog candidate scenes, applies a unique static text change, and restores that text through semantic revert. This establishes browser-control compatibility; a file manager's filesystem, remote connections and native operations require separate application evidence.
+
 These packages are preserved when importing and resolved through the host for both live and candidate previews, including export subpaths such as `three/addons/...`. A browser import of the Tauri API does not provide native IPC. Other dependencies or versions require an explicit host compatibility change and execution evidence. Workspaces, `file:` dependencies, aliases, JSX-only entry points, React 18, Vue and Next are not automatically adapted. Core tool dependency declarations use the existing importer policy; the controlled host still selects its React/tool versions.
 
 All Git object reads disable replacement objects without changing repository settings, so provenance refers to the requested commit's actual tree and blobs. Registered browser dependencies used by value imports, re-exports or literal dynamic imports are retained even when declared in optional or development dependencies; unused build tooling is not copied. CSS imports such as `@import "theme.css"` resolve as local stylesheet resources.

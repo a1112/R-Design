@@ -26,7 +26,8 @@ afterEach(async () => { await Promise.all(directories.splice(0).map(root => rm(r
 describe('React 19 fragment chart composition', () => {
   it('uses the scoped React 19 element recognizer and renders direct, fragment and nested/array Line children equally in SSR', async () => {
     const declaration = JSON.parse(await readFile(path.join(host, 'package.json'), 'utf8'));
-    expect(declaration.overrides).toEqual({ 'recharts@2.15.4': { 'react-is@18.3.1': '19.3.0' } });
+    expect(declaration.overrides['recharts@2.15.4']).toEqual({ 'react-is@18.3.1': '19.3.0' });
+    expect(Object.keys(declaration.overrides).filter(name => name.startsWith('react-is'))).toEqual([]);
     const chartRequire = createRequire(require.resolve('recharts/package.json'));
     expect(chartRequire('react-is/package.json').version).toBe('19.3.0');
     // The other legacy consumer keeps its original recognizer.
