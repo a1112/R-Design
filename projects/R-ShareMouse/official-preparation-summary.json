@@ -1,0 +1,473 @@
+{
+  "name": "R-ShareMouse",
+  "testedHostSha": "3fba881610f73705c1da026d0ed5298d79855441",
+  "source": {
+    "repository": "a1112/R-ShareMouse",
+    "branch": "main",
+    "sha": "2f5d8a489a0622d4b56687ffe692e7ae30af310d",
+    "visibility": "public",
+    "frontend": "apps/rshare-desktop-frontend"
+  },
+  "copiedFileCount": 114,
+  "byteIdenticalPreparedCopy": true,
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "sha256": "3e8e3a70f4894ec544e08ac5778faa4c4b5188166c6d7796c7c65ba2fac925fb"
+    },
+    {
+      "path": "package.json",
+      "sha256": "6939327bb2cf61470638c27dd8fadd901d518f4f7164544ef64501c1858ec5c4"
+    },
+    {
+      "path": "src/app/App.tsx",
+      "sha256": "b1406b05e3dc3c6b156692fc033819ee88adc381b346c3b4975749d0c3ef7b44"
+    },
+    {
+      "path": "src/app/MobileController.tsx",
+      "sha256": "94f3c1afbf8d6c52f100fad605d5979174157409bb4459cb08ab25a69c19f78d"
+    },
+    {
+      "path": "src/app/NetworkAudioPanel.tsx",
+      "sha256": "36daa9e629a7ad56c9b3d4e85b8b8301008dbe6157a5bb743f4e448b3e7ef2eb"
+    },
+    {
+      "path": "src/app/WakePanel.tsx",
+      "sha256": "ffa72106e66f0761cf97bf1a589c5a5412c1bad1e424c8206f616cc5b7e901da"
+    },
+    {
+      "path": "src/app/components/FileTransfersPanel.tsx",
+      "sha256": "6564cb38081ca4481160b6f571a7b84c46c97f0c30c1a45abc3dad3e4f336785"
+    },
+    {
+      "path": "src/app/components/MonitorManager.tsx",
+      "sha256": "49217776e9e43d1246fe37930103cd548afd9d9e443369c8b4bd8195bd91be9c"
+    },
+    {
+      "path": "src/app/components/figma/ImageWithFallback.tsx.reference.txt",
+      "sha256": "79caaf9d1736698c090823383f7b18a9496e9c1309a40f925c8aeb37e496bd8e"
+    },
+    {
+      "path": "src/app/components/ui/accordion.tsx.reference.txt",
+      "sha256": "0ff6fadd3560c21aa67911d817f89d206188fd07bd57244ba59a117bd4ff9cb4"
+    },
+    {
+      "path": "src/app/components/ui/alert-dialog.tsx.reference.txt",
+      "sha256": "16f0bf95de446a8579cba6e75557fd83eb4aa0dbbc77ee936fbb59451e9390e9"
+    },
+    {
+      "path": "src/app/components/ui/alert.tsx.reference.txt",
+      "sha256": "19835c5f03b78e8915b5e8900a0681ddfb83e3bcc0c9930e62f31c01e4dfb129"
+    },
+    {
+      "path": "src/app/components/ui/aspect-ratio.tsx.reference.txt",
+      "sha256": "7706745e217bebbc2d7bdf6697e9c6d484061146ae771755c9b6f240762c7217"
+    },
+    {
+      "path": "src/app/components/ui/avatar.tsx.reference.txt",
+      "sha256": "d40b1cbabe71c094c6bcf089ac5702ec77623dbc75c770ca9f86530e03d6fea1"
+    },
+    {
+      "path": "src/app/components/ui/badge.tsx.reference.txt",
+      "sha256": "8329a0b50f818665f1aca05ab93c16b103178b463f2949234ee4416bbc7d3fe2"
+    },
+    {
+      "path": "src/app/components/ui/breadcrumb.tsx.reference.txt",
+      "sha256": "c9fcf4df692c80c06ccc38c32f7045d1f389197c503edac32941cde64bada62e"
+    },
+    {
+      "path": "src/app/components/ui/button.tsx.reference.txt",
+      "sha256": "a3f96150fdf0c929eec3759673cc34b2cf5538fc088b25a54c00e0a3ed1c3f60"
+    },
+    {
+      "path": "src/app/components/ui/calendar.tsx.reference.txt",
+      "sha256": "280ba2b6416bb46259762fbb0068c61e93f186242516a10c2f319d484b09485d"
+    },
+    {
+      "path": "src/app/components/ui/card.tsx.reference.txt",
+      "sha256": "afc99cfa090791e394e68766095a4a86f5f6140521546b32d4b298061d72473f"
+    },
+    {
+      "path": "src/app/components/ui/carousel.tsx.reference.txt",
+      "sha256": "5ffdde6336f0ee479c11255f3b951b230a1771f0080323f4dd0def03d677f50c"
+    },
+    {
+      "path": "src/app/components/ui/chart.tsx.reference.txt",
+      "sha256": "e3e14ac980ce857edda5414ceaf8d7e504b5be37a4d99c28ff67c4c2535f51ff"
+    },
+    {
+      "path": "src/app/components/ui/checkbox.tsx.reference.txt",
+      "sha256": "894eb30992723a15e3ae75c46a3bf8808a526f5b3bff2c61c78f4d3e8d521cb8"
+    },
+    {
+      "path": "src/app/components/ui/collapsible.tsx.reference.txt",
+      "sha256": "b763764ebced561c04e2e6ada9dc53375bb90b9f4bcb91b0f3d5de7381aaf0cb"
+    },
+    {
+      "path": "src/app/components/ui/command.tsx.reference.txt",
+      "sha256": "17ae21889928aeb0c042911153b7f0715bf537b190da31f16fc5798b9439aa2f"
+    },
+    {
+      "path": "src/app/components/ui/context-menu.tsx",
+      "sha256": "6cfb772865c50a323839acdb90e33d79e9fdfce09223bd2ee4e826c2937d4378"
+    },
+    {
+      "path": "src/app/components/ui/dialog.tsx.reference.txt",
+      "sha256": "f4adc0065a7f795b5d99b8afe095a443d2d03b523cf5f958bc36ee7fbe0d3e45"
+    },
+    {
+      "path": "src/app/components/ui/drawer.tsx.reference.txt",
+      "sha256": "5a99d073185e0ef6d984436547dce1f99c333dde7c1d7f33a2155dce05216514"
+    },
+    {
+      "path": "src/app/components/ui/dropdown-menu.tsx.reference.txt",
+      "sha256": "798b5337dc147d88c65de01f7221e0bfa04272968a1fce6acc1ec0bef7d9ddb9"
+    },
+    {
+      "path": "src/app/components/ui/form.tsx.reference.txt",
+      "sha256": "b181a640358bd91b827f7e3ba610036f24a976994d4d88b480471a167770a508"
+    },
+    {
+      "path": "src/app/components/ui/hover-card.tsx.reference.txt",
+      "sha256": "6ec1ef98aef3898ef3f8eb35e52c10add150d76cd041132d2520fe3016ecfe60"
+    },
+    {
+      "path": "src/app/components/ui/input-otp.tsx.reference.txt",
+      "sha256": "b15b03f71841b176baa6e0294a0790eea1ffe9264c55003fbbc9039d8457057b"
+    },
+    {
+      "path": "src/app/components/ui/input.tsx.reference.txt",
+      "sha256": "cb82ffcd1a9accdf9b07edc8e976f43ad1c9cf91968ffd7639df5df14b7ad407"
+    },
+    {
+      "path": "src/app/components/ui/label.tsx.reference.txt",
+      "sha256": "5ed157f039340cedaa59a888931db608667827170ae9538513a50ccf2ca65a9f"
+    },
+    {
+      "path": "src/app/components/ui/menubar.tsx.reference.txt",
+      "sha256": "1f0173397dac560a4748782bb595c956155a9360755667bee3d18c4a0f1179b1"
+    },
+    {
+      "path": "src/app/components/ui/navigation-menu.tsx.reference.txt",
+      "sha256": "df9f6e0c1d3fb1b265f8561ef00c98412f24a360a00cb7935b7c6f9a0d7513e6"
+    },
+    {
+      "path": "src/app/components/ui/pagination.tsx.reference.txt",
+      "sha256": "10bad2279ea5120ade645a1a834ed74f2471cde0fe7f3e9457fcb4918b7d0bc3"
+    },
+    {
+      "path": "src/app/components/ui/popover.tsx.reference.txt",
+      "sha256": "f14e16bebcfb1b605f6336d52153e43b76456c419930faea216d0ce2e3b1d3b7"
+    },
+    {
+      "path": "src/app/components/ui/progress.tsx.reference.txt",
+      "sha256": "956cf4b485bcf57684caac10df2aa2a72387d0736d8f4cd1315c49ebd2da4615"
+    },
+    {
+      "path": "src/app/components/ui/radio-group.tsx.reference.txt",
+      "sha256": "ecaeebb62d064893c23e7242b796ff5834e2b430676b3eecb1b3d4bc413283c8"
+    },
+    {
+      "path": "src/app/components/ui/resizable.tsx.reference.txt",
+      "sha256": "7930ed39d1095de95193bb72ef046b8198647e1114d9a437aa1cd04c0975c5a8"
+    },
+    {
+      "path": "src/app/components/ui/scroll-area.tsx.reference.txt",
+      "sha256": "5bd9bb1d6909467b431283e96d2a9c83003bca1aa043d149dcfed8e81de51986"
+    },
+    {
+      "path": "src/app/components/ui/select.tsx.reference.txt",
+      "sha256": "6aaf2111952394fbb8c64a505af02d08da28cc25726d61a991daebe400772480"
+    },
+    {
+      "path": "src/app/components/ui/separator.tsx.reference.txt",
+      "sha256": "54cc34fc3ef7e445948c5bccf7307efbb2c8f9e63db0fc68dd3fa8ee54dc9812"
+    },
+    {
+      "path": "src/app/components/ui/sheet.tsx.reference.txt",
+      "sha256": "8e1e064f92e2463bc7b8bb227a7c4d68d7464837c02d48ff75a87585d864c54c"
+    },
+    {
+      "path": "src/app/components/ui/sidebar.tsx.reference.txt",
+      "sha256": "24e197a06698ac0606e99b3ab9e7c31e9544e759eb929d22f37ea15391cae1c1"
+    },
+    {
+      "path": "src/app/components/ui/skeleton.tsx.reference.txt",
+      "sha256": "7fd5d7f3ea479c3c1ae7be79bdbaf84c87647333768f70d396cd84580535d485"
+    },
+    {
+      "path": "src/app/components/ui/slider.tsx.reference.txt",
+      "sha256": "19dd9d8b758f41fa61967d1a0540ea34ed989727258d23eef9a50cdebcab805b"
+    },
+    {
+      "path": "src/app/components/ui/sonner.tsx.reference.txt",
+      "sha256": "c5853f16cc11cb69e0115bab13eeabe7be5dad16fafd77b35cdfe4dbc64f0256"
+    },
+    {
+      "path": "src/app/components/ui/switch.tsx.reference.txt",
+      "sha256": "d4c744131c6161300510909aafe2c2cb6d819f2c7a8c2aeb75d4317004c7eff7"
+    },
+    {
+      "path": "src/app/components/ui/table.tsx.reference.txt",
+      "sha256": "e4ec7d3be042efd0fa363a57dd0e649a7831b86f975d4ec5192ebbfdd66e0f95"
+    },
+    {
+      "path": "src/app/components/ui/tabs.tsx.reference.txt",
+      "sha256": "933b8f421bd84b21a22e3fd11cd62fbf4fd8b6fb7252f42ea706b9cd29255051"
+    },
+    {
+      "path": "src/app/components/ui/textarea.tsx.reference.txt",
+      "sha256": "6c3127c28ba1dda0428ba286a9e291c52ad95bfc8acd10518b262b71e470f3e7"
+    },
+    {
+      "path": "src/app/components/ui/toggle-group.tsx.reference.txt",
+      "sha256": "43e56c5487ed93a2e0d418dcf944a646c716b8c8c55d050fcda1d5cd1248cce6"
+    },
+    {
+      "path": "src/app/components/ui/toggle.tsx.reference.txt",
+      "sha256": "31f91bca26bed6bc884e3dbebe095046d4cf925b9d7676094721ac287d0b2135"
+    },
+    {
+      "path": "src/app/components/ui/tooltip.tsx.reference.txt",
+      "sha256": "2f3a8720fb4b75c6911450be73d0407e2a84bb5ea1ded28ccdbf955be62a0155"
+    },
+    {
+      "path": "src/app/components/ui/use-mobile.ts.reference.txt",
+      "sha256": "738d8e4520edeca7caa2ca56a4923839e30be14a00fc32b5a770f5d5b451a63e"
+    },
+    {
+      "path": "src/app/components/ui/utils.ts",
+      "sha256": "d1f1e0d62cb8d8d1e04c26e14de842d8a151f75812d81b046c65b5d1fe8e4b27"
+    },
+    {
+      "path": "src/app/desktop-model.mjs",
+      "sha256": "4396004e199398722015776d0ccbe940308710ed48133408d038c44561c8a564"
+    },
+    {
+      "path": "src/app/desktop-shell.mjs",
+      "sha256": "81d9e81dc3fcfb3f3f5deb40f4753814a8413c5dd4b8f983518085f3ff642445"
+    },
+    {
+      "path": "src/app/desktop-theme.mjs",
+      "sha256": "9b5b1a0bb2e9218cf3d7a70cf9405dc926a95621f18feae2a3d592e3b6a6e85e"
+    },
+    {
+      "path": "src/app/dev-bridge-security.mjs.source.txt",
+      "sha256": "6b53490de0398ee5717b405551eb44facd6972d92a5ac309a6af5eb7104a9de7"
+    },
+    {
+      "path": "src/app/display-capture.mjs",
+      "sha256": "d1dedbf975da9fca22522c9bcfc44da3b0ed1f94fa7f28395721d584da01913d"
+    },
+    {
+      "path": "src/app/file-transfer.mjs",
+      "sha256": "f5a6a7ae874007800e5fa8747bd897757629ba9d71d366dc8024c8fe795fb5b6"
+    },
+    {
+      "path": "src/app/hardware-assets.mjs",
+      "sha256": "8b760a8d2c2235d071039f31a84c7cdf2ec175919cb54768159bb0c332a0e803"
+    },
+    {
+      "path": "src/app/ipc-frame.mjs",
+      "sha256": "5084cd2971bd6f5a67a57c4417df5ee8c7505ce489485127ab5098aabfe78851"
+    },
+    {
+      "path": "src/app/macos-permissions.mjs",
+      "sha256": "c0ce7c17f5b09a7cf8065c7a54378dea0528464ccbf39eabdd342df5bea7b2a5"
+    },
+    {
+      "path": "src/app/mobile-controller.mjs",
+      "sha256": "4c7ce1328653bd59473c65180a9a8044f235c032c096f2bc2ad143bede580d88"
+    },
+    {
+      "path": "src/app/monitor-context-menu.mjs",
+      "sha256": "fd20d23f758e7b7498eb4596e7b02e50adfd411ad5234b2d50072ae54cd29361"
+    },
+    {
+      "path": "src/app/network-audio-model.mjs",
+      "sha256": "04b309916588a93013296150edb86558834a3b0dd794da950076e207924d1f99"
+    },
+    {
+      "path": "src/app/ui-state-client.mjs",
+      "sha256": "f53aa4b86c05802fe01a3b193a0441ce565ee6e7a1f8a12c98a24f02d026a8f7"
+    },
+    {
+      "path": "src/app/ui-store.mjs",
+      "sha256": "1d01e00af3395a2a1e5808fb4952056ade736682bac9edfa5905604f38a55755"
+    },
+    {
+      "path": "src/app/use-ui-store.ts",
+      "sha256": "21d1c7767de2208138a3857dbafff68213eea5e09b8d183e27c0413e3d4ccc3d"
+    },
+    {
+      "path": "src/app/wake-model.mjs",
+      "sha256": "eeda6a3d97c773790afb7fc2eb956c9476be6ac8ec6444a9bc9dcdaa31c5f20e"
+    },
+    {
+      "path": "src/app/window-platform.mjs",
+      "sha256": "40fd2e7d4b9a1b6b1776cd1bfeec3a1774a08c33c20b93f85d1ca06ce520fdaa"
+    },
+    {
+      "path": "src/assets/hardware/generated-hardware-sheet.png.part-01.json",
+      "sha256": "5991595be7149441d147214599ccbfd3d850c9a092c1bc4f64ef0d7689995101"
+    },
+    {
+      "path": "src/assets/hardware/generated-hardware-sheet.png.part-01.txt",
+      "sha256": "0d7b5b47c54a3edec7996ea2bd348cf805c0abac12de2a400f77a3d856269032"
+    },
+    {
+      "path": "src/assets/hardware/generated-hardware-sheet.png.part-02.json",
+      "sha256": "3c8eda36eaafbe38674d0194692da1820ce18e53e24790dcc813eded3f0153ca"
+    },
+    {
+      "path": "src/assets/hardware/generated-hardware-sheet.png.part-02.txt",
+      "sha256": "3146b7ae70ba9514311c6147c2b8803d2a80a1ee5b4b4ad5b764901f76377da3"
+    },
+    {
+      "path": "src/assets/hardware/generated-hardware-sheet.png.part-03.json",
+      "sha256": "2fcd96c26bb7b5b77e895378f893c13878b32924a0a24868f6ee7d04fe906655"
+    },
+    {
+      "path": "src/assets/hardware/generated-hardware-sheet.png.part-03.txt",
+      "sha256": "fbe67f0fcbeffdf275da375f97852d0ba25b76f7296a564fa51b9597722aad1e"
+    },
+    {
+      "path": "src/assets/hardware/generated-hardware-sheet.png.part-04.json",
+      "sha256": "60c6480051ce91c9f8e0486613b984fe53a63644d02df3b0305ddbf121d44b6a"
+    },
+    {
+      "path": "src/assets/hardware/generated-hardware-sheet.png.part-04.txt",
+      "sha256": "913137e8fb9951f7019609485d0d27217e218607b57a70c8b4331c787790fa9f"
+    },
+    {
+      "path": "src/assets/hardware/generated-hardware-sheet.png.part-05.json",
+      "sha256": "e5d1f9dcd202cf3737f4a4bb59ac5ef2ac8cac413e30d4a41ea5c5c2305f8559"
+    },
+    {
+      "path": "src/assets/hardware/generated-hardware-sheet.png.part-05.txt",
+      "sha256": "df736bec5c1af2704b293beabe3a144b41c86931618f3a48787198e4bbb4e94f"
+    },
+    {
+      "path": "src/assets/hardware/live2d/gamepad/base.png.part-01.json",
+      "sha256": "24c60da7d13f230a9a4d2b089764514d1d81a6952f1af67a9d365d49374a4e73"
+    },
+    {
+      "path": "src/assets/hardware/live2d/gamepad/base.png.part-01.txt",
+      "sha256": "eb6d388acdd8ba492e6f0d7b3e87be255c295c8e904838f25a0c68d5d9f543cf"
+    },
+    {
+      "path": "src/assets/hardware/live2d/gamepad/base.png.part-02.json",
+      "sha256": "a6401316ba689d06e5b53667ed60e1eda5faf75fcb38ef241c393a924c2ab52d"
+    },
+    {
+      "path": "src/assets/hardware/live2d/gamepad/base.png.part-02.txt",
+      "sha256": "a2cb5f1b9dbd05af447760cd86288c6e76ae52b0e0b5fcaa98e626d95ebf1102"
+    },
+    {
+      "path": "src/assets/hardware/live2d/gamepad/base.png.part-03.json",
+      "sha256": "0d4dd9df74105b317c90c94c46ecee15487f910272eb335d7510f7630aec8178"
+    },
+    {
+      "path": "src/assets/hardware/live2d/gamepad/base.png.part-03.txt",
+      "sha256": "e7411576192be652b788bca9dac339918bf64313b9a074aa7088caf33ca31ba9"
+    },
+    {
+      "path": "src/assets/hardware/live2d/gamepad/manifest.json",
+      "sha256": "f34a99b35e8f69c7c1db7855223d1f1b6bdf8c31390ae59e3949cae6106c8510"
+    },
+    {
+      "path": "src/assets/hardware/live2d/keyboard/base.png",
+      "sha256": "d8afc093e438d2ce1de3ba8915736dcf532e40b542286f1d6973f79809a0535d"
+    },
+    {
+      "path": "src/assets/hardware/live2d/keyboard/gaming/base.png",
+      "sha256": "c137723445c778df29a9da823c9823cda40f9c54857e149939870d788fefb9bc"
+    },
+    {
+      "path": "src/assets/hardware/live2d/keyboard/gaming/manifest.json",
+      "sha256": "3bdf78c1b292fd05ad031da7448941ec52ec57382ee0e28c8fa0b4a6f23fc74c"
+    },
+    {
+      "path": "src/assets/hardware/live2d/keyboard/manifest.json",
+      "sha256": "c6e50e78e2589be5141ef2ec1e727bd61290432c8e9d56f11f2369f6e751faf4"
+    },
+    {
+      "path": "src/assets/hardware/live2d/mouse/base.png",
+      "sha256": "8ada778380a4e8d6cb80b718e31b35cfbeece05383e4e62b5bf155067a38d2bc"
+    },
+    {
+      "path": "src/assets/hardware/live2d/mouse/gaming/base.png",
+      "sha256": "43469a76dcc63395d3e6526d560434fc0552c9b5ac95fbbdbcf214bfd848149a"
+    },
+    {
+      "path": "src/assets/hardware/live2d/mouse/gaming/manifest.json",
+      "sha256": "2589b425295812c810ee2d6e6124eaecddc8158a460b158ed3f2ce10d340ee70"
+    },
+    {
+      "path": "src/assets/hardware/live2d/mouse/manifest.json",
+      "sha256": "191439274174fc6abba5074f4828baf2d27ec8f31bd8704f769e4d6ce8b183c2"
+    },
+    {
+      "path": "src/imports/QQ_1776505649654.png",
+      "sha256": "862086407d9dd53c6af7beb12f2b2755eb873af30c829284de05d92daa309540"
+    },
+    {
+      "path": "src/imports/QQ_1776508192515.png",
+      "sha256": "b2dd7e35ea80bbcf81c9e47522462fc577a757b556108c5f0518483c262a811a"
+    },
+    {
+      "path": "src/main.tsx",
+      "sha256": "f7293e1b617adaa16988a51dfcadef0f580b62a8474329620347551e339c8e77"
+    },
+    {
+      "path": "src/rdesign.compiled.css",
+      "sha256": "eb4d83f159c0d5ee555edc0a83223539684d06bee17d83d9c01b72c0fde965a6"
+    },
+    {
+      "path": "src/rdesignAssetUrls.ts",
+      "sha256": "62b495860e90abe5270e3e7ed45c33a3d36c9a9c2adbfc40c1e730720cac91ad"
+    },
+    {
+      "path": "src/rdesignBoot.ts",
+      "sha256": "492366345e96c8f43dc8dc475704a88b6955e337bb28d106d3dfecbdfd7e1f54"
+    },
+    {
+      "path": "src/rdesignBoundary.ts",
+      "sha256": "5ce4f0096efb7a92f8bb4c5b7aed7c8e7df4363e9289a146423f8948d4ecba11"
+    },
+    {
+      "path": "src/rdesignPackingLedger.json",
+      "sha256": "55ebf726a448a04cfb20728eb7c5eaaeca5cf1813010b11c2968bf72863a84c4"
+    },
+    {
+      "path": "src/rdesignProvenance.json",
+      "sha256": "a6da55b81c52577efef0268ca3e0842c0114e8409a9a3644ace481f336439ccd"
+    },
+    {
+      "path": "src/styles/fonts.css",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "src/styles/index.css",
+      "sha256": "c20d9ff9946cfc2d8f3bf39f0c336e109de7531316554e7ac4bcbab39752f551"
+    },
+    {
+      "path": "src/styles/tailwind.css",
+      "sha256": "eb4d83f159c0d5ee555edc0a83223539684d06bee17d83d9c01b72c0fde965a6"
+    },
+    {
+      "path": "src/styles/tailwind.css.source.txt",
+      "sha256": "c7dddb734b0c9e3cfaa6698cd725f018b8a5e41f847ae42fd9b0269d44ee9ff4"
+    },
+    {
+      "path": "src/styles/theme.css",
+      "sha256": "bbebb4cd280d5c3a3e808233670b18e7ce72c08da66823522d2b5ca3166acde7"
+    },
+    {
+      "path": "src/upstreamMain.tsx",
+      "sha256": "af3a225e9f9e92841c79e7a75623b2ba1e04c8400008d002bb85c40f8fbb295c"
+    }
+  ],
+  "scope": "Complete prepared source/resources; dormant modules remain verbatim references; no additional dependency installation or host overrides",
+  "parentFrozenChecksum": "76ed4110e304ee998ecbcf502135ac86b4da7faa2f752cbcf9f3e8063485a411"
+}

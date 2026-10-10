@@ -1,0 +1,185 @@
+{
+  "name": "R-ShareMouse",
+  "testedHostSha": "3fba881610f73705c1da026d0ed5298d79855441",
+  "extensionMergedIntoMain": false,
+  "source": {
+    "repository": "a1112/R-ShareMouse",
+    "branch": "main",
+    "sha": "2f5d8a489a0622d4b56687ffe692e7ae30af310d",
+    "visibility": "public",
+    "frontend": "apps/rshare-desktop-frontend"
+  },
+  "bundle": {
+    "file": ".rdesign/desktop-official-deliverables/R-ShareMouse.3fba881.rdesign-project.json",
+    "checksum": "27ee0b64e43a67460ad6bf30f204e736bfc1f44ec32ad0b70354127f513df70a",
+    "fileSha256": "02e204114586ce2349c2de7073fc1c3653a883bcf2068297b473fde16913cb0c",
+    "bytes": 13915205,
+    "sourceFiles": 115
+  },
+  "mode": "Actual official ProjectWorkspace, BrowserRuntime, scenario runner and ChangeEngine; no runtime overrides or project dependency installations",
+  "runRoot": ".rdesign/desktop-official-validation/R-ShareMouse/run-OcmuVe",
+  "scenes": [
+    {
+      "id": "layout-desktop",
+      "passed": true,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "screenshot": "layout-desktop.png",
+      "frameCodeRevision": "3781d9f409b5fc7c00b17b90f8a6f8607fdd07cb0491a62f16cf4d630f5729b0",
+      "nodes": 146,
+      "exactOriginalSourceNodes": 60,
+      "clippedControls": 0
+    },
+    {
+      "id": "layout-narrow",
+      "passed": true,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "layout-narrow.png",
+      "frameCodeRevision": "3781d9f409b5fc7c00b17b90f8a6f8607fdd07cb0491a62f16cf4d630f5729b0",
+      "nodes": 116,
+      "exactOriginalSourceNodes": 51,
+      "clippedControls": 7
+    },
+    {
+      "id": "settings-desktop",
+      "passed": true,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "screenshot": "settings-desktop.png",
+      "frameCodeRevision": "3781d9f409b5fc7c00b17b90f8a6f8607fdd07cb0491a62f16cf4d630f5729b0",
+      "nodes": 119,
+      "exactOriginalSourceNodes": 32,
+      "clippedControls": 0
+    }
+  ],
+  "interactions": [
+    {
+      "name": "Original layout → settings route",
+      "passed": true
+    },
+    {
+      "name": "Start service rejects with original unavailable UI",
+      "passed": true,
+      "nativeSuccess": false
+    }
+  ],
+  "pageErrors": [],
+  "externalRequests": [],
+  "failures": [],
+  "nativeBackend": "unavailable; no native/backend capability accepted",
+  "preflight": {
+    "passed": true,
+    "checksum": "27ee0b64e43a67460ad6bf30f204e736bfc1f44ec32ad0b70354127f513df70a",
+    "sourceFileCount": 115,
+    "sourceBytes": 12531319,
+    "scenarioCount": 3,
+    "errors": [],
+    "warnings": [
+      "结构预检不证明运行、后端、原生能力或业务状态转换；导入后场景须重新验收"
+    ]
+  },
+  "import": {
+    "passed": true,
+    "ids": [
+      "project_5980a913-15e1-47b9-9d2f-b0ffebbeb448",
+      "project_2f6f9566-52d7-4f87-9e18-7746b5ed300d"
+    ],
+    "distinctSourceDirectories": true,
+    "incomingEvidenceStatus": "unverified",
+    "preservedFiles": 114
+  },
+  "productionBuild": "passed",
+  "candidate": {
+    "passed": true,
+    "prepare": "passed",
+    "verify": "passed actual build and registered scenarios",
+    "accept": "passed actual DOM readback",
+    "revert": "passed semantic text restoration",
+    "byteIdenticalRevert": "not asserted",
+    "originalText": "设备与显示器",
+    "sourceBinding": {
+      "sourceNodeId": "source-a731dd54736a8e4f",
+      "file": "src/app/components/MonitorManager.tsx",
+      "line": 1480,
+      "column": 14,
+      "fileHash": "49217776e9e43d1246fe37930103cd548afd9d9e443369c8b4bd8195bd91be9c",
+      "reliability": "exact",
+      "scope": "instance",
+      "editableProperties": [
+        "text",
+        "fontSize",
+        "fontWeight",
+        "borderRadius",
+        "gap",
+        "padding",
+        "paddingTop",
+        "paddingBottom",
+        "paddingLeft",
+        "paddingRight",
+        "margin",
+        "background",
+        "backgroundColor",
+        "gridTemplateColumns",
+        "height",
+        "minHeight",
+        "width",
+        "maxWidth",
+        "letterSpacing",
+        "lineHeight",
+        "borderColor",
+        "borderWidth",
+        "display",
+        "alignItems",
+        "justifyContent"
+      ]
+    },
+    "sharedScopeRejected": true,
+    "persistedStatus": "reverted",
+    "independentProjectUnchanged": true,
+    "evidence": [
+      {
+        "name": "生产构建",
+        "passed": true,
+        "detail": "独立候选目录 Vite 生产构建通过"
+      },
+      {
+        "name": "布局 · 桌面",
+        "passed": true,
+        "detail": "就绪条件 [data-rdesign-id=\"rshare-shell\"]；1440×900 源分辨率 PNG"
+      },
+      {
+        "name": "布局 · 窄屏",
+        "passed": true,
+        "detail": "就绪条件 [data-rdesign-id=\"rshare-shell\"]；390×844 源分辨率 PNG"
+      },
+      {
+        "name": "设置 · 外观",
+        "passed": true,
+        "detail": "就绪条件 [data-rdesign-page=\"settings\"]；1440×900 源分辨率 PNG"
+      },
+      {
+        "name": "基础键盘焦点",
+        "passed": true,
+        "detail": "基础 Tab 焦点通过；具体业务交互以登记场景步骤为准"
+      },
+      {
+        "name": "运行错误",
+        "passed": true,
+        "detail": "场景运行未产生 JavaScript 异常"
+      },
+      {
+        "name": "目标属性回读",
+        "passed": true,
+        "detail": "指定实例的文字与内联属性均已实际生效"
+      }
+    ]
+  },
+  "passed": true
+}

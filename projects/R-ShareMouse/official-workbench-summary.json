@@ -1,0 +1,62 @@
+{
+  "name": "R-ShareMouse",
+  "testedHostSha": "3fba881610f73705c1da026d0ed5298d79855441",
+  "extensionMergedIntoMain": false,
+  "source": {
+    "repository": "a1112/R-ShareMouse",
+    "branch": "main",
+    "sha": "2f5d8a489a0622d4b56687ffe692e7ae30af310d",
+    "visibility": "public",
+    "frontend": "apps/rshare-desktop-frontend"
+  },
+  "runRoot": ".rdesign/desktop-official-workbench/R-ShareMouse/run-RpgczY",
+  "mode": "Actual Workbench file chooser, official Bridge and fresh process restart; headless browsers and independent loopback ports",
+  "checks": [
+    {
+      "name": "Actual Workbench file chooser import/open/live source mappings",
+      "passed": true,
+      "importedId": "project_6a453f4a-fd2f-458e-a4b7-9c006a313ffd",
+      "incomingScenes": 3,
+      "originalSourceNodes": 60
+    },
+    {
+      "name": "Actual Bridge scene layout-desktop",
+      "passed": true,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "snapshotId": "snapshot_d894cd04-d92d-4128-82c5-6c3d08f39e86"
+    },
+    {
+      "name": "Actual Bridge scene layout-narrow",
+      "passed": true,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "snapshotId": "snapshot_a5b76980-940d-49fe-b3d7-fc7be41ef687"
+    },
+    {
+      "name": "Actual Bridge scene settings-desktop",
+      "passed": true,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "snapshotId": "snapshot_e62f528e-eb1f-47a5-ad3e-ce5143638bf4"
+    },
+    {
+      "name": "Fresh Bridge + Workbench browser restart restores active project and saved snapshots",
+      "passed": true,
+      "importedId": "project_6a453f4a-fd2f-458e-a4b7-9c006a313ffd",
+      "oldSession": "7338fe60-19ff-41e4-8d93-4adadc839292",
+      "newSession": "4c709668-0e6a-4676-b9b9-40d36a09944f",
+      "restoredSnapshots": 3,
+      "originalLegacyProject": "project_bdf39f2a-f151-4f24-a2c4-d8a700d81e99"
+    }
+  ],
+  "clientPageErrors": [],
+  "failures": [],
+  "passed": true
+}

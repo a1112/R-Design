@@ -1,0 +1,62 @@
+{
+  "name": "R-Link",
+  "testedHostSha": "3fba881610f73705c1da026d0ed5298d79855441",
+  "extensionMergedIntoMain": false,
+  "source": {
+    "repository": "a1112/R-Link",
+    "branch": "main",
+    "sha": "c7d45379038010face712f20f84d67f4e6b0e81b",
+    "visibility": "public",
+    "frontend": "apps/r-link-web"
+  },
+  "runRoot": ".rdesign/desktop-official-workbench/R-Link/run-10Wntj",
+  "mode": "Actual Workbench file chooser, official Bridge and fresh process restart; headless browsers and independent loopback ports",
+  "checks": [
+    {
+      "name": "Actual Workbench file chooser import/open/live source mappings",
+      "passed": true,
+      "importedId": "project_521012ed-37bc-4575-a98e-d3abfbfb4791",
+      "incomingScenes": 3,
+      "originalSourceNodes": 75
+    },
+    {
+      "name": "Actual Bridge scene main-desktop",
+      "passed": true,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "snapshotId": "snapshot_958afaf4-b993-4bb3-881c-cf268b0d458c"
+    },
+    {
+      "name": "Actual Bridge scene main-narrow",
+      "passed": true,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "snapshotId": "snapshot_87f2e41d-cef7-4c1b-92d4-f76eb666824e"
+    },
+    {
+      "name": "Actual Bridge scene devices-desktop",
+      "passed": true,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "snapshotId": "snapshot_fd0c5e89-b82d-445d-925e-519e32f2f4b8"
+    },
+    {
+      "name": "Fresh Bridge + Workbench browser restart restores active project and saved snapshots",
+      "passed": true,
+      "importedId": "project_521012ed-37bc-4575-a98e-d3abfbfb4791",
+      "oldSession": "256086ce-f3b1-48b3-a3b1-bfe4c05ad7f3",
+      "newSession": "bef48d49-0494-40c7-b834-75542177d46c",
+      "restoredSnapshots": 3,
+      "originalLegacyProject": "project_3f51d3b5-c83e-4a69-aba7-c812f9867b73"
+    }
+  ],
+  "clientPageErrors": [],
+  "failures": [],
+  "passed": true
+}

@@ -1,0 +1,161 @@
+{
+  "name": "R-Link",
+  "testedHostSha": "3fba881610f73705c1da026d0ed5298d79855441",
+  "extensionMergedIntoMain": false,
+  "source": {
+    "repository": "a1112/R-Link",
+    "branch": "main",
+    "sha": "c7d45379038010face712f20f84d67f4e6b0e81b",
+    "visibility": "public",
+    "frontend": "apps/r-link-web"
+  },
+  "bundle": {
+    "file": ".rdesign/desktop-official-deliverables/R-Link.3fba881.rdesign-project.json",
+    "checksum": "729a2689633b6b022cf3750ae7358900049bc43afa394f3980a27f0b513e4810",
+    "fileSha256": "490a958dc11d11929906724447ea80f4a6aa8fe36e08d9046025d25a71f8cf9e",
+    "bytes": 1102205,
+    "sourceFiles": 148
+  },
+  "mode": "Actual official ProjectWorkspace, BrowserRuntime, scenario runner and ChangeEngine; no runtime overrides or project dependency installations",
+  "runRoot": ".rdesign/desktop-official-validation/R-Link/run-huLfMF",
+  "scenes": [
+    {
+      "id": "main-desktop",
+      "passed": true,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "screenshot": "main-desktop.png",
+      "frameCodeRevision": "c8e0caad8936df37ee3cede5b28bc445f9738302dc6b57bbfa8bc39705c2a641",
+      "nodes": 241,
+      "exactOriginalSourceNodes": 75,
+      "clippedControls": 0
+    },
+    {
+      "id": "main-narrow",
+      "passed": true,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "main-narrow.png",
+      "frameCodeRevision": "c8e0caad8936df37ee3cede5b28bc445f9738302dc6b57bbfa8bc39705c2a641",
+      "nodes": 217,
+      "exactOriginalSourceNodes": 71,
+      "clippedControls": 0
+    },
+    {
+      "id": "devices-desktop",
+      "passed": true,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "screenshot": "devices-desktop.png",
+      "frameCodeRevision": "c8e0caad8936df37ee3cede5b28bc445f9738302dc6b57bbfa8bc39705c2a641",
+      "nodes": 97,
+      "exactOriginalSourceNodes": 16,
+      "clippedControls": 0
+    }
+  ],
+  "interactions": [
+    {
+      "name": "Original topology → device-management route",
+      "passed": true
+    },
+    {
+      "name": "Native window helper explicitly rejects",
+      "passed": true,
+      "nativeSuccess": false
+    }
+  ],
+  "pageErrors": [],
+  "externalRequests": [],
+  "failures": [],
+  "nativeBackend": "unavailable; no native/backend capability accepted",
+  "preflight": {
+    "passed": true,
+    "checksum": "729a2689633b6b022cf3750ae7358900049bc43afa394f3980a27f0b513e4810",
+    "sourceFileCount": 148,
+    "sourceBytes": 1026497,
+    "scenarioCount": 3,
+    "errors": [],
+    "warnings": [
+      "结构预检不证明运行、后端、原生能力或业务状态转换；导入后场景须重新验收"
+    ]
+  },
+  "import": {
+    "passed": true,
+    "ids": [
+      "project_f08ff3a0-d2bc-49fe-ad3a-b0bfb3d3897a",
+      "project_2c3c3632-b30d-46e7-9e68-5148542a6450"
+    ],
+    "distinctSourceDirectories": true,
+    "incomingEvidenceStatus": "unverified",
+    "preservedFiles": 147
+  },
+  "productionBuild": "passed",
+  "candidate": {
+    "passed": true,
+    "prepare": "passed",
+    "verify": "passed actual build and registered scenarios",
+    "accept": "passed actual DOM readback",
+    "revert": "passed semantic text restoration",
+    "byteIdenticalRevert": "not asserted",
+    "originalText": "R-Link",
+    "sourceBinding": {
+      "sourceNodeId": "source-0c67a4584e627317",
+      "file": "src/components/layout/Sidebar.tsx",
+      "line": 20,
+      "column": 23,
+      "fileHash": "684b446f5ddff9c0d4c1a2f2baa3faee87f82ebd1622cee5349dbf3a5999f965",
+      "reliability": "exact",
+      "scope": "instance",
+      "editableProperties": [
+        "text"
+      ]
+    },
+    "sharedScopeRejected": true,
+    "persistedStatus": "reverted",
+    "independentProjectUnchanged": true,
+    "evidence": [
+      {
+        "name": "生产构建",
+        "passed": true,
+        "detail": "独立候选目录 Vite 生产构建通过"
+      },
+      {
+        "name": "主界面 · 桌面",
+        "passed": true,
+        "detail": "就绪条件 #root > *；1440×900 源分辨率 PNG"
+      },
+      {
+        "name": "主界面 · 窄屏",
+        "passed": true,
+        "detail": "就绪条件 #root > *；390×844 源分辨率 PNG"
+      },
+      {
+        "name": "设备管理 · 桌面",
+        "passed": true,
+        "detail": "就绪条件 [data-rdesign-route=\"remote\"]；1440×900 源分辨率 PNG"
+      },
+      {
+        "name": "基础键盘焦点",
+        "passed": true,
+        "detail": "基础 Tab 焦点通过；具体业务交互以登记场景步骤为准"
+      },
+      {
+        "name": "运行错误",
+        "passed": true,
+        "detail": "场景运行未产生 JavaScript 异常"
+      },
+      {
+        "name": "目标属性回读",
+        "passed": true,
+        "detail": "指定实例的文字与内联属性均已实际生效"
+      }
+    ]
+  },
+  "passed": true
+}
