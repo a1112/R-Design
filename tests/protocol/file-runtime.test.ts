@@ -42,10 +42,11 @@ import * as Dialog from '@radix-ui/react-dialog';import * as Menu from '@radix-u
 import * as Select from '@radix-ui/react-select';import {Slot} from '@radix-ui/react-slot';
 import * as Tooltip from '@radix-ui/react-tooltip';import {cva} from 'class-variance-authority';import {format,parseISO} from 'date-fns';
 const appearance=cva('file-action',{variants:{tone:{active:'active-tone',quiet:'quiet-tone'}}});
-function App(){const [selected,setSelected]=React.useState('name'),[action,setAction]=React.useState('none');return <main>
+function App(){const [selected,setSelected]=React.useState('name'),[action,setAction]=React.useState('none'),[outsideClicks,setOutsideClicks]=React.useState(0);return <main>
 <h1 data-rdesign-id="file-title">File controls</h1><time data-testid="file-date">{format(parseISO('2026-10-10'),'yyyy-MM-dd')}</time>
 <Slot className={appearance({tone:'active'})}><button data-testid="slot-action" onClick={()=>setAction('slot')}>Slotted action</button></Slot><output data-testid="file-action">{action}</output>
-<Dialog.Root><Dialog.Trigger data-rdesign-id="dialog-trigger">Open file dialog</Dialog.Trigger><Dialog.Portal><Dialog.Content data-rdesign-id="file-dialog"><Dialog.Title>File details</Dialog.Title><Dialog.Description>Synthetic browser fixture</Dialog.Description><Dialog.Close>Close details</Dialog.Close></Dialog.Content></Dialog.Portal></Dialog.Root>
+<Dialog.Root><Dialog.Trigger data-rdesign-id="dialog-trigger">Open file dialog</Dialog.Trigger><Dialog.Portal><Dialog.Content data-rdesign-id="file-dialog"><Dialog.Title>File details</Dialog.Title><Dialog.Description>Synthetic browser fixture</Dialog.Description><Dialog.Close>Close details</Dialog.Close><Tooltip.Provider delayDuration={0}><Tooltip.Root><Tooltip.Trigger>Dialog help</Tooltip.Trigger><Tooltip.Portal><Tooltip.Content>Nested file help fixture</Tooltip.Content></Tooltip.Portal></Tooltip.Root></Tooltip.Provider></Dialog.Content></Dialog.Portal></Dialog.Root>
+<button data-testid="outside-action" onClick={()=>setOutsideClicks(count=>count+1)}>Outside action</button><output data-testid="outside-clicks">{outsideClicks}</output>
 <Menu.Root><Menu.Trigger data-rdesign-id="menu-trigger">File actions</Menu.Trigger><Menu.Portal><Menu.Content><Menu.Item onSelect={()=>setAction('renamed')}>Rename fixture</Menu.Item></Menu.Content></Menu.Portal></Menu.Root>
 <Select.Root value={selected} onValueChange={setSelected}><Select.Trigger data-rdesign-id="sort-trigger"><Select.Value/></Select.Trigger><Select.Portal><Select.Content><Select.Viewport><Select.Item value="name"><Select.ItemText>Name</Select.ItemText></Select.Item><Select.Item value="date"><Select.ItemText>Date</Select.ItemText></Select.Item></Select.Viewport></Select.Content></Select.Portal></Select.Root><output data-testid="file-sort">{selected}</output>
 <Tooltip.Provider delayDuration={0}><Tooltip.Root><Tooltip.Trigger data-rdesign-id="tooltip-trigger">Help</Tooltip.Trigger><Tooltip.Portal><Tooltip.Content>File help fixture</Tooltip.Content></Tooltip.Portal></Tooltip.Root></Tooltip.Provider>
@@ -69,9 +70,28 @@ createRoot(document.getElementById('root')!).render(<App/>);`);
       expect(await runtime.page.getByTestId('slot-action').getAttribute('class')).toBe('file-action active-tone');
       await runtime.page.getByTestId('slot-action').click();
       expect(await runtime.page.getByTestId('file-action').textContent()).toBe('slot');
+      const initialPointerEvents = await runtime.page.locator('body').evaluate(body => body.style.pointerEvents);
       await runtime.page.getByRole('button', { name: 'Open file dialog' }).click();
       await runtime.page.getByRole('dialog', { name: 'File details' }).waitFor();
       await runtime.page.getByRole('button', { name: 'Close details' }).click();
+      const dialog = runtime.page.getByRole('dialog', { name: 'File details' });
+      const dialogTrigger = runtime.page.getByRole('button', { name: 'Open file dialog' });
+      for (let cycle = 1; cycle <= 3; cycle++) {
+        await dialogTrigger.click(); await dialog.waitFor();
+        const nestedHelp = runtime.page.getByRole('button', { name: 'Dialog help', exact: true });
+        await nestedHelp.focus(); await nestedHelp.hover();
+        await runtime.page.getByRole('tooltip').waitFor();
+        expect(await runtime.page.getByRole('tooltip').textContent()).toBe('Nested file help fixture');
+        await runtime.page.keyboard.press('Escape');
+        expect(await dialog.isVisible()).toBe(true);
+        await runtime.page.getByRole('tooltip').waitFor({ state: 'hidden' });
+        expect(await nestedHelp.evaluate(button => button === document.activeElement)).toBe(true);
+        await runtime.page.keyboard.press('Escape'); await dialog.waitFor({ state: 'hidden' });
+        await expect.poll(() => dialogTrigger.evaluate(button => button === document.activeElement), { timeout: 3000 }).toBe(true);
+        await expect.poll(() => runtime.page.locator('body').evaluate(body => body.style.pointerEvents), { timeout: 3000 }).toBe(initialPointerEvents);
+        await runtime.page.getByTestId('outside-action').click();
+        expect(await runtime.page.getByTestId('outside-clicks').textContent()).toBe(String(cycle));
+      }
       await runtime.page.getByRole('button', { name: 'File actions' }).click();
       await runtime.page.getByRole('menuitem', { name: 'Rename fixture' }).click();
       expect(await runtime.page.getByTestId('file-action').textContent()).toBe('renamed');
