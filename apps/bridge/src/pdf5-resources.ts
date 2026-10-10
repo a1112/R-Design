@@ -31,7 +31,7 @@ export function pdf5Resources(projectRoot: string, repoRoot: string): Plugin {
         try {
           const directory = directories[parts[0]], file = realpathSync(path.join(directory, parts[1]));
           if (!file.startsWith(directory + path.sep)) { response.statusCode = 403; response.end('PDF5 resource escaped its profile'); return; }
-          response.setHeader('Content-Type', file.endsWith('.wasm') ? 'application/wasm' : 'application/octet-stream');
+          response.setHeader('Content-Type', /\.(?:js|mjs)$/.test(file) ? 'text/javascript' : file.endsWith('.wasm') ? 'application/wasm' : 'application/octet-stream');
           response.setHeader('X-Content-Type-Options', 'nosniff');
           if (request.method === 'HEAD') { response.end(); return; }
           const stream = createReadStream(file); stream.on('error', () => { response.statusCode = 404; response.end('PDF5 resource unavailable'); }); stream.pipe(response);
