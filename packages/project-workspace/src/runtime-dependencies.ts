@@ -10,6 +10,19 @@ export const REVIEWED_RUNTIME_DEPENDENCIES: Readonly<Record<string, string>> = O
   'react-router-dom': '7.9.3',
   uplot: '1.6.32',
   zod: '3.25.76',
+  '@radix-ui/react-context-menu': '2.3.7',
+  clsx: '2.1.1',
+  'tailwind-merge': '3.7.0',
+  'qrcode-generator': '1.5.2',
+  // Separate import name preserves the existing icon version for other projects.
+  'lucide-react-v0487': '0.487.0',
+  'framer-motion': '12.43.0',
+  recharts: '2.15.4', // Host pins this package's react-is to 19.3.0 for React 19 fragments.
+  sonner: '2.0.8',
+  xterm: '5.3.0',
+  'xterm-addon-fit': '0.8.0',
+  'xterm-addon-web-links': '0.9.0',
+  motion: '12.23.24',
 });
 
 export const CORE_PROJECT_DEPENDENCIES = new Set([
