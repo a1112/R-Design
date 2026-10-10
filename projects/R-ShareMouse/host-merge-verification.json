@@ -1,0 +1,14 @@
+{
+  "mainSha": "11e2461ecabcbed1be938fefb08a7a6b73bc2629",
+  "reviewedCandidateSha": "eaaab0859e63b84d9f0b8dcf383a3b0c7b549437",
+  "mainTree": "6e48722ec0602247510ef8c413137c959b36c3a1",
+  "candidateTree": "6e48722ec0602247510ef8c413137c959b36c3a1",
+  "wholeGitTreeEqual": true,
+  "gitDiffExitCode": 0,
+  "compatibilityPR": "https://github.com/a1112/R-Design/pull/4",
+  "prMerged": true,
+  "prState": "closed",
+  "prHeadSha": "eaaab0859e63b84d9f0b8dcf383a3b0c7b549437",
+  "prMergeSha": "11e2461ecabcbed1be938fefb08a7a6b73bc2629",
+  "hostLockfile": "Identical Git tree; normal npm ci was completed on the reviewed candidate without scripts or peer override"
+}

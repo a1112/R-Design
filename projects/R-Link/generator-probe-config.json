@@ -1,0 +1,46 @@
+{
+  "repositoryRoot": "../sources/R-Link",
+  "repositoryUrl": "https://github.com/a1112/R-Link",
+  "commit": "c7d45379038010face712f20f84d67f4e6b0e81b",
+  "frontendDirectory": "apps/r-link-web",
+  "name": "R-Link · 原入口兼容性检查",
+  "limitations": [
+    "This is an explicit offline design preview of the real source application.",
+    "Native IPC and production API operations are unavailable; no native success is synthesized.",
+    "Narrow captures preserve the original application and record layout limitations.",
+    "Private upstream source, screenshots and complete bundles remain local."
+  ],
+  "relocations": [],
+  "scenarios": [
+    {
+      "id": "original-source-1440",
+      "name": "原入口兼容性检查 1440",
+      "route": "/",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "steps": [],
+      "readySelector": "#root > *",
+      "dependencies": [
+        "src/main.tsx"
+      ],
+      "status": "unverified"
+    },
+    {
+      "id": "original-source-390",
+      "name": "原入口兼容性检查 390",
+      "route": "/",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "steps": [],
+      "readySelector": "#root > *",
+      "dependencies": [
+        "src/main.tsx"
+      ],
+      "status": "unverified"
+    }
+  ]
+}

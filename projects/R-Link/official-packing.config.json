@@ -1,0 +1,62 @@
+{
+  "repositoryRoot": "../sources/R-Link",
+  "repositoryUrl": "https://github.com/a1112/R-Link",
+  "commit": "c7d45379038010face712f20f84d67f4e6b0e81b",
+  "preparedDirectory": ".rdesign/desktop-official-prepared/11e2461ecabcbed1be938fefb08a7a6b73bc2629/R-Link",
+  "provenanceFile": "src/rdesignPackingLedger.json",
+  "name": "R-Link · 完整前端设计工程",
+  "scenarios": [
+    {
+      "id": "main-desktop",
+      "name": "主界面 · 桌面",
+      "route": "/#network",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "steps": [],
+      "readySelector": "#root > *",
+      "dependencies": [
+        "src/upstreamMain.tsx"
+      ],
+      "status": "unverified"
+    },
+    {
+      "id": "main-narrow",
+      "name": "主界面 · 窄屏",
+      "route": "/#network",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "steps": [],
+      "readySelector": "#root > *",
+      "dependencies": [
+        "src/upstreamMain.tsx"
+      ],
+      "status": "unverified"
+    },
+    {
+      "id": "devices-desktop",
+      "name": "设备管理 · 桌面",
+      "route": "/#remote",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "steps": [],
+      "readySelector": "[data-rdesign-route=\"remote\"]",
+      "dependencies": [
+        "src/components/pages/RemoteView.tsx"
+      ],
+      "status": "unverified"
+    }
+  ],
+  "limitations": [
+    "This is an explicit offline design preview of the real source application.",
+    "Native IPC and production API operations are unavailable; no native success is synthesized.",
+    "Narrow captures preserve the original application and record layout limitations.",
+    "Private upstream source, screenshots and complete bundles remain local.",
+    "All prepared application source and static assets retained; unreachable executable modules are verbatim .reference.txt source archives, separately reviewed dependencies required to enable them. No calendar installation, peer override, private-path exception, native or backend success."
+  ]
+}

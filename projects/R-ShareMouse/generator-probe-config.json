@@ -1,0 +1,46 @@
+{
+  "repositoryRoot": "../sources/R-ShareMouse",
+  "repositoryUrl": "https://github.com/a1112/R-ShareMouse",
+  "commit": "2f5d8a489a0622d4b56687ffe692e7ae30af310d",
+  "frontendDirectory": "apps/rshare-desktop-frontend",
+  "name": "R-ShareMouse · 原入口兼容性检查",
+  "limitations": [
+    "Native IPC rejects operations in this preview.",
+    "No daemon connection, discovery, pairing, input capture/injection, virtual display, audio, network gateway or file transfer is validated.",
+    "Narrow viewport records the original desktop layout and its clipping; it is not a mobile compatibility claim.",
+    "Large PNGs are losslessly represented as base64 text segments and reconstructed by the preview adapter."
+  ],
+  "relocations": [],
+  "scenarios": [
+    {
+      "id": "original-source-1440",
+      "name": "原入口兼容性检查 1440",
+      "route": "/",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "steps": [],
+      "readySelector": "#root > *",
+      "dependencies": [
+        "src/main.tsx"
+      ],
+      "status": "unverified"
+    },
+    {
+      "id": "original-source-390",
+      "name": "原入口兼容性检查 390",
+      "route": "/",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "steps": [],
+      "readySelector": "#root > *",
+      "dependencies": [
+        "src/main.tsx"
+      ],
+      "status": "unverified"
+    }
+  ]
+}

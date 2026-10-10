@@ -1,0 +1,223 @@
+{
+  "name": "R-ShareMouse",
+  "toolSha": "d4f41d0e7ab552129a82d91648ecd3dade692de9",
+  "mergedIntoMain": false,
+  "dependencyGaps": [
+    {
+      "dependency": "@radix-ui/react-accordion",
+      "actualVerifiedVersion": "1.2.3",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-alert-dialog",
+      "actualVerifiedVersion": "1.1.23",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-aspect-ratio",
+      "actualVerifiedVersion": "1.1.2",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-avatar",
+      "actualVerifiedVersion": "1.1.3",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-checkbox",
+      "actualVerifiedVersion": "1.3.11",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-collapsible",
+      "actualVerifiedVersion": "1.1.3",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-context-menu",
+      "actualVerifiedVersion": "2.3.7",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-dialog",
+      "actualVerifiedVersion": "1.1.23",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-dropdown-menu",
+      "actualVerifiedVersion": "2.1.24",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-hover-card",
+      "actualVerifiedVersion": "1.1.6",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-label",
+      "actualVerifiedVersion": "2.1.15",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-menubar",
+      "actualVerifiedVersion": "1.1.6",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-navigation-menu",
+      "actualVerifiedVersion": "1.2.5",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-popover",
+      "actualVerifiedVersion": "1.1.6",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-progress",
+      "actualVerifiedVersion": "1.1.2",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-radio-group",
+      "actualVerifiedVersion": "1.4.7",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-scroll-area",
+      "actualVerifiedVersion": "1.2.18",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-select",
+      "actualVerifiedVersion": "2.3.7",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-separator",
+      "actualVerifiedVersion": "1.1.2",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-slider",
+      "actualVerifiedVersion": "1.2.3",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-slot",
+      "actualVerifiedVersion": "1.3.3",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-switch",
+      "actualVerifiedVersion": "1.3.7",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-tabs",
+      "actualVerifiedVersion": "1.1.21",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-toggle",
+      "actualVerifiedVersion": "1.1.2",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-toggle-group",
+      "actualVerifiedVersion": "1.1.2",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "@radix-ui/react-tooltip",
+      "actualVerifiedVersion": "1.2.8",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "class-variance-authority",
+      "actualVerifiedVersion": "0.7.1",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "clsx",
+      "actualVerifiedVersion": "2.1.1",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "cmdk",
+      "actualVerifiedVersion": "1.1.1",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "embla-carousel-react",
+      "actualVerifiedVersion": "8.6.0",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "input-otp",
+      "actualVerifiedVersion": "1.4.2",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "lucide-react",
+      "actualVerifiedVersion": "0.487.0",
+      "registeredVersion": "0.468.0"
+    },
+    {
+      "dependency": "next-themes",
+      "actualVerifiedVersion": "0.4.6",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "qrcode-generator",
+      "actualVerifiedVersion": "1.5.2",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "react-day-picker",
+      "actualVerifiedVersion": "8.10.1",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "react-hook-form",
+      "actualVerifiedVersion": "7.55.0",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "react-resizable-panels",
+      "actualVerifiedVersion": "2.1.7",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "recharts",
+      "actualVerifiedVersion": "2.15.4",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "sonner",
+      "actualVerifiedVersion": "2.0.8",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "tailwind-merge",
+      "actualVerifiedVersion": "3.7.0",
+      "registeredVersion": null
+    },
+    {
+      "dependency": "vaul",
+      "actualVerifiedVersion": "1.1.2",
+      "registeredVersion": null
+    }
+  ],
+  "provenancePathGaps": [],
+  "sourceAndResourceLedger": {
+    "stagedFiles": 89,
+    "splitResources": 2,
+    "independentGitByteCheck": "passed by prepare-packing; actual packer result below"
+  },
+  "packing": {
+    "status": "blocked",
+    "code": "IMPORT_CONFIG",
+    "detail": "仅允许受支持且已登记版本的 React 工程依赖"
+  }
+}

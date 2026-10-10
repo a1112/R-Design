@@ -1,0 +1,91 @@
+{
+  "repositoryRoot": "../sources/R-ShareMouse",
+  "repositoryUrl": "https://github.com/a1112/R-ShareMouse",
+  "commit": "2f5d8a489a0622d4b56687ffe692e7ae30af310d",
+  "preparedDirectory": ".rdesign/desktop-official-prepared/11e2461ecabcbed1be938fefb08a7a6b73bc2629/pr3-review-fixes/R-ShareMouse",
+  "provenanceFile": "src/rdesignPackingLedger.json",
+  "name": "R-ShareMouse · 完整前端设计工程",
+  "scenarios": [
+    {
+      "id": "layout-desktop",
+      "name": "布局 · 桌面",
+      "route": "/",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "steps": [],
+      "readySelector": "[data-rdesign-id=\"rshare-shell\"]",
+      "dependencies": [
+        "src/app/App.tsx",
+        "src/rdesignResponsive.css"
+      ],
+      "status": "unverified"
+    },
+    {
+      "id": "layout-narrow",
+      "name": "布局 · 窄屏",
+      "route": "/",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "steps": [],
+      "readySelector": "[data-rdesign-id=\"rshare-shell\"]",
+      "dependencies": [
+        "src/app/App.tsx",
+        "src/rdesignResponsive.css"
+      ],
+      "status": "unverified"
+    },
+    {
+      "id": "settings-desktop",
+      "name": "设置 · 外观",
+      "route": "/#settings",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "steps": [
+        {
+          "action": "click",
+          "target": "rshare-settings-appearance"
+        }
+      ],
+      "readySelector": "[data-rdesign-id=\"rshare-theme-light\"]",
+      "dependencies": [
+        "src/app/App.tsx",
+        "src/rdesignResponsive.css"
+      ],
+      "status": "unverified"
+    },
+    {
+      "id": "settings-narrow",
+      "name": "设置 · 外观窄屏",
+      "route": "/#settings",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "steps": [
+        {
+          "action": "click",
+          "target": "rshare-settings-appearance"
+        }
+      ],
+      "readySelector": "[data-rdesign-id=\"rshare-theme-light\"]",
+      "dependencies": [
+        "src/app/App.tsx",
+        "src/rdesignResponsive.css"
+      ],
+      "status": "unverified"
+    }
+  ],
+  "limitations": [
+    "Native IPC rejects operations in this preview.",
+    "No daemon connection, discovery, pairing, input capture/injection, virtual display, audio, network gateway or file transfer is validated.",
+    "An explicit design-preview adapter makes narrow controls reachable; desktop source is preserved. Native/backend functionality remains unavailable.",
+    "Large PNGs are losslessly represented as base64 text segments and reconstructed by the preview adapter.",
+    "All prepared application source and static assets retained; unreachable executable modules are verbatim .reference.txt source archives, separately reviewed dependencies required to enable them. No calendar installation, peer override, private-path exception, native or backend success."
+  ]
+}

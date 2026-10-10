@@ -1,0 +1,675 @@
+{
+  "name": "R-ShareMouse",
+  "testedHostSha": "11e2461ecabcbed1be938fefb08a7a6b73bc2629",
+  "extensionMergedIntoMain": true,
+  "source": {
+    "repository": "a1112/R-ShareMouse",
+    "branch": "main",
+    "sha": "2f5d8a489a0622d4b56687ffe692e7ae30af310d",
+    "visibility": "public",
+    "frontend": "apps/rshare-desktop-frontend"
+  },
+  "bundle": {
+    "file": ".rdesign/desktop-official-deliverables/R-ShareMouse.11e2461.review-fixes.rdesign-project.json",
+    "checksum": "413b6502cf191df34e7653b22da505b347060dfbd2dc567df83b21ff0ede1539",
+    "fileSha256": "ef149dae0f44e7f1809a4c643ab55aa6497bbeb89b33e73729310004bd3477ed",
+    "bytes": 13928477,
+    "sourceFiles": 116
+  },
+  "mode": "Actual official ProjectWorkspace, BrowserRuntime, scenario runner and ChangeEngine; no runtime overrides or project dependency installations",
+  "runRoot": ".rdesign/desktop-official-validation/R-ShareMouse/run-kNNK1O",
+  "scenes": [
+    {
+      "id": "layout-desktop",
+      "passed": true,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "screenshot": "layout-desktop.png",
+      "frameCodeRevision": "434471bc80db44a4bf23a829185143925a32f458c8a02fa7fd81b30c72ec0bdb",
+      "nodes": 146,
+      "exactOriginalSourceNodes": 60,
+      "clippedControls": 0
+    },
+    {
+      "id": "layout-narrow",
+      "passed": true,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "layout-narrow.png",
+      "frameCodeRevision": "434471bc80db44a4bf23a829185143925a32f458c8a02fa7fd81b30c72ec0bdb",
+      "nodes": 146,
+      "exactOriginalSourceNodes": 59,
+      "clippedControls": 0
+    },
+    {
+      "id": "settings-desktop",
+      "passed": true,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "screenshot": "settings-desktop.png",
+      "frameCodeRevision": "434471bc80db44a4bf23a829185143925a32f458c8a02fa7fd81b30c72ec0bdb",
+      "nodes": 104,
+      "exactOriginalSourceNodes": 32,
+      "clippedControls": 0
+    },
+    {
+      "id": "settings-narrow",
+      "passed": true,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "settings-narrow.png",
+      "frameCodeRevision": "434471bc80db44a4bf23a829185143925a32f458c8a02fa7fd81b30c72ec0bdb",
+      "nodes": 96,
+      "exactOriginalSourceNodes": 28,
+      "clippedControls": 0
+    }
+  ],
+  "interactions": [
+    {
+      "name": "Original layout → settings route",
+      "passed": true
+    },
+    {
+      "name": "Start service rejects with original unavailable UI",
+      "passed": true,
+      "nativeSuccess": false
+    }
+  ],
+  "pageErrors": [],
+  "externalRequests": [],
+  "failures": [],
+  "nativeBackend": "unavailable; no native/backend capability accepted",
+  "preflight": {
+    "passed": true,
+    "checksum": "413b6502cf191df34e7653b22da505b347060dfbd2dc567df83b21ff0ede1539",
+    "sourceFileCount": 116,
+    "sourceBytes": 12543087,
+    "scenarioCount": 4,
+    "errors": [],
+    "warnings": [
+      "结构预检不证明运行、后端、原生能力或业务状态转换；导入后场景须重新验收"
+    ]
+  },
+  "import": {
+    "passed": true,
+    "ids": [
+      "project_1b1e7fe9-ac23-4240-98c3-13614a973cfc",
+      "project_5a584a3c-3b6d-424a-aa3f-7631325bb8b8"
+    ],
+    "distinctSourceDirectories": true,
+    "incomingEvidenceStatus": "unverified",
+    "preservedFiles": 115
+  },
+  "productionBuild": "passed",
+  "responsiveAcceptance": {
+    "passed": true,
+    "viewportChecks": [
+      {
+        "width": 390,
+        "height": 844,
+        "passed": true,
+        "originalSevenControls": [
+          {
+            "control": "启动服务",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "最小化",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "最大化",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "关闭",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "上移",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "下移",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "右移",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          }
+        ],
+        "layout": {
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "visibleControls": 21,
+          "clipped": [],
+          "horizontalOverflow": []
+        },
+        "settings": {
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "visibleControls": 19,
+          "clipped": [],
+          "horizontalOverflow": []
+        },
+        "keyboardNavigation": "passed actual Tab focus",
+        "sidebarToggle": "passed original local state",
+        "zoomAndFitReset": "passed original zoom/pan readback",
+        "settingsNavigation": "all seven original sections reachable via their vertical scroll container",
+        "themeSelection": "passed actual aria-pressed readback for dark/light/system",
+        "nativeWindowAndService": "explicitly unavailable; no native success accepted"
+      },
+      {
+        "width": 320,
+        "height": 844,
+        "passed": true,
+        "originalSevenControls": [
+          {
+            "control": "启动服务",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "最小化",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "最大化",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "关闭",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "上移",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "下移",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          },
+          {
+            "control": "右移",
+            "visible": true,
+            "hit": true,
+            "clippedAncestors": []
+          }
+        ],
+        "layout": {
+          "viewport": {
+            "width": 320,
+            "height": 844
+          },
+          "visibleControls": 21,
+          "clipped": [],
+          "horizontalOverflow": []
+        },
+        "settings": {
+          "viewport": {
+            "width": 320,
+            "height": 844
+          },
+          "visibleControls": 19,
+          "clipped": [],
+          "horizontalOverflow": []
+        },
+        "keyboardNavigation": "passed actual Tab focus",
+        "sidebarToggle": "passed original local state",
+        "zoomAndFitReset": "passed original zoom/pan readback",
+        "settingsNavigation": "all seven original sections reachable via their vertical scroll container",
+        "themeSelection": "passed actual aria-pressed readback for dark/light/system",
+        "nativeWindowAndService": "explicitly unavailable; no native success accepted"
+      }
+    ],
+    "samePageRoundTrips": [
+      {
+        "desktopMode": "default",
+        "width": 390,
+        "passed": true,
+        "desktop": {
+          "zoom": 1,
+          "panOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "fitted": {
+          "zoom": 1,
+          "panOffset": {
+            "x": -38.5,
+            "y": -90.5
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "fitAudit": {
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "visibleControls": 21,
+          "clipped": [],
+          "horizontalOverflow": []
+        },
+        "restored": {
+          "zoom": 1,
+          "panOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "manualNarrow": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 31.205882352941174,
+            "y": -84.64705882352942
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "manualNarrowRestored": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 31.205882352941174,
+            "y": -84.64705882352942
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "resetFit": {
+          "zoom": 1,
+          "panOffset": {
+            "x": -38.5,
+            "y": -90.5
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "finalDesktop": {
+          "zoom": 1,
+          "panOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "sameDocument": true,
+        "actualZoomButtonAndCanvasDrag": true
+      },
+      {
+        "desktopMode": "default",
+        "width": 320,
+        "passed": true,
+        "desktop": {
+          "zoom": 1,
+          "panOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "fitted": {
+          "zoom": 0.885993,
+          "panOffset": {
+            "x": -52.911817587723604,
+            "y": -69.07537644202606
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "fitAudit": {
+          "viewport": {
+            "width": 320,
+            "height": 844
+          },
+          "visibleControls": 21,
+          "clipped": [],
+          "horizontalOverflow": []
+        },
+        "restored": {
+          "zoom": 1,
+          "panOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "manualNarrow": {
+          "zoom": 0.735994,
+          "panOffset": {
+            "x": 24.654412943583775,
+            "y": -57.9492495862738
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "manualNarrowRestored": {
+          "zoom": 0.735994,
+          "panOffset": {
+            "x": 24.654412943583775,
+            "y": -57.9492495862738
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "resetFit": {
+          "zoom": 0.885993,
+          "panOffset": {
+            "x": -52.911817587723604,
+            "y": -69.07537644202606
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "finalDesktop": {
+          "zoom": 1,
+          "panOffset": {
+            "x": 0,
+            "y": 0
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "sameDocument": true,
+        "actualZoomButtonAndCanvasDrag": true
+      },
+      {
+        "desktopMode": "manual",
+        "width": 390,
+        "passed": true,
+        "desktop": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 141.1764705882353,
+            "y": 41.23529411764706
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "fitted": {
+          "zoom": 1,
+          "panOffset": {
+            "x": -38.5,
+            "y": -90.5
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "fitAudit": {
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "visibleControls": 21,
+          "clipped": [],
+          "horizontalOverflow": []
+        },
+        "restored": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 141.1764705882353,
+            "y": 41.23529411764706
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "manualNarrow": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 31.205882352941174,
+            "y": -84.64705882352942
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "manualNarrowRestored": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 31.205882352941174,
+            "y": -84.64705882352942
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "resetFit": {
+          "zoom": 1,
+          "panOffset": {
+            "x": -38.5,
+            "y": -90.5
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "finalDesktop": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 141.1764705882353,
+            "y": 41.23529411764706
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "sameDocument": true,
+        "actualZoomButtonAndCanvasDrag": true
+      },
+      {
+        "desktopMode": "manual",
+        "width": 320,
+        "passed": true,
+        "desktop": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 141.1764705882353,
+            "y": 41.23529411764706
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "fitted": {
+          "zoom": 0.885993,
+          "panOffset": {
+            "x": -52.911817587723604,
+            "y": -69.07537644202606
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "fitAudit": {
+          "viewport": {
+            "width": 320,
+            "height": 844
+          },
+          "visibleControls": 21,
+          "clipped": [],
+          "horizontalOverflow": []
+        },
+        "restored": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 141.1764705882353,
+            "y": 41.23529411764706
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "manualNarrow": {
+          "zoom": 0.735994,
+          "panOffset": {
+            "x": 24.654412943583775,
+            "y": -57.9492495862738
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "manualNarrowRestored": {
+          "zoom": 0.735994,
+          "panOffset": {
+            "x": 24.654412943583775,
+            "y": -57.9492495862738
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "resetFit": {
+          "zoom": 0.885993,
+          "panOffset": {
+            "x": -52.911817587723604,
+            "y": -69.07537644202606
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "finalDesktop": {
+          "zoom": 0.85,
+          "panOffset": {
+            "x": 141.1764705882353,
+            "y": 41.23529411764706
+          },
+          "documentTimeOrigin": 1791643386601.6,
+          "url": "http://127.0.0.1:61017/#layout"
+        },
+        "sameDocument": true,
+        "actualZoomButtonAndCanvasDrag": true
+      }
+    ],
+    "desktopBehavior": "Actual 1440 → 390/320 → 1440 round trips restore default and user-chosen desktop zoom/pan; user-chosen narrow views persist until explicit reset",
+    "horizontalOverflowAccepted": false,
+    "nativeOrBackendAccepted": false
+  },
+  "candidate": {
+    "passed": true,
+    "prepare": "passed",
+    "verify": "passed actual build and registered scenarios",
+    "accept": "passed actual DOM readback",
+    "revert": "passed semantic text restoration",
+    "byteIdenticalRevert": "not asserted",
+    "originalText": "设备与显示器",
+    "sourceBinding": {
+      "sourceNodeId": "source-b5f4bc7bbf8a39c0",
+      "file": "src/app/components/MonitorManager.tsx",
+      "line": 1554,
+      "column": 14,
+      "fileHash": "92997ef06b7c50f76048a845527857d8426fdf518ef991e03333f0288709b9d0",
+      "reliability": "exact",
+      "scope": "instance",
+      "editableProperties": [
+        "text",
+        "fontSize",
+        "fontWeight",
+        "borderRadius",
+        "gap",
+        "padding",
+        "paddingTop",
+        "paddingBottom",
+        "paddingLeft",
+        "paddingRight",
+        "margin",
+        "background",
+        "backgroundColor",
+        "gridTemplateColumns",
+        "height",
+        "minHeight",
+        "width",
+        "maxWidth",
+        "letterSpacing",
+        "lineHeight",
+        "borderColor",
+        "borderWidth",
+        "display",
+        "alignItems",
+        "justifyContent"
+      ]
+    },
+    "sharedScopeRejected": true,
+    "persistedStatus": "reverted",
+    "independentProjectUnchanged": true,
+    "evidence": [
+      {
+        "name": "生产构建",
+        "passed": true,
+        "detail": "独立候选目录 Vite 生产构建通过"
+      },
+      {
+        "name": "布局 · 桌面",
+        "passed": true,
+        "detail": "就绪条件 [data-rdesign-id=\"rshare-shell\"]；1440×900 源分辨率 PNG"
+      },
+      {
+        "name": "布局 · 窄屏",
+        "passed": true,
+        "detail": "就绪条件 [data-rdesign-id=\"rshare-shell\"]；390×844 源分辨率 PNG"
+      },
+      {
+        "name": "设置 · 外观",
+        "passed": true,
+        "detail": "就绪条件 [data-rdesign-id=\"rshare-theme-light\"]；1440×900 源分辨率 PNG"
+      },
+      {
+        "name": "设置 · 外观窄屏",
+        "passed": true,
+        "detail": "就绪条件 [data-rdesign-id=\"rshare-theme-light\"]；390×844 源分辨率 PNG"
+      },
+      {
+        "name": "基础键盘焦点",
+        "passed": true,
+        "detail": "基础 Tab 焦点通过；具体业务交互以登记场景步骤为准"
+      },
+      {
+        "name": "运行错误",
+        "passed": true,
+        "detail": "场景运行未产生 JavaScript 异常"
+      },
+      {
+        "name": "目标属性回读",
+        "passed": true,
+        "detail": "指定实例的文字与内联属性均已实际生效"
+      }
+    ]
+  },
+  "passed": true
+}

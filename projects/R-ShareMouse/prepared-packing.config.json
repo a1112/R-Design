@@ -1,0 +1,61 @@
+{
+  "repositoryRoot": "../sources/R-ShareMouse",
+  "repositoryUrl": "https://github.com/a1112/R-ShareMouse",
+  "commit": "2f5d8a489a0622d4b56687ffe692e7ae30af310d",
+  "preparedDirectory": ".rdesign/desktop-prepared/R-ShareMouse",
+  "provenanceFile": "src/rdesignPackingLedger.json",
+  "name": "R-ShareMouse · 完整前端设计工程",
+  "scenarios": [
+    {
+      "id": "layout-desktop",
+      "name": "布局 · 桌面",
+      "route": "/",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "steps": [],
+      "readySelector": "[data-rdesign-id=\"rshare-shell\"]",
+      "dependencies": [
+        "src/app/App.tsx"
+      ],
+      "status": "unverified"
+    },
+    {
+      "id": "layout-narrow",
+      "name": "布局 · 窄屏",
+      "route": "/",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "steps": [],
+      "readySelector": "[data-rdesign-id=\"rshare-shell\"]",
+      "dependencies": [
+        "src/app/App.tsx"
+      ],
+      "status": "unverified"
+    },
+    {
+      "id": "settings-desktop",
+      "name": "设置 · 外观",
+      "route": "/#settings",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "steps": [],
+      "readySelector": "[data-rdesign-page=\"settings\"]",
+      "dependencies": [
+        "src/app/App.tsx"
+      ],
+      "status": "unverified"
+    }
+  ],
+  "limitations": [
+    "Native IPC rejects operations in this preview.",
+    "No daemon connection, discovery, pairing, input capture/injection, virtual display, audio, network gateway or file transfer is validated.",
+    "Narrow viewport records the original desktop layout and its clipping; it is not a mobile compatibility claim.",
+    "Large PNGs are losslessly represented as base64 text segments and reconstructed by the preview adapter."
+  ]
+}

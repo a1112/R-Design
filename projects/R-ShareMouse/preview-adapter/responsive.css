@@ -1,0 +1,32 @@
+/* Design-preview adaptation, scoped to narrow viewports. Original desktop styles remain intact. */
+@media (max-width: 640px) {
+  html, body { width: 100%; min-width: 0; height: 100%; }
+  body { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
+  #root { flex: 1 1 0; min-width: 0; min-height: 0; width: 100%; height: auto !important; }
+  [data-rdesign-preview-status-root] { flex: 0 0 auto; padding: 6px 8px; }
+  [data-rdesign-id="design-preview-notice"] { position: static !important; max-width: none !important; width: 100%; box-sizing: border-box; }
+  [data-rdesign-id="rshare-shell"] { min-width: 0; }
+  [data-rdesign-responsive="titlebar"] { height: auto !important; min-height: 40px; flex-wrap: wrap; gap: 6px; padding-top: 6px; padding-bottom: 6px; }
+  [data-rdesign-responsive="navigation"] { flex: 1 0 100%; flex-wrap: wrap; }
+  [data-rdesign-responsive="navigation"] button { white-space: nowrap; min-height: 32px; }
+  [data-rdesign-responsive="titlebar"] > .rshare-titlebar-drag-region { display: none; }
+  [data-rdesign-responsive="actions"] { flex: 1 1 0; min-width: 0; flex-wrap: wrap; }
+  [data-rdesign-responsive="actions"] button { white-space: nowrap; }
+  [data-rdesign-responsive="window-controls"] { margin-left: 0 !important; height: auto !important; }
+  [data-rdesign-responsive="window-controls"] button { width: 32px !important; min-width: 32px; height: 32px !important; }
+  [data-rdesign-responsive="error-notice"] { overflow-wrap: anywhere; }
+  [data-rdesign-responsive="status-footer"] { height: auto !important; min-height: 32px; padding-top: 6px; padding-bottom: 6px; overflow-wrap: anywhere; }
+  [data-rdesign-responsive="monitor-layout"], [data-rdesign-responsive="layout-content"], [data-rdesign-responsive="layout-canvas"] { min-width: 0; }
+  [data-rdesign-responsive="layout-toolbar"] { height: auto !important; min-height: 36px; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
+  [data-rdesign-responsive="layout-toolbar"] > button { flex: 0 0 auto; white-space: nowrap; min-height: 28px; }
+  [data-rdesign-responsive="layout-toolbar"] > .flex-1 { display: none; }
+  [data-rdesign-responsive="layout-toolbar"] > span { flex: 1 1 130px; }
+  [data-rdesign-responsive="layout-zoom"] { margin-left: 0 !important; }
+  [data-rdesign-responsive="layout-zoom"] button { min-width: 28px; min-height: 28px; }
+  [data-rdesign-responsive="layout-content"] { flex-direction: column; }
+  [data-rdesign-responsive="layout-sidebar"] { width: 100% !important; flex: 0 0 144px; height: 144px; border-right: 0 !important; border-bottom: 1px solid rgba(128, 128, 128, 0.2); }
+  [data-rdesign-responsive="layout-sidebar"][data-rdesign-sidebar-open="false"] { display: none; }
+  [data-rdesign-responsive="layout-sidebar-content"] { width: 100% !important; }
+  [data-rdesign-responsive="settings-navigation"] { max-height: 190px; }
+  [data-rdesign-responsive="settings-content"] { min-width: 0; }
+}

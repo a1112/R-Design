@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "testedHostSha": "11e2461ecabcbed1be938fefb08a7a6b73bc2629",
+  "originalSourceSha": "2f5d8a489a0622d4b56687ffe692e7ae30af310d",
+  "breakpoint": 640,
+  "files": [
+    {
+      "path": "src/app/App.tsx",
+      "originalSourcePath": "apps/rshare-desktop-frontend/src/app/App.tsx",
+      "originalSourceSha256": "55b4eb08d39382a42c253c8608afad2ec0ee39192e10a3f11610bc9b9c5f81fd",
+      "beforeSha256": "b1406b05e3dc3c6b156692fc033819ee88adc381b346c3b4975749d0c3ef7b44",
+      "afterSha256": "be3dd20084f7cd6abcee6ceeb318479685c06d5279096a9571dcf5a6fa6d47a6"
+    },
+    {
+      "path": "src/app/components/MonitorManager.tsx",
+      "originalSourcePath": "apps/rshare-desktop-frontend/src/app/components/MonitorManager.tsx",
+      "originalSourceSha256": "36a8c88faa7e518370fc610259e874e517bf7b744e85baaf4acbdbdd668664a6",
+      "beforeSha256": "49217776e9e43d1246fe37930103cd548afd9d9e443369c8b4bd8195bd91be9c",
+      "afterSha256": "92997ef06b7c50f76048a845527857d8426fdf518ef991e03333f0288709b9d0"
+    },
+    {
+      "path": "src/main.tsx",
+      "sourceKind": "generated design boundary",
+      "beforeSha256": "f7293e1b617adaa16988a51dfcadef0f580b62a8474329620347551e339c8e77",
+      "afterSha256": "f4fad351272ac73d404f851f14fc15d73e7dd8305d23bbb55c4ee51ced13df97"
+    },
+    {
+      "path": "src/rdesignResponsive.css",
+      "beforeSha256": null,
+      "afterSha256": "1a619b4a791685a02607787eede9f6dc1727a6e64384ed0e7d88ce7def094e00",
+      "kind": "new authored design-preview CSS"
+    }
+  ],
+  "upstreamSourceModified": false,
+  "desktopLayoutChanged": false,
+  "viewportStateBehavior": "Capture desktop zoom/pan on entry, restore on exit, preserve manual narrow choices; explicit reset re-enables narrow fit",
+  "verification": "passed; external independent evidence in official-validation-summary.json and official-workbench-summary.json; source ledger keeps pre-acceptance state",
+  "changedFiles": 4,
+  "preparedBaselineWasByteIdentical": true,
+  "actualAcceptance": "passed actual final-main import/build/4 scenes, narrow controls, same-page default/manual zoom/pan round trips, candidate accept/semantic revert, actual Workbench import and fresh process restart",
+  "samePageRoundTrips": 4
+}

@@ -1,0 +1,543 @@
+{
+  "testedHostSha": "d4f41d0e7ab552129a82d91648ecd3dade692de9",
+  "registry": {
+    "lucide-react": "0.468.0",
+    "three": "0.180.0",
+    "@tauri-apps/api": "2.8.0",
+    "react-markdown": "9.0.3",
+    "remark-gfm": "4.0.1",
+    "i18next": "25.10.0",
+    "react-i18next": "16.3.5",
+    "react-router-dom": "7.9.3",
+    "uplot": "1.6.32",
+    "zod": "3.25.76"
+  },
+  "dependencies": [
+    {
+      "package": "@radix-ui/react-accordion",
+      "versions": [
+        "1.2.3"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-alert-dialog",
+      "versions": [
+        "1.1.23"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-aspect-ratio",
+      "versions": [
+        "1.1.2"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-avatar",
+      "versions": [
+        "1.1.3"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-checkbox",
+      "versions": [
+        "1.3.11"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-collapsible",
+      "versions": [
+        "1.1.3"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-context-menu",
+      "versions": [
+        "2.3.7"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": [
+        "R-ShareMouse"
+      ]
+    },
+    {
+      "package": "@radix-ui/react-dialog",
+      "versions": [
+        "1.1.23"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-dropdown-menu",
+      "versions": [
+        "2.1.24"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-hover-card",
+      "versions": [
+        "1.1.6"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-label",
+      "versions": [
+        "2.1.15"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-menubar",
+      "versions": [
+        "1.1.6"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-navigation-menu",
+      "versions": [
+        "1.2.5"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-popover",
+      "versions": [
+        "1.1.6"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-progress",
+      "versions": [
+        "1.1.2"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-radio-group",
+      "versions": [
+        "1.4.7"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-scroll-area",
+      "versions": [
+        "1.2.18"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-select",
+      "versions": [
+        "2.3.7"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-separator",
+      "versions": [
+        "1.1.2"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-slider",
+      "versions": [
+        "1.2.3"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-slot",
+      "versions": [
+        "1.3.3"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-switch",
+      "versions": [
+        "1.3.7"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-tabs",
+      "versions": [
+        "1.1.21"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-toggle",
+      "versions": [
+        "1.1.2"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-toggle-group",
+      "versions": [
+        "1.1.2"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@radix-ui/react-tooltip",
+      "versions": [
+        "1.2.8"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "class-variance-authority",
+      "versions": [
+        "0.7.1"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "clsx",
+      "versions": [
+        "2.1.1"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": [
+        "R-ShareMouse"
+      ]
+    },
+    {
+      "package": "cmdk",
+      "versions": [
+        "1.1.1"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "embla-carousel-react",
+      "versions": [
+        "8.6.0"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "input-otp",
+      "versions": [
+        "1.4.2"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "lucide-react",
+      "versions": [
+        "0.487.0"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": [
+        "R-ShareMouse",
+        "R-Link"
+      ]
+    },
+    {
+      "package": "next-themes",
+      "versions": [
+        "0.4.6"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "qrcode-generator",
+      "versions": [
+        "1.5.2"
+      ],
+      "projects": [
+        "R-ShareMouse"
+      ],
+      "productionProjects": [
+        "R-ShareMouse"
+      ]
+    },
+    {
+      "package": "react-day-picker",
+      "versions": [
+        "8.10.1"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "react-hook-form",
+      "versions": [
+        "7.55.0"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "react-resizable-panels",
+      "versions": [
+        "2.1.7"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "recharts",
+      "versions": [
+        "2.15.4"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": [
+        "R-Link"
+      ]
+    },
+    {
+      "package": "sonner",
+      "versions": [
+        "2.0.8"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": [
+        "R-Link"
+      ]
+    },
+    {
+      "package": "tailwind-merge",
+      "versions": [
+        "3.7.0"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": [
+        "R-ShareMouse"
+      ]
+    },
+    {
+      "package": "vaul",
+      "versions": [
+        "1.1.2"
+      ],
+      "projects": [
+        "R-ShareMouse",
+        "R-Link"
+      ],
+      "productionProjects": []
+    },
+    {
+      "package": "@tauri-apps/api",
+      "versions": [
+        "2.8.0"
+      ],
+      "projects": [
+        "R-Link"
+      ],
+      "productionProjects": [
+        "R-Link"
+      ]
+    },
+    {
+      "package": "framer-motion",
+      "versions": [
+        "12.43.0"
+      ],
+      "projects": [
+        "R-Link"
+      ],
+      "productionProjects": [
+        "R-Link"
+      ]
+    },
+    {
+      "package": "xterm",
+      "versions": [
+        "5.3.0"
+      ],
+      "projects": [
+        "R-Link"
+      ],
+      "productionProjects": [
+        "R-Link"
+      ]
+    },
+    {
+      "package": "xterm-addon-fit",
+      "versions": [
+        "0.8.0"
+      ],
+      "projects": [
+        "R-Link"
+      ],
+      "productionProjects": [
+        "R-Link"
+      ]
+    },
+    {
+      "package": "xterm-addon-web-links",
+      "versions": [
+        "0.9.0"
+      ],
+      "projects": [
+        "R-Link"
+      ],
+      "productionProjects": [
+        "R-Link"
+      ]
+    }
+  ],
+  "note": "Public two-project compatibility request only; no host allowlist changes or unsupported-component acceptance."
+}

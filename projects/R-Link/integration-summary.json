@@ -1,0 +1,802 @@
+{
+  "name": "R-Link",
+  "source": {
+    "repository": "a1112/R-Link",
+    "branch": "main",
+    "sha": "c7d45379038010face712f20f84d67f4e6b0e81b",
+    "visibility": "public",
+    "frontend": "apps/r-link-web"
+  },
+  "testedHostSha": "d4f41d0e7ab552129a82d91648ecd3dade692de9",
+  "sharedExtensionMergedIntoMain": false,
+  "sourceCheckout": "clean exact committed SHA; no replace refs; read with --no-replace-objects",
+  "generatorProbe": {
+    "status": "blocked",
+    "code": "ENGINEERING_FRAMEWORK",
+    "detail": "宿主使用 React 19；其他主版本须先完成兼容验收"
+  },
+  "probePurpose": "Original-source compatibility only; use prepared-packing.config.json for the complete adapter",
+  "preparedPacking": {
+    "name": "R-Link",
+    "toolSha": "d4f41d0e7ab552129a82d91648ecd3dade692de9",
+    "mergedIntoMain": false,
+    "dependencyGaps": [
+      {
+        "dependency": "@radix-ui/react-accordion",
+        "actualVerifiedVersion": "1.2.3",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-alert-dialog",
+        "actualVerifiedVersion": "1.1.23",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-aspect-ratio",
+        "actualVerifiedVersion": "1.1.2",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-avatar",
+        "actualVerifiedVersion": "1.1.3",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-checkbox",
+        "actualVerifiedVersion": "1.3.11",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-collapsible",
+        "actualVerifiedVersion": "1.1.3",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-context-menu",
+        "actualVerifiedVersion": "2.3.7",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-dialog",
+        "actualVerifiedVersion": "1.1.23",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-dropdown-menu",
+        "actualVerifiedVersion": "2.1.24",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-hover-card",
+        "actualVerifiedVersion": "1.1.6",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-label",
+        "actualVerifiedVersion": "2.1.15",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-menubar",
+        "actualVerifiedVersion": "1.1.6",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-navigation-menu",
+        "actualVerifiedVersion": "1.2.5",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-popover",
+        "actualVerifiedVersion": "1.1.6",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-progress",
+        "actualVerifiedVersion": "1.1.2",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-radio-group",
+        "actualVerifiedVersion": "1.4.7",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-scroll-area",
+        "actualVerifiedVersion": "1.2.18",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-select",
+        "actualVerifiedVersion": "2.3.7",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-separator",
+        "actualVerifiedVersion": "1.1.2",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-slider",
+        "actualVerifiedVersion": "1.2.3",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-slot",
+        "actualVerifiedVersion": "1.3.3",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-switch",
+        "actualVerifiedVersion": "1.3.7",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-tabs",
+        "actualVerifiedVersion": "1.1.21",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-toggle",
+        "actualVerifiedVersion": "1.1.2",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-toggle-group",
+        "actualVerifiedVersion": "1.1.2",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "@radix-ui/react-tooltip",
+        "actualVerifiedVersion": "1.2.8",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "class-variance-authority",
+        "actualVerifiedVersion": "0.7.1",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "clsx",
+        "actualVerifiedVersion": "2.1.1",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "cmdk",
+        "actualVerifiedVersion": "1.1.1",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "embla-carousel-react",
+        "actualVerifiedVersion": "8.6.0",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "framer-motion",
+        "actualVerifiedVersion": "12.43.0",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "input-otp",
+        "actualVerifiedVersion": "1.4.2",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "lucide-react",
+        "actualVerifiedVersion": "0.487.0",
+        "registeredVersion": "0.468.0"
+      },
+      {
+        "dependency": "next-themes",
+        "actualVerifiedVersion": "0.4.6",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "react-day-picker",
+        "actualVerifiedVersion": "8.10.1",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "react-hook-form",
+        "actualVerifiedVersion": "7.55.0",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "react-resizable-panels",
+        "actualVerifiedVersion": "2.1.7",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "recharts",
+        "actualVerifiedVersion": "2.15.4",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "sonner",
+        "actualVerifiedVersion": "2.0.8",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "tailwind-merge",
+        "actualVerifiedVersion": "3.7.0",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "vaul",
+        "actualVerifiedVersion": "1.1.2",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "xterm",
+        "actualVerifiedVersion": "5.3.0",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "xterm-addon-fit",
+        "actualVerifiedVersion": "0.8.0",
+        "registeredVersion": null
+      },
+      {
+        "dependency": "xterm-addon-web-links",
+        "actualVerifiedVersion": "0.9.0",
+        "registeredVersion": null
+      }
+    ],
+    "provenancePathGaps": [],
+    "sourceAndResourceLedger": {
+      "stagedFiles": 138,
+      "splitResources": 0,
+      "independentGitByteCheck": "passed by prepare-packing; actual packer result below"
+    },
+    "packing": {
+      "status": "blocked",
+      "code": "IMPORT_CONFIG",
+      "detail": "仅允许受支持且已登记版本的 React 工程依赖"
+    }
+  },
+  "originalFramework": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "adaptedFramework": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "dependencies": [
+    {
+      "package": "@radix-ui/react-accordion",
+      "version": "1.2.3",
+      "upstreamRequested": "^1.2.3",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-alert-dialog",
+      "version": "1.1.23",
+      "upstreamRequested": "^1.1.6",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-aspect-ratio",
+      "version": "1.1.2",
+      "upstreamRequested": "^1.1.2",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-avatar",
+      "version": "1.1.3",
+      "upstreamRequested": "^1.1.3",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-checkbox",
+      "version": "1.3.11",
+      "upstreamRequested": "^1.1.4",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-collapsible",
+      "version": "1.1.3",
+      "upstreamRequested": "^1.1.3",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-context-menu",
+      "version": "2.3.7",
+      "upstreamRequested": "^2.2.6",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-dialog",
+      "version": "1.1.23",
+      "upstreamRequested": "^1.1.6",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-dropdown-menu",
+      "version": "2.1.24",
+      "upstreamRequested": "^2.1.6",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-hover-card",
+      "version": "1.1.6",
+      "upstreamRequested": "^1.1.6",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-label",
+      "version": "2.1.15",
+      "upstreamRequested": "^2.1.2",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-menubar",
+      "version": "1.1.6",
+      "upstreamRequested": "^1.1.6",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-navigation-menu",
+      "version": "1.2.5",
+      "upstreamRequested": "^1.2.5",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-popover",
+      "version": "1.1.6",
+      "upstreamRequested": "^1.1.6",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-progress",
+      "version": "1.1.2",
+      "upstreamRequested": "^1.1.2",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-radio-group",
+      "version": "1.4.7",
+      "upstreamRequested": "^1.2.3",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-scroll-area",
+      "version": "1.2.18",
+      "upstreamRequested": "^1.2.3",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-select",
+      "version": "2.3.7",
+      "upstreamRequested": "^2.1.6",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-separator",
+      "version": "1.1.2",
+      "upstreamRequested": "^1.1.2",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-slider",
+      "version": "1.2.3",
+      "upstreamRequested": "^1.2.3",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-slot",
+      "version": "1.3.3",
+      "upstreamRequested": "^1.1.2",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-switch",
+      "version": "1.3.7",
+      "upstreamRequested": "^1.1.3",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-tabs",
+      "version": "1.1.21",
+      "upstreamRequested": "^1.1.3",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-toggle",
+      "version": "1.1.2",
+      "upstreamRequested": "^1.1.2",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-toggle-group",
+      "version": "1.1.2",
+      "upstreamRequested": "^1.1.2",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@radix-ui/react-tooltip",
+      "version": "1.2.8",
+      "upstreamRequested": "^1.1.8",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "@tauri-apps/api",
+      "version": "2.8.0",
+      "upstreamRequested": "^2.0.0",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": true,
+      "registeredInFrozenHost": true,
+      "peerReact": null,
+      "peerSupportsActualReact": null
+    },
+    {
+      "package": "class-variance-authority",
+      "version": "0.7.1",
+      "upstreamRequested": "^0.7.1",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": null,
+      "peerSupportsActualReact": null
+    },
+    {
+      "package": "clsx",
+      "version": "2.1.1",
+      "upstreamRequested": "2.1.1",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": null,
+      "peerSupportsActualReact": null
+    },
+    {
+      "package": "cmdk",
+      "version": "1.1.1",
+      "upstreamRequested": "^1.1.1",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^18 || ^19 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "embla-carousel-react",
+      "version": "8.6.0",
+      "upstreamRequested": "^8.6.0",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8.0 || ^17.0.1 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "framer-motion",
+      "version": "12.43.0",
+      "upstreamRequested": "12.43.0",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": true,
+      "registeredInFrozenHost": false,
+      "peerReact": "^18.0.0 || ^19.0.0",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "input-otp",
+      "version": "1.4.2",
+      "upstreamRequested": "^1.4.2",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "lucide-react",
+      "version": "0.487.0",
+      "upstreamRequested": "^0.487.0",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": true,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "next-themes",
+      "version": "0.4.6",
+      "upstreamRequested": "^0.4.6",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "react-day-picker",
+      "version": "8.10.1",
+      "upstreamRequested": "^8.10.1",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8.0 || ^17.0.0 || ^18.0.0",
+      "peerSupportsActualReact": false
+    },
+    {
+      "package": "react-hook-form",
+      "version": "7.55.0",
+      "upstreamRequested": "^7.55.0",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8.0 || ^17 || ^18 || ^19",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "react-resizable-panels",
+      "version": "2.1.7",
+      "upstreamRequested": "^2.1.7",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "recharts",
+      "version": "2.15.4",
+      "upstreamRequested": "^2.15.2",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": true,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "sonner",
+      "version": "2.0.8",
+      "upstreamRequested": "^2.0.3",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": true,
+      "registeredInFrozenHost": false,
+      "peerReact": "^18.0.0 || ^19.0.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "tailwind-merge",
+      "version": "3.7.0",
+      "upstreamRequested": "3.6.0",
+      "satisfiesOriginalRequest": false,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": null,
+      "peerSupportsActualReact": null
+    },
+    {
+      "package": "vaul",
+      "version": "1.1.2",
+      "upstreamRequested": "^1.1.2",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": false,
+      "registeredInFrozenHost": false,
+      "peerReact": "^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc",
+      "peerSupportsActualReact": true
+    },
+    {
+      "package": "xterm",
+      "version": "5.3.0",
+      "upstreamRequested": "^5.3.0",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": true,
+      "registeredInFrozenHost": false,
+      "peerReact": null,
+      "peerSupportsActualReact": null
+    },
+    {
+      "package": "xterm-addon-fit",
+      "version": "0.8.0",
+      "upstreamRequested": "^0.8.0",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": true,
+      "registeredInFrozenHost": false,
+      "peerReact": null,
+      "peerSupportsActualReact": null
+    },
+    {
+      "package": "xterm-addon-web-links",
+      "version": "0.9.0",
+      "upstreamRequested": "^0.9.0",
+      "satisfiesOriginalRequest": true,
+      "declaredInCandidate": true,
+      "reachableFromMain": true,
+      "registeredInFrozenHost": false,
+      "peerReact": null,
+      "peerSupportsActualReact": null
+    }
+  ],
+  "sourceModulesMissingCandidateDeclarations": [],
+  "rawTailwindInputs": [],
+  "parseIssues": [],
+  "requiredHostChanges": [
+    "Reviewed dependencies and exact versions for every retained UI module; full declarations are preserved",
+    "react-day-picker@8.10.1 does not declare React 19 peer support; optional calendar is retained and unverified"
+  ],
+  "acceptance": {
+    "checksumAndFileIntegrity": "passed",
+    "documentAndResourceSchema": "passed except separately reported dependency policy",
+    "frozenPacking": "blocked IMPORT_CONFIG",
+    "frozenPreflight": {
+      "passed": false,
+      "code": "IMPORT_CONFIG",
+      "detail": "仅允许受支持且已登记版本的 React 工程依赖"
+    },
+    "frozenImport": {
+      "status": "blocked",
+      "code": "IMPORT_CONFIG",
+      "detail": "仅允许受支持且已登记版本的 React 工程依赖",
+      "baseline": "d4f41d0e7ab552129a82d91648ecd3dade692de9",
+      "required": "Explicit host dependency compatibility support"
+    },
+    "originalApplicationPreview": "passed isolated headless Chromium; ephemeral loopback port",
+    "sourceMapping": {
+      "passed": true,
+      "file": "src/components/TopologyView.tsx",
+      "line": 66,
+      "allowedProperties": [
+        "text"
+      ],
+      "checkedProperty": "text",
+      "checked": "Original visible JSX literal text or static inline style transformation; validation only, no source write",
+      "readonly": "Dynamic/i18n text, theme expressions and unbound canvas internals remain read-only"
+    },
+    "productionBuild": "passed",
+    "nativeBackend": "unavailable, not validated",
+    "officialCandidateAcceptanceAndRevert": "blocked, not accepted"
+  },
+  "waitingForOwner": "Explicit compatibility support for the recorded package versions and remaining packer constraints; no shared files modified"
+}
