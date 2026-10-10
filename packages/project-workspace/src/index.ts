@@ -33,6 +33,10 @@ const SOURCE_EXTENSION = /\.(?:[cm]?[jt]sx?|css|scss|sass|less|json|svg|html|txt
 const BINARY_EXTENSION = /\.(?:png|jpe?g|webp|gif|avif|ico|woff2?|ttf|otf)$/i;
 const EXECUTABLE_CONFIG = /^(?:vite|vitest|webpack|rollup|next|nuxt|babel|eslint|postcss|tailwind)\.config\.|^(?:\.npmrc|\.yarnrc|Makefile|Dockerfile)$/i;
 const CREDENTIAL = /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|\bAKIA[0-9A-Z]{16}\b|\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{50,}|sk-(?:proj-|ant-)?[A-Za-z0-9_-]{24,})\b|\b(?:api[_-]?key|access[_-]?token|client[_-]?secret|password)\s*[:=]\s*["'](?!fixture|demo|example|test|placeholder|your[_-]|\$\{|process\.env)[A-Za-z0-9_+/=-]{16,}["']/i;
+/** The same content boundary applies before and after resource encoding. */
+export function assertNoPrivateSourceContent(content: string): void {
+  if (CREDENTIAL.test(content)) throw new DomainError('IMPORT_SECRET', '项目文件包含私密凭据，请先移除凭据', 400);
+}
 const PACKAGE = { name: '@rdesign/project', version: '0.1.0', private: true, type: 'module', scripts: { dev: 'vite --host 127.0.0.1', build: 'vite build' }, dependencies: { '@rdesign/runtime-web': '*', react: '^19.1.0', 'react-dom': '^19.1.0' } };
 /** Rebuild executable metadata, retaining only dependencies already shipped by the host. */
 export function projectPackage(dependencies: Record<string, unknown> = {}) {
@@ -87,7 +91,7 @@ function validateSource(file: string, content: unknown): string {
   portablePath(file);
   if (BINARY_EXTENSION.test(file)) throw new DomainError('IMPORT_FILE', '二进制资产必须声明 base64 编码', 400);
   if (typeof content !== 'string' || Buffer.byteLength(content) > MAX_FILE_BYTES || content.includes('\0') || content.includes('\ufffd')) throw new DomainError('IMPORT_FILE', '文件必须是最多 1 MiB 的 UTF-8 文本', 400);
-  if (CREDENTIAL.test(content)) throw new DomainError('IMPORT_SECRET', '项目文件包含私密凭据，请先移除凭据', 400);
+  assertNoPrivateSourceContent(content);
   if (file === 'package.json') {
     let config: any; try { config = JSON.parse(content); } catch { throw new DomainError('IMPORT_CONFIG', '无效 package.json', 400); }
     const scripts = config.scripts ?? {};
@@ -101,6 +105,13 @@ function binaryFile(file: string, content: unknown): Buffer {
   if (!BINARY_EXTENSION.test(file) || typeof content !== 'string' || content.length > Math.ceil(MAX_FILE_BYTES / 3) * 4 || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(content)) throw new DomainError('IMPORT_FILE', '二进制资产编码或类型无效', 400);
   const bytes = Buffer.from(content, 'base64');
   if (!bytes.length || bytes.length > MAX_FILE_BYTES || bytes.toString('base64') !== content) throw new DomainError('IMPORT_FILE', '二进制资产须为最多 1 MiB 的规范 base64', 400);
+  assertPortableBinaryResource(file, bytes);
+  return bytes;
+}
+/** Split resources remain supported asset types; encoded text is not an asset bypass. */
+export function assertPortableBinaryResource(file: string, bytes: Buffer): void {
+  assertNoPrivateSourceContent(bytes.toString('utf8'));
+  if (!BINARY_EXTENSION.test(file)) throw new DomainError('IMPORT_FILE', '资源分片仅支持已登记的二进制图片或字体类型', 400);
   const extension = path.extname(file).toLowerCase();
   const prefix = bytes.subarray(0, 12); const ascii = prefix.toString('ascii');
   const valid = extension === '.png' ? bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
@@ -114,7 +125,6 @@ function binaryFile(file: string, content: unknown): Buffer {
     : extension === '.ttf' ? prefix.subarray(0, 4).equals(Buffer.from([0, 1, 0, 0])) || ascii.startsWith('true')
     : extension === '.otf' && ascii.startsWith('OTTO');
   if (!valid) throw new DomainError('IMPORT_FILE', '二进制资产内容与文件类型不匹配', 400);
-  return bytes;
 }
 function fileBytes(file: PortableProjectBundle['sourceFiles'][number]): string | Buffer {
   if (file.encoding !== undefined && !['utf8', 'base64'].includes(file.encoding)) throw new DomainError('IMPORT_FILE', '不支持的工程文件编码', 400);
