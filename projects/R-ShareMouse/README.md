@@ -24,6 +24,7 @@ R-ShareMouse、R-Link 在冻结 PR4 候选 `3fba881610f73705c1da026d0ed5298d7985
 ```sh
 npm ci --ignore-scripts --prefix ../frozen-tool
 node projects/R-ShareMouse/tooling/prepare-official.mjs "$RDESIGN_DESKTOP_HANDOFF" R-ShareMouse R-Link
+mkdir -p .rdesign/desktop-official-deliverables
 node --import ../frozen-tool/node_modules/tsx/dist/loader.mjs ../frozen-tool/scripts/engineering.ts pack-prepared projects/R-ShareMouse/official-packing.config.json .rdesign/desktop-official-deliverables/R-ShareMouse.3fba881.rdesign-project.json
 node --import ../frozen-tool/node_modules/tsx/dist/loader.mjs ../frozen-tool/scripts/engineering.ts pack-prepared projects/R-Link/official-packing.config.json .rdesign/desktop-official-deliverables/R-Link.3fba881.rdesign-project.json
 node --import ../frozen-tool/node_modules/tsx/dist/loader.mjs projects/R-ShareMouse/tooling/official-verify.ts R-ShareMouse
