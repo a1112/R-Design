@@ -2,7 +2,8 @@ import { chromium, type Browser, type Page } from 'playwright';
 import { createServer, type ViteDevServer, build } from 'vite';
 import react from '@vitejs/plugin-react';
 import { fileBoundary } from './vite-security.js';
-import { runtimeDependencies } from './runtime-dependencies.js';
+import { runtimeDependencies, readRuntimeProfile, profileHostDependencies } from './runtime-dependencies.js';
+import type { RuntimeProfile } from '../../../packages/project-workspace/src/runtime-profiles.js';
 import { rdesignSourceIds } from '../../../packages/runtime-web/src/vite.js';
 import path from 'node:path';
 import { existsSync, realpathSync } from 'node:fs';
@@ -32,7 +33,30 @@ export class BrowserRuntime {
   private revision = ''; private queue:Promise<unknown>=Promise.resolve();
   lastFrame:RuntimeFrame|null=null;status:RuntimeFrame['status']='connecting';private needsReload=false;
   constructor(public root:string, public repoRoot:string, public kind:'live'|'candidate'='live', public port=0,public privateDirectory?:string) { this.root=realpathSync(root); }
-  config() { return {configFile:false as const,cacheDir:path.join(this.repoRoot,`node_modules/.vite/runtime-${digest(this.root).slice(0,16)}-${this.port}`),publicDir:false as const,root:this.root,define:{'import.meta.env.VITE_RDESIGN_RUNTIME':'"true"'},plugins:[fileBoundary({root:this.root,allow:[this.root,path.join(this.repoRoot,'packages/runtime-web'),path.join(this.repoRoot,'packages/protocol'),path.join(this.repoRoot,'node_modules')],privateRoots:this.privateDirectory&&(path.resolve(this.privateDirectory)===this.root||path.resolve(this.privateDirectory).startsWith(this.root+path.sep))?[this.privateDirectory]:[]}),runtimeDependencies(this.repoRoot),rdesignSourceIds({root:this.root}),react()],resolve:{alias:{'@rdesign/runtime-web':path.join(this.repoRoot,'packages/runtime-web/src/index.ts'),'@rdesign/protocol':path.join(this.repoRoot,'packages/protocol/src/index.ts'),'react':path.join(this.repoRoot,'node_modules/react'),'react-dom':path.join(this.repoRoot,'node_modules/react-dom')}},server:{host:'127.0.0.1',port:this.port,strictPort:this.port>0,hmr:false,ws:false as const,fs:{strict:true,allow:[this.root,path.join(this.repoRoot,'packages/runtime-web'),path.join(this.repoRoot,'packages/protocol'),path.join(this.repoRoot,'node_modules')],deny:['**/.git/**','**/.env','**/.env.*','**/*.{crt,pem,key}','**/change-meta.json',path.join(this.root,'**/.rdesign/**'),...(this.privateDirectory&&(path.resolve(this.privateDirectory)===this.root||path.resolve(this.privateDirectory).startsWith(this.root+path.sep))?[path.join(path.resolve(this.privateDirectory),'**')]:[])]}},logLevel:'error' as const}; }
+  private selectedProfile: RuntimeProfile | null = null;
+  private profile() {
+    const profile = readRuntimeProfile(this.root);
+    if (this.selectedProfile && profile !== this.selectedProfile) throw new DomainError('RUNTIME_PROFILE_CHANGED', '运行配置已变化，须创建新的运行实例', 409, true);
+    return profile;
+  }
+  config() {
+    const profile = this.profile(), host = profileHostDependencies(this.repoRoot, profile);
+    this.selectedProfile = profile;
+    const allow = [this.root, path.join(this.repoRoot, 'packages/runtime-web'), path.join(this.repoRoot, 'packages/protocol'), path.join(this.repoRoot, 'node_modules'), ...host.allow];
+    const privateRoots = this.privateDirectory && (path.resolve(this.privateDirectory) === this.root || path.resolve(this.privateDirectory).startsWith(this.root + path.sep)) ? [this.privateDirectory] : [];
+    return {
+      configFile: false as const,
+      cacheDir: path.join(this.repoRoot, `node_modules/.vite/runtime-${digest(this.root).slice(0,16)}-${profile}-${this.port}`),
+      publicDir: false as const, root: this.root,
+      define: { 'import.meta.env.VITE_RDESIGN_RUNTIME': '"true"' },
+      plugins: [fileBoundary({ root: this.root, allow, privateRoots }), runtimeDependencies(this.repoRoot, profile, this.root), rdesignSourceIds({ root: this.root, excludedIntrinsics: host.sceneIntrinsics }), react()],
+      ...(profile === 'react18' ? { css: { postcss: { plugins: [] } } } : {}),
+      resolve: { alias: { '@rdesign/runtime-web': path.join(this.repoRoot, 'packages/runtime-web/src/index.ts'), '@rdesign/protocol': path.join(this.repoRoot, 'packages/protocol/src/index.ts'), ...host.aliases } },
+      server: { host: '127.0.0.1', port: this.port, strictPort: this.port > 0, hmr: false, ws: false as const,
+        fs: { strict: true, allow, deny: ['**/.git/**', '**/.env', '**/.env.*', '**/*.{crt,pem,key}', '**/change-meta.json', path.join(this.root, '**/.rdesign/**'), ...privateRoots.map(root => path.join(path.resolve(root), '**'))] } },
+      logLevel: 'error' as const,
+    };
+  }
   async start() {
     if (this.port === 0) this.port = await availablePreviewPort();
     this.server=await createServer(this.config());await this.server.listen();
@@ -42,6 +66,7 @@ export class BrowserRuntime {
   }
   url() {const address=this.server.httpServer?.address();if(!address||typeof address==='string')throw new Error('Preview server unavailable');return `http://127.0.0.1:${address.port}`;}
   async refreshSources() {
+    try { this.profile(); } catch (error) { this.status = 'build-failed'; throw error; }
     const next=await codeHash(this.root);
     try {if((this.needsReload||this.revision&&this.revision!==next)&&this.page){this.status='resyncing';this.needsReload=true;this.server.moduleGraph.invalidateAll();await this.page.reload({waitUntil:'networkidle',timeout:8000});await this.page.waitForFunction(()=>Boolean((window as any).__RDESIGN__),undefined,{timeout:5000});}
       this.index=await indexSources(this.root);this.revision=next;this.needsReload=false;this.status='live';

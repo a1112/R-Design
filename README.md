@@ -75,6 +75,8 @@ npm run dev
 
 启动参数 `RDESIGN_WORKSPACE` 指向明确授权的 React/Vite 项目目录。首版预览运行器适用于常规 `src/`、`index.html`、JSX/TSX 工程，并提供本仓库 React 运行依赖；复杂自定义 Vite 插件、服务代理和其他框架须另设适配。当前使用 `src/` 资源导入；`public/` 不自动映射到根路径，以便严格检查资源文件和符号链接。运行实例需要显式接入 Runtime SDK，源码标识只用于开发构建，不能把未知业务数据变成可写常量。
 
+默认仍使用宿主 React 19。需要 fiber 8 / drei 9 的工程可显式选择[受控 React 18 运行配置](docs/runtime-profiles.md)，使用宿主冻结的 React 18.3.1 与 Three 依赖；工程导入不会安装依赖或执行项目插件。
+
 详见 [Runtime SDK 接入](packages/runtime-web/README.md)。唯一实例上的 JSX 文字常量和内联样式可直接修改；共享节点、动态表达式和未知映射会拒绝回写。外部源码更新会重新读取版本并重载受控页面，不保留临时覆盖。
 
 默认绑定本机。跨设备启动需要 TLS 和准确的授权来源：

@@ -4,7 +4,8 @@ import path from 'node:path';
 import type { Project, ChangeSet, RuntimeFrame, ProjectSummary as SharedProjectSummary, EngineeringBundle } from '../../protocol/src/index.js';
 import { createProject, digest, DomainError } from '../../document-core/src/index.js';
 import { codeHash } from '../../source-binding/src/index.js';
-import { CORE_PROJECT_DEPENDENCIES, REVIEWED_RUNTIME_DEPENDENCIES, reviewedDependency } from './runtime-dependencies.js';
+import { CORE_PROJECT_DEPENDENCIES, reviewedRuntimeDependencies, reviewedDependency } from './runtime-dependencies.js';
+import { assertProfileCoreVersions, assertProfileExecution, runtimeProfileFromPackage, type RuntimeProfile } from './runtime-profiles.js';
 
 export type ProjectTemplate = 'blank' | 'react-monitor';
 export interface ProjectSummary extends SharedProjectSummary { template: ProjectTemplate; lastOpenedAt: string }
@@ -39,14 +40,16 @@ export function assertNoPrivateSourceContent(content: string): void {
 }
 const PACKAGE = { name: '@rdesign/project', version: '0.1.0', private: true, type: 'module', scripts: { dev: 'vite --host 127.0.0.1', build: 'vite build' }, dependencies: { '@rdesign/runtime-web': '*', react: '^19.1.0', 'react-dom': '^19.1.0' } };
 /** Rebuild executable metadata, retaining only dependencies already shipped by the host. */
-export function projectPackage(dependencies: Record<string, unknown> = {}) {
+export function projectPackage(dependencies: Record<string, unknown> = {}, profile: RuntimeProfile = 'react19') {
+  runtimeProfileFromPackage({ rdesign: { runtimeProfile: profile } });
+  const reviewed = reviewedRuntimeDependencies(profile);
   const extra: Record<string, string> = {};
   for (const [name, version] of Object.entries(dependencies)) {
     if (CORE_PROJECT_DEPENDENCIES.has(name)) continue;
-    if (!reviewedDependency(name, version)) throw new DomainError('IMPORT_CONFIG', `工程依赖未受支持或版本未登记: ${name}`, 400);
-    extra[name] = REVIEWED_RUNTIME_DEPENDENCIES[name];
+    if (!reviewedDependency(name, version, profile)) throw new DomainError('IMPORT_CONFIG', `工程依赖未受支持或版本未登记: ${name}`, 400);
+    extra[name] = reviewed[name];
   }
-  return { ...PACKAGE, dependencies: { ...PACKAGE.dependencies, ...extra } };
+  return { ...PACKAGE, ...(profile === 'react18' ? { rdesign: { runtimeProfile: profile } } : {}), dependencies: { ...PACKAGE.dependencies, ...(profile === 'react18' ? { react: '18.3.1', 'react-dom': '18.3.1' } : {}), ...extra } };
 }
 const VITE_CONFIG = "import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';\nimport { rdesignSourceIds } from '@rdesign/runtime-web/vite';\nexport default defineConfig({ plugins: [rdesignSourceIds(), react()], server: { host: '127.0.0.1' } });\n";
 const HTML = '<!doctype html>\n<html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>R-Design 项目</title></head><body style="margin:0"><div id="root"></div><script type="module" src="/src/main.tsx"></script></body></html>\n';
@@ -94,9 +97,12 @@ function validateSource(file: string, content: unknown): string {
   assertNoPrivateSourceContent(content);
   if (file === 'package.json') {
     let config: any; try { config = JSON.parse(content); } catch { throw new DomainError('IMPORT_CONFIG', '无效 package.json', 400); }
+    const profile = runtimeProfileFromPackage(config);
+    assertProfileCoreVersions(config, profile);
+    assertProfileExecution(config, profile);
     const scripts = config.scripts ?? {};
     if (Object.entries(scripts).some(([key, value]) => !['dev', 'build'].includes(key) || typeof value !== 'string' || !/^vite(?: build)?(?: --host 127\.0\.0\.1)?(?: --port \d+)?$/.test(value)) || config.bin || config.workspaces || config.packageManager || config.overrides || config.resolutions) throw new DomainError('IMPORT_CONFIG', '项目包配置包含未授权的执行入口', 400);
-    for (const dependencies of [config.dependencies, config.devDependencies, config.optionalDependencies]) for (const [name, version] of Object.entries(dependencies ?? {})) if (!(CORE_PROJECT_DEPENDENCIES.has(name) && typeof version === 'string' && /^(?:\*|[\^~]?[0-9]+(?:\.[0-9x*]+){0,2})$/.test(version)) && !reviewedDependency(name, version)) throw new DomainError('IMPORT_CONFIG', '仅允许受支持且已登记版本的 React 工程依赖', 400);
+    for (const dependencies of [config.dependencies, config.devDependencies, config.optionalDependencies]) for (const [name, version] of Object.entries(dependencies ?? {})) if (!(CORE_PROJECT_DEPENDENCIES.has(name) && typeof version === 'string' && /^(?:\*|[\^~]?[0-9]+(?:\.[0-9x*]+){0,2})$/.test(version)) && !reviewedDependency(name, version, profile)) throw new DomainError('IMPORT_CONFIG', '仅允许受支持且已登记版本的 React 工程依赖', 400);
   }
   return content;
 }
@@ -392,7 +398,7 @@ export class ProjectWorkspace {
     for (const file of incoming.sourceFiles) await this.atomic(path.join(source, file.path), fileBytes(file));
     const config = JSON.parse(incoming.sourceFiles.find(file => file.path === 'package.json')?.content ?? '{}');
     const dependencies = { ...config.dependencies, ...config.devDependencies, ...config.optionalDependencies };
-    await this.atomic(path.join(source, 'package.json'), JSON.stringify(projectPackage(dependencies), null, 2) + '\n'); await this.atomic(path.join(source, 'vite.config.ts'), VITE_CONFIG);
+    await this.atomic(path.join(source, 'package.json'), JSON.stringify(projectPackage(dependencies, runtimeProfileFromPackage(config)), null, 2) + '\n'); await this.atomic(path.join(source, 'vite.config.ts'), VITE_CONFIG);
     await this.atomic(path.join(source, 'src/runtime-module.d.ts'), "declare module '@rdesign/runtime-web';\n");
     const revision = await codeHash(source); const now = new Date().toISOString();
     const document = structuredClone(incoming.document); const formerId = document.project.id;
