@@ -128,13 +128,15 @@ export function runtimeDependencies(repoRoot: string, profile: RuntimeProfile = 
     transform(code, id) {
       if (profile !== 'react18' || !sourceFile(id) || !/\.[cm]?[jt]sx?(?:\?|$)/.test(id) || id.split('?')[0].endsWith('.d.ts')) return null;
       const ast = parse(code, { sourceType: 'module', plugins: ['typescript', 'jsx'] });
+      const pureTypeImports = ast.program.body.filter(node => node.type === 'ImportDeclaration' &&
+        (node.importKind === 'type' || node.specifiers.length > 0 && node.specifiers.every(item => item.type === 'ImportSpecifier' && item.importKind === 'type')));
       const assertSourceSpecifier = (source: string) => {
         assertSpecifier(source);
         if (source.startsWith('/@fs/') || source.split('/').includes('node_modules')) throw new DomainError('IMPORT_CONFIG', '项目源码须使用登记的包名称而非宿主依赖文件路径', 400);
       };
       const visit = (node: any) => {
         if (!node || typeof node !== 'object') return;
-        if (['ImportDeclaration', 'ExportNamedDeclaration', 'ExportAllDeclaration'].includes(node.type) && node.source && node.importKind !== 'type' && node.exportKind !== 'type') assertSourceSpecifier(node.source.value);
+        if (['ImportDeclaration', 'ExportNamedDeclaration', 'ExportAllDeclaration'].includes(node.type) && node.source && node.importKind !== 'type' && node.exportKind !== 'type' && !pureTypeImports.includes(node)) assertSourceSpecifier(node.source.value);
         if (node.type === 'ImportExpression' || node.type === 'CallExpression' && (node.callee?.type === 'Import' || node.callee?.type === 'Identifier' && node.callee.name === 'require')) {
           const argument = node.type === 'ImportExpression' ? node.source : node.arguments[0];
           if (argument?.type !== 'StringLiteral') throw new DomainError('IMPORT_CONFIG', 'React 18 配置禁止不受控动态模块导入', 400);
@@ -144,7 +146,14 @@ export function runtimeDependencies(repoRoot: string, profile: RuntimeProfile = 
           if (Array.isArray(value)) value.forEach(visit); else if (value && typeof value === 'object') visit(value);
         }
       };
-      visit(ast.program); return null;
+      visit(ast.program);
+      if (!pureTypeImports.length) return null;
+      // Pure declarations have no runtime import. Preserve offsets for DOM source bindings.
+      let transformed = code;
+      for (const declaration of [...pureTypeImports].reverse()) {
+        transformed = transformed.slice(0, declaration.start!) + transformed.slice(declaration.start!, declaration.end!).replace(/[^\r\n]/g, ' ') + transformed.slice(declaration.end!);
+      }
+      return { code: transformed, map: null };
     },
     async resolveId(source, importer) {
       if (profile === 'react18') {

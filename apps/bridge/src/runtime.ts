@@ -49,7 +49,7 @@ export class BrowserRuntime {
       cacheDir: path.join(this.repoRoot, `node_modules/.vite/runtime-${digest(this.root).slice(0,16)}-${profile}-${this.port}`),
       publicDir: false as const, root: this.root,
       define: { 'import.meta.env.VITE_RDESIGN_RUNTIME': '"true"' },
-      plugins: [fileBoundary({ root: this.root, allow, privateRoots }), runtimeDependencies(this.repoRoot, profile, this.root), rdesignSourceIds({ root: this.root, excludedIntrinsics: host.sceneIntrinsics }), react()],
+      plugins: [fileBoundary({ root: this.root, allow, privateRoots }), runtimeDependencies(this.repoRoot, profile, this.root), rdesignSourceIds({ root: this.root, excludedIntrinsics: host.sceneIntrinsics, domOnly: profile === 'react18' }), react()],
       ...(profile === 'react18' ? { css: { postcss: { plugins: [] } } } : {}),
       resolve: { alias: { '@rdesign/runtime-web': path.join(this.repoRoot, 'packages/runtime-web/src/index.ts'), '@rdesign/protocol': path.join(this.repoRoot, 'packages/protocol/src/index.ts'), ...host.aliases } },
       server: { host: '127.0.0.1', port: this.port, strictPort: this.port > 0, hmr: false, ws: false as const,

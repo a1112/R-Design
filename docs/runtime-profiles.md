@@ -1,5 +1,7 @@
 # Controlled browser runtime profiles
 
+Independent review still has three unresolved findings: HTML external-script handling, dependency-path boundaries and cold-cache path handling. The corresponding security work is paused and has not been rerun or changed in this follow-up. The implemented checks described below do not establish that these findings are resolved. This follow-up addresses only custom Fiber intrinsic instrumentation and pure type-import compilation.
+
 Managed previews keep the existing host React 19 runtime by default. A project can explicitly select the host-owned React 18 runtime with this package metadata:
 
 ```json
@@ -39,7 +41,9 @@ The new profile admits the reviewed renderer names and versions and keeps existi
 
 Project executable configurations, package lifecycle scripts, private-content checks, normalized portable paths, provenance checks and resource limits retain their existing policy. React 18 linked projects also reject lifecycle scripts and package-level dependency redirects; inline host PostCSS configuration disables discovery of project plugins. Vite still disables the project configuration and public directory, binds to loopback, disables HMR/WebSocket serving, and applies canonical file/private-root checks. The only added host filesystem allowance is the installed React 18 workspace's dependency directory. These checks control the managed module/tooling boundary; they do not make arbitrary application JavaScript a security sandbox.
 
-The DOM observer remains framework-independent. For React 18 previews the source-ID transform derives the scene intrinsic catalog from the frozen host Three constructors instead of attaching DOM IDs to mesh/material/light objects. DOM toolbar elements remain mapped; names shared by DOM and Three are conservatively excluded from automatic IDs in this profile. Canvas and Shadow DOM retain their existing explicit degradation states; this change does not add a scene editor or prove native window behavior.
+The DOM observer remains framework-independent. React 18 source IDs are limited to standard DOM intrinsics and omit the frozen Three catalog and Canvas subtrees. Custom intrinsics registered by Fiber `extend` are left free of DOM-only attributes; DOM toolbars outside the scene and supported Drei `Html` portals remain mapped. Names shared by DOM and the frozen Three catalog are conservatively excluded from automatic IDs in this profile. Canvas and Shadow DOM retain their existing explicit degradation states; this change does not add a scene editor or prove native window behavior.
+
+Both `import type { T }` and declarations containing only inline type specifiers (`import { type T }`) are erased before runtime compilation. Their character positions are retained for source mapping. Mixed declarations keep their value imports and the existing runtime import checks.
 
 ## Verification and audit limits
 
