@@ -9,7 +9,7 @@ import { projectPackage } from '../../packages/project-workspace/src/index';
 import { injectSourceIds } from '../../packages/runtime-web/src/vite';
 
 const host = path.resolve(import.meta.dirname, '../..');
-it('keeps custom scene tags free of DOM IDs while retaining DOM toolbar and Html portal IDs', () => {
+it('defers DOM-only IDs to mounted instances across toolbar, scene and Html portal elements', () => {
   const code = `import{Canvas as Surface}from'@react-three/fiber';import{Html as Portal}from'@react-three/drei';
   const App=()=> <main><button>Toolbar</button><Surface><button/><customSceneObject/><Portal><button>Portal toolbar</button></Portal></Surface></main>;`;
   const transformed = injectSourceIds(code, '/fixture/src/main.tsx', '/fixture', new Set(), true);
@@ -21,8 +21,9 @@ it('keeps custom scene tags free of DOM IDs while retaining DOM toolbar and Html
     for (const value of Object.values(node)) { if (Array.isArray(value)) value.forEach(visit); else if (value && typeof value === 'object') visit(value); }
   };
   visit(ast.program);
-  expect(openings.filter(item => item.name === 'button').map(item => item.id)).toEqual([true, false, true]);
+  expect(openings.filter(item => item.name === 'button').map(item => item.id)).toEqual([false, false, false]);
   expect(openings.find(item => item.name === 'customSceneObject')?.id).toBe(false);
+  expect(transformed).toContain('setAttribute');
   // The legacy/default transform retains its existing custom-element behavior.
   expect(injectSourceIds('<customSceneObject/>', '/fixture/src/main.tsx', '/fixture')).toContain('data-rdesign-id');
 });
