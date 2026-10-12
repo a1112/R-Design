@@ -43,6 +43,8 @@ Project executable configurations, package lifecycle scripts, private-content ch
 
 The DOM observer remains framework-independent. React 18 instrumentation combines the element's original ref with a stable source-ID callback. It sets the ID only when the actual mounted instance is an Element in its owning DOM window; the ID is never passed as an element prop to Three. This supports cross-component and dynamically extended intrinsics even when their names match HTML tags, without relying on lexical Canvas ancestry or a tag blacklist. DOM toolbars and Drei `Html` portals retain source mapping; callback and object refs are forwarded. Legacy string refs are preserved without automatic IDs. The default React 19 transform is unchanged. Canvas and Shadow DOM retain their existing explicit degradation states; this change does not add a scene editor or prove native window behavior.
 
+The original JSX attributes and children remain intact for the downstream compiler. A host React `cloneElement` call composes the source ref after JSX element creation, retaining the compiler's quoted-entity decoding, expression-string whitespace and attribute/child/key evaluation order.
+
 Both `import type { T }` and declarations containing only inline type specifiers (`import { type T }`) are erased before runtime compilation. Their character positions are retained for source mapping. Mixed declarations keep their value imports and the existing runtime import checks.
 
 ## Verification and audit limits
