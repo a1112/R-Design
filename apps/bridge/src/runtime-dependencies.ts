@@ -2,7 +2,8 @@ import path from 'node:path';
 import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { parse } from '@babel/parser';
-import type { Plugin } from 'vite';
+import { normalizePath, type DevEnvironment, type Plugin } from 'vite';
+import { parse as parseHtml, type DefaultTreeAdapterMap } from 'parse5';
 import { CORE_PROJECT_DEPENDENCIES, reviewedDependency, reviewedRuntimeDependencies, REACT18_RENDERER_DEPENDENCIES } from '../../../packages/project-workspace/src/runtime-dependencies.js';
 import { REACT18_CORE_VERSIONS, assertProfileCoreVersions, assertProfileExecution, runtimeProfileFromPackage, type RuntimeProfile } from '../../../packages/project-workspace/src/runtime-profiles.js';
 import { DomainError } from '../../../packages/document-core/src/index.js';
@@ -69,20 +70,34 @@ export function runtimeDependencies(repoRoot: string, profile: RuntimeProfile = 
   const anchor = profile === 'react18' ? path.join(repoRoot, 'packages/runtime-react18/package.json') : path.join(repoRoot, 'package.json');
   const names = Object.keys(reviewedRuntimeDependencies(profile));
   const trustedRoots = [path.join(repoRoot, 'node_modules'), path.join(repoRoot, 'packages/runtime-react18/node_modules')];
-  const sourceFile = (id: string | undefined) => Boolean(sourceRoot && id && id.split('?')[0].startsWith(sourceRoot + path.sep) && !trustedRoots.some(root => id.startsWith(root + path.sep)));
+  const comparisonPath = (file: string) => process.platform === 'win32' ? normalizePath(file).toLowerCase() : normalizePath(file);
+  const within = (file: string, root: string) => comparisonPath(file).startsWith(comparisonPath(root) + '/');
+  const sourceFile = (id: string | undefined) => Boolean(sourceRoot && id && within(id.split('?')[0], sourceRoot) && !trustedRoots.some(root => within(id.split('?')[0], root)));
   const registered = (source: string) => names.some(name => source === name || source.startsWith(name + '/'));
   const approved = (source: string) => registered(source) || /^(?:react(?:-dom)?|@rdesign\/runtime-web)(?:\/|$)/.test(source);
   const assertSpecifier = (source: string) => {
-    if (!source || source.includes('\\') || source.startsWith('//') || (!source.startsWith('.') && !source.startsWith('/') && !approved(source))) {
+    if (!source || /[\\%]/.test(source) || source.startsWith('//') || source.startsWith('/@fs/') || source.split('/').includes('node_modules') ||
+      (!source.startsWith('.') && !source.startsWith('/') && (!approved(source) || source.split('/').some(part => part === '.' || part === '..')))) {
       throw new DomainError('IMPORT_CONFIG', '项目模块导入未登记或不受控', 400);
     }
   };
   let approvedRoots: string[] | undefined;
   let cacheDirectory: string | undefined;
+  // Optimizer IDs exist before their output files. Resolve existing ancestors
+  // canonically, without accepting a dangling symlink as a pending output.
+  const canonicalPendingPath = (file: string): string => {
+    try { return realpathSync(file); } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+      try { if (lstatSync(file).isSymbolicLink()) throw new Error('Dangling cache symlink'); }
+      catch (statError) { if ((statError as NodeJS.ErrnoException).code !== 'ENOENT') throw statError; }
+      const parent = path.dirname(file); if (parent === file) throw error;
+      return path.join(canonicalPendingPath(parent), path.basename(file));
+    }
+  };
   const permittedFile = (file: string) => {
     const actual = realpathSync(file);
     if (actual === realpathSync(path.join(repoRoot, 'node_modules/vite/dist/client/client.mjs'))) return true;
-    if (cacheDirectory && actual.startsWith(cacheDirectory + path.sep)) return true;
+    if (cacheDirectory && within(file, cacheDirectory)) return false;
     if (sourceRoot && actual.startsWith(sourceRoot + path.sep) && !path.relative(sourceRoot, actual).split(path.sep).includes('node_modules')) return true;
     approvedRoots ??= [...Object.values(profileHostDependencies(repoRoot, profile).aliases),
       path.join(repoRoot, 'packages/runtime-web')].map(root => realpathSync(root));
@@ -124,7 +139,8 @@ export function runtimeDependencies(repoRoot: string, profile: RuntimeProfile = 
           // Vite's explicit optimizer resolver bypasses normal resolveId hooks.
           // These aliases still point only into the same authorized host modules.
           resolve: { alias: {
-            ...Object.fromEntries(declared.map(name => [name, path.join(repoRoot, 'node_modules', name)])),
+            ...Object.fromEntries(declared.filter(name => profile !== 'react18' || !(name in REACT18_RENDERER_DEPENDENCIES))
+              .map(name => [name, path.join(repoRoot, 'node_modules', name)])),
             // The package's browser export requires document. Its same pinned
             // entity-table implementation also works in genuine Web Workers.
             'decode-named-character-reference': path.join(repoRoot, 'node_modules/decode-named-character-reference/index.js'),
@@ -142,24 +158,25 @@ export function runtimeDependencies(repoRoot: string, profile: RuntimeProfile = 
       order: 'pre',
       handler(html) {
         if (profile !== 'react18') return;
-        const document = html.replace(/<!--[\s\S]*?-->/g, '');
-        if (/<base\b/i.test(document)) throw new DomainError('IMPORT_CONFIG', 'React 18 预览禁止 HTML base 重定向', 400);
-        const decode = (value: string) => value.replace(/&#(x[0-9a-f]+|[0-9]+);?/gi, (_, code: string) => {
-          const point = code[0].toLowerCase() === 'x' ? parseInt(code.slice(1), 16) : parseInt(code, 10);
-          return point > 0 && point <= 0x10ffff ? String.fromCodePoint(point) : '\ufffd';
-        }).replace(/&(colon|sol|Tab|NewLine);/g, (_, name: string) => ({ colon: ':', sol: '/', Tab: '\t', NewLine: '\n' })[name]!);
-        for (const script of document.matchAll(/<script\b([^>]*)>/gi)) {
-          const attributes = new Map<string, string>();
-          for (const item of script[1].matchAll(/([^\s"'<>/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g)) {
-            const name = item[1].toLowerCase();
-            if (!attributes.has(name)) attributes.set(name, decode(item[2] ?? item[3] ?? item[4] ?? '').trim());
+        const visit = (node: DefaultTreeAdapterMap['node']) => {
+          if ('tagName' in node) {
+            if (node.tagName === 'base') throw new DomainError('IMPORT_CONFIG', 'React 18 预览禁止 HTML base 重定向', 400);
+            if (node.tagName === 'script') {
+              if (node.namespaceURI !== 'http://www.w3.org/1999/xhtml') throw new DomainError('IMPORT_CONFIG', 'React 18 预览只接受受控 HTML 脚本入口', 400);
+              const attributes = new Map(node.attrs.map(attr => [attr.name, attr.value.trim()]));
+              if (attributes.get('type')?.toLowerCase() === 'importmap') throw new DomainError('IMPORT_CONFIG', 'React 18 预览禁止项目 import map', 400);
+              if (attributes.has('src')) {
+                let source: string;
+                try { source = decodeURIComponent(attributes.get('src')!.replace(/\s/g, '')); }
+                catch { throw new DomainError('IMPORT_CONFIG', '无效模块脚本入口编码', 400); }
+                if (attributes.get('type')?.toLowerCase() !== 'module' || !source || /^[a-z][a-z0-9+.-]*:/i.test(source) || source.startsWith('//') || source.startsWith('/@') || source.split('/').includes('node_modules') || /[\\%&\ufffd]/.test(source)) throw new DomainError('IMPORT_CONFIG', 'React 18 预览只接受项目内的受控模块脚本入口', 400);
+              }
+            }
+            if (node.tagName === 'template' && 'content' in node) visit(node.content as DefaultTreeAdapterMap['documentFragment']);
           }
-          if (attributes.get('type')?.toLowerCase() === 'importmap') throw new DomainError('IMPORT_CONFIG', 'React 18 预览禁止项目 import map', 400);
-          if (attributes.has('src')) {
-            const source = attributes.get('src')!.replace(/\s/g, '');
-            if (attributes.get('type')?.toLowerCase() !== 'module' || !source || /^[a-z][a-z0-9+.-]*:/i.test(source) || source.startsWith('//') || source.startsWith('/@fs/') || source.split('/').includes('node_modules') || /[\\&\ufffd]/.test(source)) throw new DomainError('IMPORT_CONFIG', 'React 18 预览只接受项目内的受控模块脚本入口', 400);
-          }
-        }
+          if ('childNodes' in node) node.childNodes.forEach(visit);
+        };
+        visit(parseHtml(html));
       },
     },
     transform(code, id) {
@@ -199,6 +216,16 @@ export function runtimeDependencies(repoRoot: string, profile: RuntimeProfile = 
           assertSpecifier(source);
           const resolved = await this.resolve(source, registered(source) ? anchor : importer, { skipSelf: true });
           if (resolved?.id === '/@react-refresh') return resolved;
+          if (resolved && cacheDirectory && within(resolved.id.split('?')[0], cacheDirectory)) {
+            const optimizer = (this.environment as DevEnvironment | undefined)?.depsOptimizer;
+            const file = resolved.id.split('?')[0];
+            const known = optimizer && [...Object.values(optimizer.metadata.optimized), ...Object.values(optimizer.metadata.discovered)]
+              .some(info => approved(info.id) && normalizePath(info.file) === normalizePath(file));
+            // Vite's optimized-deps loader waits for processing. Preserve that
+            // protocol instead of requiring a cold output to exist in resolveId.
+            if (known && within(canonicalPendingPath(file), canonicalPendingPath(cacheDirectory))) return resolved;
+            throw new DomainError('IMPORT_CONFIG', '项目模块绕过受控宿主缓存边界', 400);
+          }
           if (!resolved || !path.isAbsolute(resolved.id.split('?')[0]) || !permittedFile(resolved.id.split('?')[0])) throw new DomainError('IMPORT_CONFIG', '项目模块绕过受控宿主依赖边界', 400);
           return resolved;
         }

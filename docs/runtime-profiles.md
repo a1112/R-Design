@@ -1,6 +1,6 @@
 # Controlled browser runtime profiles
 
-Independent review still has three unresolved findings: HTML external-script handling, dependency-path boundaries and cold-cache path handling. The corresponding security work is paused and has not been rerun or changed in this follow-up. The implemented checks described below do not establish that these findings are resolved. This follow-up addresses only custom Fiber intrinsic instrumentation and pure type-import compilation.
+Managed React 18 previews parse HTML with the pinned parse5 host parser, reject external and SVG script entries, and enforce reviewed import paths before delegating to Vite. Source paths use normalized separators and Windows case comparison. Optimizer output paths require approved dependency metadata and canonical ancestry; a pending cold output is left to Vite's loader to await. These checks govern the managed module boundary and do not sandbox arbitrary application JavaScript.
 
 Managed previews keep the existing host React 19 runtime by default. A project can explicitly select the host-owned React 18 runtime with this package metadata:
 
@@ -18,6 +18,8 @@ Managed previews keep the existing host React 19 runtime by default. A project c
 Only `react19` and `react18` are recognized. The metadata does not accept paths, aliases, registries or extra fields. React 18 portable packages require exact core versions, including declarations in optional/dev dependencies. Omitting the metadata preserves legacy normalization and React 19 behavior. Switching profiles in an active runtime requires a new runtime instance; it cannot reuse an incompatible live preview.
 
 The original-source engineering configuration also accepts `runtimeProfile: "react18"`. Its original React/ReactDOM declarations must normalize to 18.3.1; the output replaces executable metadata with controlled scripts and exact versions. Prepared-source packaging retains the explicit package metadata and verifies its original/adapted hashes as before. Import reconstruction preserves the selected profile. Live and candidate runtimes use the same resolver and package checks.
+
+Reader prebundling preserves the selected profile's renderer aliases. The default React 19 reader keeps its pinned PDF resource handler, ES workers and declared reader/editor dependencies; selecting React 18 does not redirect Three/Fiber/Drei to the default host's versions.
 
 ## Host-owned versions
 
@@ -50,6 +52,8 @@ Both `import type { T }` and declarations containing only inline type specifiers
 ## Verification and audit limits
 
 Synthetic tests cover source and prepared packing, two independent imports, both runtime kinds, React major and JSX-runtime identity, hook updates, Motion/icons, reload, dependency/script/metadata negatives, missing host packages, metadata symlinks, active-profile changes, Three metadata with restricted exports, source-ID exclusion, ignored project PostCSS plugins and private/escape HTTP boundaries. Existing regression tests exercise the default runtime.
+
+Focused module-boundary regressions cover quoted `>` and comment-like HTML attributes, SVG external scripts, encoded host script paths, Windows normalized/case-varied module IDs, reviewed-package traversal, resolver delegation, metadata-authorized pending optimizer outputs, unregistered cache files, and preservation of React 18 reader aliases. The optimizer tests exercise its resolver contract with isolated dependency metadata; they do not constitute malicious-PDF or untrusted-JavaScript sandbox acceptance.
 
 The synthetic renderer test also runs an actual fiber8/drei9 WebGL2 cylinder in live and candidate runtimes, checks real framebuffer colors before and after a React state update, exercises mesh hover and narrow-screen resizing, and reloads the scene. On the verified Mac mini this uses the installed full official Chromium with `--disable-gpu` and its ANGLE/SwiftShader WebGL2 renderer. This is software WebGL2 evidence; GPU hardware, native windows and any particular private frontend remain separate acceptance work.
 
