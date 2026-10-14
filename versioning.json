@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "notes": [
+    "Adoption preserves all existing canonical versions; no release, bump, commit or tag is performed by this tool.",
+    "Central artifact versions are historical observations, not authoritative replacements for source manifest versions.",
+    "Versions on explicitly separate units are independent even when currently numerically equal."
+  ],
+  "units": {
+    "app": {
+      "canonical": {
+        "path": "package.json",
+        "adapter": "json",
+        "pointer": "/version",
+        "format": "semver"
+      },
+      "mirrors": [
+        {
+          "path": "package-lock.json",
+          "adapter": "json",
+          "pointer": "/version",
+          "format": "semver"
+        },
+        {
+          "path": "package-lock.json",
+          "adapter": "json",
+          "pointer": "/packages//version",
+          "format": "semver"
+        }
+      ],
+      "notes": "Separately selectable first-party version authority; preserve its existing canonical version. This does not assert an independently published release."
+    },
+    "packages-runtime-web": {
+      "canonical": {
+        "path": "packages/runtime-web/package.json",
+        "adapter": "json",
+        "pointer": "/version",
+        "format": "semver"
+      },
+      "mirrors": [
+        {
+          "path": "package-lock.json",
+          "adapter": "json",
+          "pointer": "/packages/packages~1runtime-web/version",
+          "format": "semver"
+        }
+      ],
+      "notes": "Separately selectable first-party version authority; preserve its existing canonical version. This does not assert an independently published release."
+    }
+  },
+  "unmanaged": [
+    {
+      "name": "fixtures",
+      "paths": [
+        "fixtures/react-monitor/package.json"
+      ],
+      "reason": "Vendored, reference, archived/prototype fixture, imported sample or developer-tool metadata; not a current product release authority."
+    },
+    {
+      "name": "projects",
+      "paths": [
+        "projects/R-ShareMouse/tooling/dependencies/package.json"
+      ],
+      "reason": "Vendored, reference, archived/prototype fixture, imported sample or developer-tool metadata; not a current product release authority."
+    }
+  ]
+}
