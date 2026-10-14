@@ -652,7 +652,22 @@ class Manager:
                 with os.fdopen(fd, "wb") as stream:
                     stream.write(raw)
                     stream.flush()
-                    os.fchmod(stream.fileno(), mode)
+                    chmod_fd = getattr(os, "fchmod", None)
+                    if chmod_fd is not None:
+                        chmod_fd(stream.fileno(), mode)
+                    elif os.chmod in os.supports_fd:
+                        os.chmod(stream.fileno(), mode)
+                    else:
+                        # Python 3.12 on Windows has no descriptor chmod. This
+                        # name was exclusively created in the validated target
+                        # directory; reject a substituted file or reparse link.
+                        opened = os.fstat(stream.fileno())
+                        named = os.lstat(temporary)
+                        if not stat.S_ISREG(named.st_mode) or not os.path.samestat(opened, named):
+                            raise VersionError("Staged version file identity changed")
+                        os.chmod(temporary, mode)
+                        if not os.path.samestat(opened, os.lstat(temporary)):
+                            raise VersionError("Staged version file identity changed")
                     os.fsync(stream.fileno())
                 return Path(temporary)
             except BaseException:

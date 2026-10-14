@@ -251,12 +251,13 @@ class Repo(unittest.TestCase):
     def test_mode_preserved(self):
         self.write('VERSION', '1.2.3\r\n')
         os.chmod(self.root / 'VERSION', 0o755)
+        expected_mode = stat.S_IMODE((self.root / 'VERSION').stat().st_mode)
         self.configure()
         m = self.manager()
         _, proposed = m.plan(None, part='patch')
         m.apply(proposed)
         self.assertEqual((self.root / 'VERSION').read_bytes(), b'1.2.4\r\n')
-        self.assertEqual(stat.S_IMODE((self.root / 'VERSION').stat().st_mode), 0o755)
+        self.assertEqual(stat.S_IMODE((self.root / 'VERSION').stat().st_mode), expected_mode)
 
     def test_caught_replace_failure_rolls_back_content_modes(self):
         self.write('VERSION', '1.2.3\n')
