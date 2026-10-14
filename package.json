@@ -94,6 +94,7 @@
     "highlight.js": "10.7.3",
     "katex": "0.16.47",
     "mermaid": "11.17.2",
+    "parse5": "7.3.0",
     "pdfjs-dist-v5": "npm:pdfjs-dist@5.7.284",
     "rehype-katex": "7.0.1",
     "rehype-raw": "7.0.0",
