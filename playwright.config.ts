@@ -30,7 +30,8 @@ export default defineConfig({
   workers: 1,
   retries: 0,
   reporter: [['list'], ['html', { open: 'never' }]],
-  use: { baseURL, trace: 'retain-on-failure', screenshot: 'only-on-failure' },
+  use: { baseURL, trace: 'retain-on-failure', screenshot: 'only-on-failure',
+    launchOptions: process.env.RDESIGN_BROWSER ? { executablePath: process.env.RDESIGN_BROWSER } : {} },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
     command: 'npm run dev',

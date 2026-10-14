@@ -5,6 +5,7 @@ import { api, ApiError, bootstrap, getToken, setToken } from './api';
 import { migrateLegacyDrafts } from './projectStorage';
 import { ProjectHome } from './ProjectHome';
 import { Workbench } from './Workbench';
+import { TeamWorkspace } from './team/TeamWorkspace';
 
 type View = { type:'home' } | { type:'editor'; id:string } | { type:'legacy-editor' };
 function readView():View {
@@ -13,6 +14,10 @@ function readView():View {
   return location.pathname==='/editor'?{type:'legacy-editor'}:{type:'home'};
 }
 export function App(){
+  if(/(?:^|\/)team(?:\/|$)/.test(location.pathname))return <TeamWorkspace/>;
+  return <LocalWorkspace/>;
+}
+function LocalWorkspace(){
   const [view,setView]=useState<View>(readView);
   const [catalog,setCatalog]=useState<WorkspaceCatalog|null>(null);
   const [loading,setLoading]=useState(true);

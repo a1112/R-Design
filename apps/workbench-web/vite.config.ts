@@ -1,4 +1,4 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath } from 'node:url';
-export default defineConfig({root:fileURLToPath(new URL('.',import.meta.url)),plugins:[react()],build:{outDir:'../../dist/workbench',emptyOutDir:true}});
+export default defineConfig({root:fileURLToPath(new URL('.',import.meta.url)),base:process.env.RDESIGN_WEB_BASE_PATH||'/',plugins:[react()],build:{outDir:'../../dist/workbench',emptyOutDir:true}});

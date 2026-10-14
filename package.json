@@ -16,6 +16,8 @@
     "test:e2e": "playwright test",
     "mcp": "tsx packages/mcp-server/src/index.ts",
     "worker": "tsx apps/agent-worker/src/index.ts",
+    "team:start": "tsx apps/team-server/src/index.ts",
+    "test:team:e2e": "playwright test --config playwright.team.config.ts",
     "engineering": "node --import tsx scripts/engineering.ts",
     "version:show": "python3 scripts/version_manager.py show",
     "version:check": "python3 scripts/version_manager.py check",
