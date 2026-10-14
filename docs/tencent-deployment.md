@@ -105,6 +105,16 @@ Windows 曾在 L 盘临时目录遇到 IO 超时和 Vite 跨盘路径限制；�
 
 2026-10-14 发布前重新执行 `npm audit --json`：当前锁文件报告 3 项高危、7 项低危、无严重项。高危条目为 PDF.js 5 以及 React Router / React Router DOM；低危条目来自 DOMPurify、KaTeX 及其消费库。团队服务与工作台源码未导入这些库；它们用于本地工程兼容运行图。告警仍保留，应按对应工程的运行约束另行升级并回归，不能把本次权限或运行器边界测试当作依赖漏洞已修复。完整审计结果位于本机忽略目录 `.rdesign/verification/npm-audit-current.json`。
 
+## 2026-10-14 最终上线记录
+
+正式应用发布为 `rdesign-a0a5c54-20261014`，对应应用与部署代码提交 `a0a5c54`；`current` 指向同名 release。团队服务实际处于 active/running，并已启用开机启动。公开 HTTPS 页面、健康接口、JS/CSS 资源、真实浏览器登录和退出、匿名权限隔离、私有文件路径拒绝、手机布局及服务重启后的原会话与管理员身份保留均已通过，浏览器无错误。独立 Node 公网复验再次通过同样的登录、资产与退出检查。
+
+初始生产数据库只有一个管理员，没有演示项目。`/etc/r-design-team.env` 为 root 的 0600 文件；数据库为服务账户的 0600 文件。在线 SQLite 一致备份位于 `/var/backups/r-design-team/rdesign-a0a5c54-20261014/team.sqlite`，完整性检查为 `ok`；回退记录指向 `/srv/r-design-team/releases/rdesign-a33f4e7-20261014`。nginx 配置检查与既有 TLS 续签 timer 检查通过。首次发布和 nginx 重载时序问题已修复；公开健康等待有 30 秒期限，必须返回 200 和准确的健康 JSON，超时仍回退。
+
+合并引入的 Python 版本管理工具也完成 Windows 修复：现有 Python 3.12 的 44 项原有测试全部通过，版本一致性检查通过。POSIX 保留文件描述符权限操作，Windows 在校验临时文件身份后保留平台实际支持的权限；原子替换与回退流程保留。
+
+管理员访问记录仅保存在本机忽略目录 `.rdesign/deployment/team-access.txt`，状态为 `deployed`，该文件不进入 Git。生产桌面与移动截图位于同目录的 `production-team-desktop.png` 和 `production-team-mobile.png`。
+
 ## 备份和回退
 
 每次发布前，如果数据库存在，安装脚本执行：
