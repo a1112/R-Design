@@ -2,7 +2,7 @@ import path from 'node:path';
 import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { parse } from '@babel/parser';
-import { normalizePath, type DevEnvironment, type Plugin } from 'vite';
+import { normalizePath, type Alias, type DevEnvironment, type Plugin } from 'vite';
 import { parse as parseHtml, type DefaultTreeAdapterMap } from 'parse5';
 import { CORE_PROJECT_DEPENDENCIES, reviewedDependency, reviewedRuntimeDependencies, REACT18_RENDERER_DEPENDENCIES } from '../../../packages/project-workspace/src/runtime-dependencies.js';
 import { REACT18_CORE_VERSIONS, assertProfileCoreVersions, assertProfileExecution, runtimeProfileFromPackage, type RuntimeProfile } from '../../../packages/project-workspace/src/runtime-profiles.js';
@@ -67,7 +67,10 @@ export function profileHostDependencies(repoRoot: string, profile: RuntimeProfil
 
 /** Candidates have no node_modules. Resolve reviewed packages through the same host as live previews. */
 export function runtimeDependencies(repoRoot: string, profile: RuntimeProfile = 'react19', sourceRoot?: string): Plugin {
-  const anchor = profile === 'react18' ? path.join(repoRoot, 'packages/runtime-react18/package.json') : path.join(repoRoot, 'package.json');
+  const rootAnchor = path.join(repoRoot, 'package.json');
+  const anchor = profile === 'react18' ? path.join(repoRoot, 'packages/runtime-react18/package.json') : rootAnchor;
+  const registryAnchor = (source: string) => profile === 'react18' && Object.keys(REACT18_RENDERER_DEPENDENCIES)
+    .some(name => source === name || source.startsWith(name + '/')) ? anchor : rootAnchor;
   const names = Object.keys(reviewedRuntimeDependencies(profile));
   const trustedRoots = [path.join(repoRoot, 'node_modules'), path.join(repoRoot, 'packages/runtime-react18/node_modules')];
   const comparisonPath = (file: string) => process.platform === 'win32' ? normalizePath(file).toLowerCase() : normalizePath(file);
@@ -83,6 +86,16 @@ export function runtimeDependencies(repoRoot: string, profile: RuntimeProfile = 
   };
   let approvedRoots: string[] | undefined;
   let cacheDirectory: string | undefined;
+  // Vite applies host aliases before pre-plugin resolution. Only its exact
+  // host-owned alias callbacks can authorize a rewritten absolute request.
+  const ownedAliasRequests = new WeakSet<object>();
+  const ownedAliases = (aliases: Record<string, string>): Alias[] => Object.entries(aliases).map(([find, replacement]) => ({
+    find, replacement,
+    async customResolver(source, importer, options) {
+      const request = { root: replacement }; ownedAliasRequests.add(request);
+      return this.resolve(source, importer, { ...options, custom: { ...options?.custom, 'rdesign-owned-alias': request } });
+    },
+  }));
   // Optimizer IDs exist before their output files. Resolve existing ancestors
   // canonically, without accepting a dangling symlink as a pending output.
   const canonicalPendingPath = (file: string): string => {
@@ -96,16 +109,16 @@ export function runtimeDependencies(repoRoot: string, profile: RuntimeProfile = 
   };
   const permittedFile = (file: string) => {
     const actual = realpathSync(file);
-    if (actual === realpathSync(path.join(repoRoot, 'node_modules/vite/dist/client/client.mjs'))) return true;
+    if (['client.mjs', 'env.mjs'].some(name => actual === realpathSync(path.join(repoRoot, 'node_modules/vite/dist/client', name)))) return true;
     if (cacheDirectory && within(file, cacheDirectory)) return false;
     if (sourceRoot && actual.startsWith(sourceRoot + path.sep) && !path.relative(sourceRoot, actual).split(path.sep).includes('node_modules')) return true;
     approvedRoots ??= [...Object.values(profileHostDependencies(repoRoot, profile).aliases),
       path.join(repoRoot, 'packages/runtime-web')].map(root => realpathSync(root));
     if (approvedRoots.some(root => actual.startsWith(root + path.sep) && !path.relative(root, actual).split(path.sep).includes('node_modules'))) return true;
     // Registered packages other than the renderer can be hoisted or nested in the host workspace.
-    const require = createRequire(anchor);
     for (const name of names) {
       try {
+        const require = createRequire(registryAnchor(name));
         const root = path.dirname(realpathSync(require.resolve(name + '/package.json')));
         if (actual.startsWith(root + path.sep) && !path.relative(root, actual).split(path.sep).includes('node_modules')) return true;
       } catch { /* Packages with restricted metadata exports are already verified renderer aliases. */ }
@@ -116,6 +129,12 @@ export function runtimeDependencies(repoRoot: string, profile: RuntimeProfile = 
     name: 'rdesign-reviewed-runtime-dependencies',
     enforce: 'pre',
     config(config) {
+      const profileAliases = profile === 'react18' ? {
+        ...profileHostDependencies(repoRoot, profile).aliases,
+        '@rdesign/runtime-web': path.join(repoRoot, 'packages/runtime-web/src/index.ts'),
+        '/@vite/client': path.join(repoRoot, 'node_modules/vite/dist/client/client.mjs'),
+        '/@vite/env': path.join(repoRoot, 'node_modules/vite/dist/client/env.mjs'),
+      } : {};
       // Reader workers and Mermaid discover shared dependencies at different times.
       // Prebundle this exact declared profile together so late discovery cannot
       // replace already loaded dynamic-import chunks while HMR is disabled.
@@ -138,9 +157,15 @@ export function runtimeDependencies(repoRoot: string, profile: RuntimeProfile = 
         return {
           // Vite's explicit optimizer resolver bypasses normal resolveId hooks.
           // These aliases still point only into the same authorized host modules.
-          resolve: { alias: {
-            ...Object.fromEntries(declared.filter(name => profile !== 'react18' || !(name in REACT18_RENDERER_DEPENDENCIES))
+          resolve: { alias: profile === 'react18' ? ownedAliases({
+            ...profileAliases,
+            ...Object.fromEntries(declared.filter(name => !(name in REACT18_RENDERER_DEPENDENCIES))
               .map(name => [name, path.join(repoRoot, 'node_modules', name)])),
+          }).concat(Object.entries({
+            'decode-named-character-reference': path.join(repoRoot, 'node_modules/decode-named-character-reference/index.js'),
+            'hast-util-from-html-isomorphic': path.join(repoRoot, 'node_modules/hast-util-from-html-isomorphic/index.js'),
+          }).map(([find, replacement]) => ({ find, replacement }))) : {
+            ...Object.fromEntries(declared.map(name => [name, path.join(repoRoot, 'node_modules', name)])),
             // The package's browser export requires document. Its same pinned
             // entity-table implementation also works in genuine Web Workers.
             'decode-named-character-reference': path.join(repoRoot, 'node_modules/decode-named-character-reference/index.js'),
@@ -152,6 +177,7 @@ export function runtimeDependencies(repoRoot: string, profile: RuntimeProfile = 
             'pdfjs-dist-v5/build/pdf.min.mjs', ...declared] },
         };
       }
+      if (profile === 'react18') return { resolve: { alias: ownedAliases(profileAliases) } };
     },
     configResolved(config) { cacheDirectory = path.resolve(config.cacheDir, 'deps'); },
     transformIndexHtml: {
@@ -209,12 +235,15 @@ export function runtimeDependencies(repoRoot: string, profile: RuntimeProfile = 
       }
       return { code: transformed, map: null };
     },
-    async resolveId(source, importer) {
+    async resolveId(source, importer, options) {
       if (profile === 'react18') {
         if (/^react-router(?:-dom)?(?:\/|$)/.test(source)) throw new DomainError('IMPORT_CONFIG', 'React 18 配置未授权 Router', 400);
         if (sourceFile(importer) && source !== 'vite/modulepreload-polyfill') {
-          assertSpecifier(source);
-          const resolved = await this.resolve(source, registered(source) ? anchor : importer, { skipSelf: true });
+          const request = options?.custom?.['rdesign-owned-alias'] as { root: string } | undefined;
+          const ownedAlias = request && ownedAliasRequests.has(request) && path.isAbsolute(source) &&
+            (comparisonPath(path.resolve(source)) === comparisonPath(request.root) || within(path.resolve(source), request.root));
+          if (!ownedAlias) assertSpecifier(source);
+          const resolved = await this.resolve(source, registered(source) ? registryAnchor(source) : importer, { skipSelf: true, custom: options?.custom });
           if (resolved?.id === '/@react-refresh') return resolved;
           if (resolved && cacheDirectory && within(resolved.id.split('?')[0], cacheDirectory)) {
             const optimizer = (this.environment as DevEnvironment | undefined)?.depsOptimizer;
@@ -231,7 +260,10 @@ export function runtimeDependencies(repoRoot: string, profile: RuntimeProfile = 
         }
       }
       if (!registered(source)) return null;
-      return this.resolve(source, anchor, { skipSelf: true });
+      // Installed host libraries keep their lockfile-owned transitive graph.
+      // A project import is resolved from the reviewed registry, not a renderer peer.
+      if (importer && trustedRoots.some(root => within(importer.split('?')[0], root))) return null;
+      return this.resolve(source, registryAnchor(source), { skipSelf: true });
     },
   };
 }

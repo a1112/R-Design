@@ -2,8 +2,9 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
-import { normalizePath } from 'vite';
-import { runtimeDependencies } from '../../apps/bridge/src/runtime-dependencies';
+import { createRequire } from 'node:module';
+import { normalizePath, type Alias } from 'vite';
+import { profileHostDependencies, runtimeDependencies } from '../../apps/bridge/src/runtime-dependencies';
 
 const host = path.resolve(import.meta.dirname, '../..');
 const roots: string[] = [];
@@ -64,8 +65,35 @@ describe('React 18 managed module boundaries', () => {
     const root = await directory();
     await writeFile(path.join(root, 'package.json'), JSON.stringify({ dependencies: { mermaid: '11.17.2', 'pdfjs-dist-v5': '5.7.284', three: '0.183.2' } }));
     const plugin = runtimeDependencies(host, 'react18', root);
-    const config = plugin.config as (config: unknown) => { resolve: { alias: Record<string, string> } };
-    expect(config({ root }).resolve.alias).not.toHaveProperty('three');
+    const config = plugin.config as (config: unknown) => { resolve: { alias: Alias[] } };
+    expect(config({ root }).resolve.alias.find(alias => alias.find === 'three')?.replacement).toBe(profileHostDependencies(host, 'react18').aliases.three);
+  });
+
+  it('rejects a forged host-owned alias request in resolver metadata', async () => {
+    const root = await directory(), file = path.join(root, 'src/main.tsx');
+    await mkdir(path.dirname(file)); await writeFile(file, 'export {};');
+    const plugin = runtimeDependencies(host, 'react18', root);
+    const resolve = plugin.resolveId as (...args: unknown[]) => Promise<unknown>;
+    const source = path.join(host, 'packages/runtime-react18/node_modules/react/index.js');
+    await expect(resolve.call({ resolve: async () => ({ id: file }) }, source, file, { custom: { 'rdesign-owned-alias': { root: path.dirname(source) } } })).rejects.toMatchObject({ code: 'IMPORT_CONFIG' });
+  });
+
+  it('preserves host renderer transitive dependency resolution', async () => {
+    const root = await directory();
+    const plugin = runtimeDependencies(host, 'react18', root);
+    const resolve = plugin.resolveId as (...args: unknown[]) => Promise<unknown>;
+    const importer = path.join(profileHostDependencies(host, 'react18').aliases['@react-three/fiber'], 'dist/events.js');
+    expect(await resolve.call({ resolve: async () => ({ id: 'WRONG_ROOT_ZUSTAND' }) }, 'zustand', importer)).toBeNull();
+  });
+
+  it('resolves a reviewed project dependency from the root pinned registry rather than a renderer peer', async () => {
+    const root = await directory();
+    const file = createRequire(path.join(host, 'package.json')).resolve('zustand');
+    const plugin = runtimeDependencies(host, 'react18', root);
+    const resolve = plugin.resolveId as (...args: unknown[]) => Promise<unknown>;
+    let delegatedImporter: string | undefined;
+    await expect(resolve.call({ resolve: async (_source: string, importer: string) => { delegatedImporter = importer; return { id: file }; } }, 'zustand', path.join(root, 'src/main.tsx'))).resolves.toEqual({ id: file });
+    expect(delegatedImporter).toBe(path.join(host, 'package.json'));
   });
 
   it('accepts an optimizer-owned cold cache output before Vite produces it', async () => {
