@@ -1,0 +1,152 @@
+[
+  {
+    "id": "desktop",
+    "name": "演示行情 · 桌面",
+    "route": "/",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".workspace-container",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "narrow",
+    "name": "演示行情 · 窄屏",
+    "route": "/",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "steps": [],
+    "readySelector": ".workspace-container",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "research",
+    "name": "研究工作区",
+    "route": "/?workspace=research",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".workspace-container",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "live-unavailable",
+    "name": "未授权实盘工作区",
+    "route": "/?workspace=live",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".workspace-container",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "data",
+    "name": "演示数据源工作区",
+    "route": "/?workspace=data",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".workspace-container",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "screener",
+    "name": "确定性选股",
+    "route": "/?workspace=screener",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".workspace-container",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "information",
+    "name": "合成资讯中心",
+    "route": "/?workspace=information",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".workspace-container",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "backtest",
+    "name": "模拟回测",
+    "route": "/?workspace=backtest",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".workspace-container",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "agent",
+    "name": "模拟研究 Agent",
+    "route": "/?workspace=agent",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".workspace-container",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "portfolio",
+    "name": "模拟组合",
+    "route": "/?workspace=portfolio",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".workspace-container",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  }
+]

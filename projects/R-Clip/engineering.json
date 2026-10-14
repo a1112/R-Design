@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "name": "R-Clip",
+  "source": {
+    "repository": "a1112/R-Clip",
+    "ref": "main",
+    "commit": "bb0ef170bee0848d670f8366e76f8aee3d909d04",
+    "visibility": "private"
+  },
+  "packageFile": "package.json",
+  "entry": "apps/desktop/src/main.tsx",
+  "capture": [
+    "apps/desktop/src",
+    "apps/desktop/src-tauri/icons/128x128.png"
+  ],
+  "dependencies": {
+    "lucide-react": "0.468.0"
+  },
+  "notice": "仅合成片段；未读取系统剪贴板；复制、录制、钥匙串和本机存储不可用。",
+  "workspaceAliases": {},
+  "replacements": [
+    {
+      "file": "apps/desktop/src/api.ts",
+      "after": "if (!desktop) return previewApi<T>(command, args);",
+      "reason": "explicit read-only synthetic snippet API",
+      "count": 1,
+      "beforeLength": 49,
+      "beforeSha256": "3163f61d8a5532b89358d67238f4bd7ced703c3caa548648cb94fdf93c3222eb"
+    },
+    {
+      "file": "apps/desktop/src/api.ts",
+      "after": "import { previewApi } from \"../../../../rdesign-preview/clip-api\";\nexport type Kind =",
+      "reason": "load owned synthetic preview transport",
+      "count": 1,
+      "beforeLength": 18,
+      "beforeSha256": "bf619987c2c0265e5bbf2e69d754e31679cf5f8f6e28bb19f3ba09148eb3cd99"
+    }
+  ],
+  "pins": [
+    {
+      "file": "apps/desktop/src/main.tsx",
+      "tag": "input",
+      "id": "clip-search",
+      "count": 1,
+      "containsLength": 17,
+      "containsSha256": "f41f25c56b937d9679790e42904ca70081808a5fca4497a7616eb11160b9c942"
+    },
+    {
+      "file": "apps/desktop/src/main.tsx",
+      "tag": "button",
+      "id": "clip-settings",
+      "count": 1,
+      "containsLength": 49,
+      "containsSha256": "a11a686b562c8d28c99fbe817d8ea0e5375631d256003cdb70d275a064a7c61c"
+    },
+    {
+      "file": "apps/desktop/src/main.tsx",
+      "tag": "button",
+      "id": "clip-item",
+      "count": 1,
+      "containsLength": 36,
+      "containsSha256": "ed8caafa99c22429ff310326d1123e26b3e7688621a42d18aac9859026766dec"
+    },
+    {
+      "file": "apps/desktop/src/main.tsx",
+      "tag": "button",
+      "id": "clip-record",
+      "count": 1,
+      "containsLength": 25,
+      "containsSha256": "47e781b9046c00e135d2b8055b2473790df3571d244f087cd3376bcc47d5e0c8"
+    }
+  ],
+  "omissionPolicy": [
+    "upstream test runners and development tests",
+    "native/backend sources",
+    "executable build configurations",
+    "credentials, environment files, Git history, node_modules"
+  ],
+  "expectedAcceptance": {
+    "checksum": "pending frozen generator",
+    "schema": "pending frozen schema",
+    "import": "pending frozen tool",
+    "runtime": "pending",
+    "mapping": "pending",
+    "interaction": "pending"
+  }
+}

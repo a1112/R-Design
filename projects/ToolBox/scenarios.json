@@ -1,0 +1,182 @@
+[
+  {
+    "id": "desktop",
+    "name": "合成硬件概览 · 桌面",
+    "route": "/#/",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".ci-dashboard-page",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "narrow",
+    "name": "合成硬件概览 · 窄屏",
+    "route": "/#/",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "steps": [],
+    "readySelector": ".ci-dashboard-page",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "hardware",
+    "name": "合成硬件库存",
+    "route": "/#/hardware",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".ci-route-content h1",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "sensors",
+    "name": "合成遥测传感器",
+    "route": "/#/sensors",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".ci-route-content h1",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "benchmarks",
+    "name": "硬件测试不可用",
+    "route": "/#/benchmarks",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".ci-route-content h1",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "reports",
+    "name": "合成报告视图",
+    "route": "/#/reports",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".ci-route-content h1",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "settings",
+    "name": "内存设置",
+    "route": "/#/settings",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".ci-route-content h1",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "rankings",
+    "name": "合成硬件排行",
+    "route": "/#/rankings",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".ci-route-content h1",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "stress",
+    "name": "压力测试不可用",
+    "route": "/#/stress",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".ci-route-content h1",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "diagnostics",
+    "name": "静态合成诊断",
+    "route": "/#/diagnostics",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".ci-route-content h1",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "storage",
+    "name": "合成存储视图",
+    "route": "/#/storage",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".ci-route-content h1",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "network",
+    "name": "合成网络视图",
+    "route": "/#/network",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".ci-route-content h1",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  }
+]

@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "name": "R-Alpha",
+  "source": {
+    "repository": "a1112/R-Alpha",
+    "ref": "agent/initial-project",
+    "commit": "db6613f2ace38b9289fa2f8a610fece230042b50",
+    "visibility": "private"
+  },
+  "packageFile": "package.json",
+  "entry": "src/main.tsx",
+  "capture": [
+    "src"
+  ],
+  "dependencies": {},
+  "notice": "确定性演示行情和模拟研究；未连接实时行情、券商或实盘；偏好仅在内存。",
+  "workspaceAliases": {},
+  "replacements": [
+    {
+      "file": "src/App.tsx",
+      "after": "() => { const route = new URLSearchParams(location.search).get(\"workspace\"); return navItems.some(item => item.key === route) ? route as WorkspaceKey : restore(\"workspace\", \"market\"); }",
+      "reason": "preview route chooses an existing original workspace",
+      "count": 1,
+      "beforeLength": 36,
+      "beforeSha256": "5b378c5fd9ae6c2d7268c9755d455e9b1571da03bf35893d5096ab3d5fc21bc1"
+    },
+    {
+      "file": "src/lib/actions.ts",
+      "after": "throw new Error('设计预览未写入系统剪贴板；请在原应用中复制。');",
+      "reason": "clipboard operations remain explicitly unavailable",
+      "count": 1,
+      "beforeLength": 45,
+      "beforeSha256": "f64a95088ca84342b68f70e470594ae7381ea4790a5209e7467b920e3385e3e4"
+    }
+  ],
+  "pins": [],
+  "omissionPolicy": [
+    "upstream test runners and development tests",
+    "native/backend sources",
+    "executable build configurations",
+    "credentials, environment files, Git history, node_modules"
+  ],
+  "expectedAcceptance": {
+    "checksum": "pending frozen generator",
+    "schema": "pending frozen schema",
+    "import": "pending frozen tool",
+    "runtime": "pending",
+    "mapping": "pending",
+    "interaction": "pending"
+  }
+}

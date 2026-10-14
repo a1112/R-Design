@@ -1,0 +1,125 @@
+[
+  {
+    "id": "desktop",
+    "name": "未授权欢迎 · 桌面",
+    "route": "/",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".welcome-form",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "narrow",
+    "name": "未授权欢迎 · 窄屏",
+    "route": "/",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "steps": [],
+    "readySelector": ".welcome-form",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "cards",
+    "name": "打开合成资料卡",
+    "route": "/",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [
+      {
+        "action": "click",
+        "target": "vault-enter"
+      }
+    ],
+    "readySelector": ".card-grid:has(.vault-card)",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "invoice-detail",
+    "name": "合成开票资料详情",
+    "route": "/",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [
+      {
+        "action": "click",
+        "target": "vault-enter"
+      },
+      {
+        "action": "click",
+        "target": "vault-invoice-card"
+      }
+    ],
+    "readySelector": ".detail-title h1",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "search-empty",
+    "name": "合成资料搜索无结果",
+    "route": "/",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [
+      {
+        "action": "click",
+        "target": "vault-enter"
+      },
+      {
+        "action": "fill",
+        "target": "vault-search",
+        "value": "RDESIGN-no-such-card"
+      }
+    ],
+    "readySelector": ".empty-list",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "lock",
+    "name": "锁定一次性预览会话",
+    "route": "/",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [
+      {
+        "action": "click",
+        "target": "vault-enter"
+      },
+      {
+        "action": "click",
+        "target": "vault-lock"
+      }
+    ],
+    "readySelector": ".welcome-form",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  }
+]

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "name": "SaveDock",
+  "source": {
+    "repository": "a1112/SaveDock",
+    "ref": "main",
+    "commit": "cf5802cbec5121519905ba108e26d9a21278e954",
+    "visibility": "private"
+  },
+  "packageFile": "apps/desktop/package.json",
+  "entry": "apps/desktop/src/main.tsx",
+  "capture": [
+    "apps/desktop/src",
+    "packages/ui/src"
+  ],
+  "dependencies": {},
+  "notice": "合成游戏与历史快照；未读取真实游戏文件；备份、恢复、同步和写盘不可用。",
+  "workspaceAliases": {
+    "@savedock/ui": "src/upstream/packages/ui/src/index.ts",
+    "@savedock/ui/style.css": "src/upstream/packages/ui/src/style.css"
+  },
+  "replacements": [
+    {
+      "file": "apps/desktop/src/main.tsx",
+      "after": "import React from 'react';\nimport { previewTransport } from '../../../../rdesign-preview/savedock-transport';",
+      "reason": "owned read-only synthetic transport",
+      "count": 1,
+      "beforeLength": 26,
+      "beforeSha256": "e9196b70166264021c76bc6aa2a4edf0fd1b8ba7fa8e412c40d2d073e6212967"
+    },
+    {
+      "file": "apps/desktop/src/main.tsx",
+      "after": "<SaveDock transport={previewTransport}/>",
+      "reason": "inject explicit design-only transport without native CLI bridge",
+      "count": 1,
+      "beforeLength": 11,
+      "beforeSha256": "2e62a70a59e6d4286d8364ee96ae09a2ed7d1dc12887e8f41569a2d370b925f8"
+    }
+  ],
+  "pins": [
+    {
+      "file": "packages/ui/src/SaveDock.tsx",
+      "tag": "button",
+      "id": "savedock-nav",
+      "expression": "`savedock-${id}`",
+      "containsLength": 25,
+      "containsSha256": "7f189ed8c44332afa8bf3889f4eee4225c5682be29e6da685db68d0ac260ee81"
+    }
+  ],
+  "omissionPolicy": [
+    "upstream test runners and development tests",
+    "native/backend sources",
+    "executable build configurations",
+    "credentials, environment files, Git history, node_modules"
+  ],
+  "expectedAcceptance": {
+    "checksum": "pending frozen generator",
+    "schema": "pending frozen schema",
+    "import": "pending frozen tool",
+    "runtime": "pending",
+    "mapping": "pending",
+    "interaction": "pending"
+  }
+}

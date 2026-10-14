@@ -1,0 +1,126 @@
+[
+  {
+    "id": "desktop",
+    "name": "应用市场 · 桌面",
+    "route": "/",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [],
+    "readySelector": ".market-toolbar input[aria-label=\"搜索应用\"]",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "narrow",
+    "name": "应用市场 · 窄屏",
+    "route": "/",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "steps": [],
+    "readySelector": ".market-toolbar input[aria-label=\"搜索应用\"]",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "account-unauthorized",
+    "name": "未授权账户",
+    "route": "/",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [
+      {
+        "action": "click",
+        "target": "box-account"
+      }
+    ],
+    "readySelector": ".account-state.unconfigured",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "product-detail",
+    "name": "搜索与真实产品详情",
+    "route": "/",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [
+      {
+        "action": "fill",
+        "target": "box-search",
+        "value": "R-Clip"
+      },
+      {
+        "action": "click",
+        "target": "box-product"
+      }
+    ],
+    "readySelector": ".detail-intro",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "favorite",
+    "name": "预览收藏切换",
+    "route": "/",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [
+      {
+        "action": "fill",
+        "target": "box-search",
+        "value": "R-Clip"
+      },
+      {
+        "action": "click",
+        "target": "box-product"
+      },
+      {
+        "action": "click",
+        "target": "box-favorite"
+      }
+    ],
+    "readySelector": ".favorite-detail[aria-pressed=\"true\"]",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  },
+  {
+    "id": "settings",
+    "name": "外观与频道设置",
+    "route": "/",
+    "viewport": {
+      "width": 1440,
+      "height": 960
+    },
+    "steps": [
+      {
+        "action": "click",
+        "target": "box-settings"
+      }
+    ],
+    "readySelector": "#theme",
+    "dependencies": [
+      "src/main.tsx"
+    ],
+    "status": "unverified"
+  }
+]

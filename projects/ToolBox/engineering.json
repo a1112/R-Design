@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "name": "ToolBox",
+  "source": {
+    "repository": "a1112/ToolBox",
+    "ref": "main",
+    "commit": "4b04f8dc59766e9c899c4a9deb976ae6cf2d4c37",
+    "visibility": "private"
+  },
+  "packageFile": "frontend/package.json",
+  "entry": "frontend/src/main.tsx",
+  "capture": [
+    "frontend/src",
+    "frontend/public",
+    "tests/contracts/v1"
+  ],
+  "dependencies": {
+    "i18next": "25.10.0",
+    "react-i18next": "16.3.5",
+    "react-router-dom": "7.9.3",
+    "uplot": "1.6.32",
+    "zod": "3.25.76"
+  },
+  "notice": "合成硬件与遥测；未测量本机；硬件测试、报告文件写入和目录打开不可用。",
+  "workspaceAliases": {},
+  "replacements": [
+    {
+      "file": "frontend/src/main.tsx",
+      "after": "",
+      "reason": "exclude optional native WDIO runner from design artifact",
+      "count": 1,
+      "beforeLength": 93,
+      "beforeSha256": "050d3108dcb4b89b05f7d6540acbe9aeac55cb74676cad9b55e358ccdb0b006f"
+    },
+    {
+      "file": "frontend/src/main.tsx",
+      "after": "void (async () => {\nconst bridge = await createBridge();\nawait appI18nReady;",
+      "reason": "preserve original async initialization without top-level await",
+      "count": 1,
+      "beforeLength": 67,
+      "beforeSha256": "ee3d0c77bbf2df299b41ead59033ba7d8b9b1152e7fb47e4a4f2721c2ef16f3b"
+    },
+    {
+      "file": "frontend/src/platform/createBridge.ts",
+      "after": "if (true) {",
+      "reason": "explicit design-only fixture provider, independent of environment credentials",
+      "count": 1,
+      "beforeLength": 61,
+      "beforeSha256": "9cbea7798ed3909bdc196f3ee47f87053d93284720238c83a84e95cd3790407c"
+    },
+    {
+      "file": "frontend/src/platform/createBridge.ts",
+      "after": "return restrictPreviewBridge(createDemoBridge());",
+      "reason": "block hardware runs and real file receipts in fixtures",
+      "count": 1,
+      "beforeLength": 26,
+      "beforeSha256": "1873ffd598124ea1205145366d3248bb0e9ca50f99090f9817c740e0acb370a6"
+    },
+    {
+      "file": "frontend/src/platform/createBridge.ts",
+      "after": "import { restrictPreviewBridge } from \"../../../../rdesign-preview/toolbox-bridge\";\n\ninterface BuildEnvironment {",
+      "reason": "explicit read-only hardware preview restriction",
+      "count": 1,
+      "beforeLength": 28,
+      "beforeSha256": "af43695989d30d5b6f97c0660109d131f501cbe39a2030f7b8ae72a28ee78c1d"
+    },
+    {
+      "file": "frontend/src/components/shell/TitleBar.tsx",
+      "after": "src={new URL(\"../../../public/coreinsight-mark.png\", import.meta.url).href}",
+      "reason": "include original logo within bundled source resource boundary",
+      "count": 1,
+      "beforeLength": 27,
+      "beforeSha256": "a6bcb0e8c83541f5072a576fd41df672594273985a06e4308076905cddc4f6ab"
+    },
+    {
+      "file": "frontend/src/components/tray/TrayPopover.tsx",
+      "after": "src={new URL(\"../../../public/coreinsight-mark.png\", import.meta.url).href}",
+      "reason": "include original logo within bundled source resource boundary",
+      "count": 1,
+      "beforeLength": 27,
+      "beforeSha256": "a6bcb0e8c83541f5072a576fd41df672594273985a06e4308076905cddc4f6ab"
+    },
+    {
+      "file": "frontend/src/features/dashboard/ComputerOverview.tsx",
+      "after": "src={resourceUrls[\"computer-overview.png\"]}",
+      "reason": "use exact reassembled original PNG exceeding per-file limit",
+      "count": 1,
+      "beforeLength": 28,
+      "beforeSha256": "4ba9b9d0d8742eb3547379ca5aee868fa965fee4e4cede520896a71ee8b5289c"
+    },
+    {
+      "file": "frontend/src/features/dashboard/ComputerOverview.tsx",
+      "after": "import { resourceUrls } from \"../../../../../rdesign-preview/resource-urls\";\nimport { Link } from \"react-router-dom\";",
+      "reason": "load byte-identical original split PNG",
+      "count": 1,
+      "beforeLength": 40,
+      "beforeSha256": "7f295281783707d62ce0d2f2c8a9dc049e1efdaecbe811b59fb0b8a7ebfc361d"
+    },
+    {
+      "file": "frontend/src/styles/global.css",
+      "after": "./design-theme.css",
+      "reason": "portable stylesheet filename; original design variables preserved byte-for-byte",
+      "count": 1,
+      "beforeLength": 12,
+      "beforeSha256": "a463502dd95164890f93837af90d5e20b45732be1277d12a141c4164057e5fc2"
+    },
+    {
+      "file": "frontend/src/main.tsx",
+      "after": "  </StrictMode>,\n);\n})();",
+      "reason": "finish browser-only async root initialization",
+      "count": 1,
+      "beforeLength": 19,
+      "beforeSha256": "cdbc84ececa6525f52c8aef4ff2802f3955b27489f733ea5e74c2b730b674f70"
+    },
+    {
+      "file": "frontend/src/contracts/v1/schemas.ts",
+      "after": "import { z } from \"zod/v4\";",
+      "reason": "use Zod v4 export bundled by host Zod 3.25.76; keep upstream v4 contract semantics",
+      "count": 1,
+      "beforeLength": 24,
+      "beforeSha256": "24a7c06b2ab00db071b7d7d4ffedfa02afd3674a4145a68966b5df07ffed9d1d"
+    }
+  ],
+  "pins": [],
+  "omissionPolicy": [
+    "upstream test runners and development tests",
+    "native/backend sources",
+    "executable build configurations",
+    "credentials, environment files, Git history, node_modules"
+  ],
+  "expectedAcceptance": {
+    "checksum": "pending frozen generator",
+    "schema": "pending frozen schema",
+    "import": "pending frozen tool",
+    "runtime": "pending",
+    "mapping": "pending",
+    "interaction": "pending"
+  },
+  "sourcePathMap": {
+    "frontend/src/styles/tokens.css": "src/upstream/frontend/src/styles/design-theme.css"
+  }
+}

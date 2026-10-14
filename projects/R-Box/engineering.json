@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "name": "R-Box",
+  "source": {
+    "repository": "a1112/R-Box",
+    "ref": "main",
+    "commit": "3cb991174ba925982cba5a1332e7d3df1570262d",
+    "visibility": "private"
+  },
+  "packageFile": "package.json",
+  "entry": "src/main.tsx",
+  "capture": [
+    "src",
+    "registry/catalog.json",
+    "registry/storefront.json",
+    "src-tauri/icons/128x128.png"
+  ],
+  "dependencies": {
+    "lucide-react": "0.468.0"
+  },
+  "notice": "仅产品目录与内存偏好；账户未授权；安装、更新和真实本机操作不可用。",
+  "workspaceAliases": {},
+  "replacements": [
+    {
+      "file": "src/App.tsx",
+      "after": "'../rdesign-metadata.json'",
+      "reason": "read version metadata without executable upstream package scripts",
+      "count": 1,
+      "beforeLength": 17,
+      "beforeSha256": "b115fea123713e7445143db337dd12e25505eb007d70f83cdb60dc091af01b85"
+    },
+    {
+      "file": "src/styles.css",
+      "after": "./macos-theme.css",
+      "reason": "portable filename for CSS design tokens; exact original bytes retained",
+      "count": 1,
+      "beforeLength": 18,
+      "beforeSha256": "a73a0fc929fa37d666a9ed8723b8c9c90ccd9fd231c9186b3d990b71b4c0658f"
+    }
+  ],
+  "pins": [
+    {
+      "file": "src/App.tsx",
+      "tag": "input",
+      "id": "box-search",
+      "count": 1,
+      "containsLength": 17,
+      "containsSha256": "c38be8b49c82bbf3c446429063721e4567173f31703a69ed08ac54b4a931dae9"
+    },
+    {
+      "file": "src/App.tsx",
+      "tag": "button",
+      "id": "box-product",
+      "count": 1,
+      "containsLength": 34,
+      "containsSha256": "249343460d62b31c8aa3a71812004e4a99f28f7bd5d16d9b6a32c7a98d6d51d6"
+    },
+    {
+      "file": "src/App.tsx",
+      "tag": "button",
+      "id": "box-account",
+      "count": 1,
+      "containsLength": 17,
+      "containsSha256": "e3f9f86c5ef6903d0d1dfcabf87be0426053d0abb1000d8fce87b1c8f550b80e"
+    },
+    {
+      "file": "src/App.tsx",
+      "tag": "button",
+      "id": "box-settings",
+      "count": 1,
+      "containsLength": 15,
+      "containsSha256": "4bdf7542a7d2df5d1e4aff369cb57901e31b732876741d4e5531af360fa5fc9c"
+    },
+    {
+      "file": "src/App.tsx",
+      "tag": "button",
+      "id": "box-favorite",
+      "count": 1,
+      "containsLength": 44,
+      "containsSha256": "2ff42eb9b11a702627144279eaf1ff9d50ac94059693a53158ae6f775b6c8288"
+    },
+    {
+      "file": "src/App.tsx",
+      "tag": "button",
+      "id": "box-close",
+      "count": 1,
+      "containsLength": 15,
+      "containsSha256": "f6eb2ce829200711cc811a89ffb96ef44bacf25cf46fd1394ce8a524ff096934"
+    }
+  ],
+  "omissionPolicy": [
+    "upstream test runners and development tests",
+    "native/backend sources",
+    "executable build configurations",
+    "credentials, environment files, Git history, node_modules"
+  ],
+  "expectedAcceptance": {
+    "checksum": "pending frozen generator",
+    "schema": "pending frozen schema",
+    "import": "pending frozen tool",
+    "runtime": "pending",
+    "mapping": "pending",
+    "interaction": "pending"
+  },
+  "sourcePathMap": {
+    "src/macos-tokens.css": "src/upstream/src/macos-theme.css"
+  }
+}
