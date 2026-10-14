@@ -301,7 +301,19 @@ nginx_installed_sha=$(printf '%s' "$nginx_result" | python3 -c 'import json,sys;
 [[ "$(sha256sum "$nginx_config" | cut -d' ' -f1)" == "$nginx_installed_sha" ]] || { printf 'nginx changed after route insertion; refusing reload.\n' >&2; false; }
 nginx -t
 systemctl reload nginx
-curl --fail --silent --show-error --max-time 10 https://175.178.16.90/r-design/api/team/health >/dev/null
+# nginx -s reload returns before the new workers accept connections; old workers can briefly return 404.
+public_ready=0
+public_deadline=$(( $(date +%s) + 30 ))
+while true; do
+  public_remaining=$(( public_deadline - $(date +%s) ))
+  (( public_remaining > 0 )) || break
+  public_timeout=2
+  if (( public_remaining < public_timeout )); then public_timeout=$public_remaining; fi
+  if curl --fail --silent --max-time "$public_timeout" https://175.178.16.90/r-design/api/team/health | python3 -c 'import json,sys; sys.exit(0 if json.load(sys.stdin)=={"status":"ok"} else 1)' 2>/dev/null; then public_ready=1; break; fi
+  (( $(date +%s) < public_deadline )) || break
+  sleep 1
+done
+[[ "$public_ready" == 1 ]] || { printf 'Public HTTPS route did not become healthy after nginx reload.\n' >&2; false; }
 curl --fail --silent --show-error --max-time 10 https://175.178.16.90/r-design/team >/dev/null
 while IFS= read -r asset_reference; do
   curl --fail --silent --show-error --max-time 10 "https://175.178.16.90$asset_reference" >/dev/null
