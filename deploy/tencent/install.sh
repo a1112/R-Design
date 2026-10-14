@@ -188,9 +188,11 @@ chmod -R a+rX,go-w "$release/dist/workbench"
 while IFS= read -r -d '' static_file; do sudo -u r-design-team test -r "$static_file"; done < <(find "$release/dist/workbench" -type f -print0)
 install -d -m 0750 -o r-design-team -g r-design-team "$data"
 install -d -m 0700 /var/backups/r-design-team "$backups"
-previous=$(readlink -f "$root/current" 2>/dev/null || true)
-if [[ -n "$previous" ]]; then
-  [[ "$previous" == "$root/releases/"* && -d "$previous" ]] || { printf 'Current release is outside managed releases.\n' >&2; exit 2; }
+previous=''
+if [[ -e "$root/current" || -L "$root/current" ]]; then
+  [[ -L "$root/current" ]] || { printf 'Current release must be a managed symlink.\n' >&2; exit 2; }
+  previous=$(readlink -f "$root/current" 2>/dev/null || true)
+  [[ -n "$previous" && "$previous" == "$root/releases/"* && -d "$previous" ]] || { printf 'Current release is outside managed releases.\n' >&2; exit 2; }
   printf '%s\n' "$previous" > "$backups/previous-release.txt"
 fi
 if [[ -f "$unit" ]]; then
