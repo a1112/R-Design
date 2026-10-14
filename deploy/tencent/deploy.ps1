@@ -150,11 +150,24 @@ try {
     $start.RedirectStandardError = $true
     $process = New-Object Diagnostics.Process
     $process.StartInfo = $start
-    if (-not $process.Start()) { throw 'Could not start secure SSH deployment.' }
+    # PowerShell 5 creates its redirected writer from Console.InputEncoding and can emit a BOM at Start.
+    $previousInputEncoding = [Console]::InputEncoding
+    try {
+        [Console]::InputEncoding = $utf8
+        if (-not $process.Start()) { throw 'Could not start secure SSH deployment.' }
+    } finally {
+        [Console]::InputEncoding = $previousInputEncoding
+    }
     $stdout = $process.StandardOutput.ReadToEndAsync()
     $stderr = $process.StandardError.ReadToEndAsync()
-    if ($Publish) { $process.StandardInput.Write($environmentText + "`n") }
-    $process.StandardInput.Close()
+    # Keep credentials as BOM-free UTF-8 bytes and close the underlying stream directly.
+    $inputStream = $process.StandardInput.BaseStream
+    if ($Publish) {
+        $inputBytes = $utf8.GetBytes($environmentText + "`n")
+        $inputStream.Write($inputBytes, 0, $inputBytes.Length)
+    }
+    $inputStream.Flush()
+    $inputStream.Close()
     if (-not $process.WaitForExit(1800000)) { $process.Kill(); throw 'Remote operation timed out; inspect its state before retrying.' }
     $output = $stdout.Result + $stderr.Result
     $output = $output.Replace([string]$access.password, '[redacted]')
