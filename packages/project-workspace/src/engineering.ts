@@ -9,7 +9,8 @@ import { createProject, digest, DomainError } from '../../document-core/src/inde
 import { codeHash } from '../../source-binding/src/index.js';
 import { assertPortableSourcePaths, isPrivateSourceName, projectPackage, readPortableSourceFiles, validatePortableProjectBundle,
   type PortableProjectBundle, type ProjectManifest } from './index.js';
-import { CORE_PROJECT_DEPENDENCIES, REVIEWED_RUNTIME_DEPENDENCIES } from './runtime-dependencies.js';
+import { CORE_PROJECT_DEPENDENCIES, reviewedRuntimeDependencies } from './runtime-dependencies.js';
+import { runtimeProfileFromPackage, type RuntimeProfile } from './runtime-profiles.js';
 
 const execute = promisify(execFile);
 const sourceType = /\.(?:[cm]?[jt]sx?|css|scss|sass|less|json|svg|html|txt|md|xml|yaml|yml|png|jpe?g|webp|gif|avif|ico|woff2?|ttf|otf)$/i;
@@ -24,6 +25,7 @@ export interface EngineeringConfig {
   name: string;
   scenarios: Scenario[];
   limitations: string[];
+  runtimeProfile?: RuntimeProfile;
   relocations?: Array<{ from: string; to: string }>;
   copies?: Array<{ from: string; to: string }>;
   edits?: Array<{ file: string; find: string; replace: string; expectedMatches?: number }>;
@@ -74,6 +76,7 @@ export function preflightEngineeringBundle(value: unknown) {
   const files = new Map(value.sourceFiles.map(file => [file.path, file]));
   const errors: string[] = [], warnings: string[] = [];
   const config = JSON.parse(files.get('package.json')?.content ?? '{}');
+  const reviewed = reviewedRuntimeDependencies(runtimeProfileFromPackage(config));
   const dependencies = { ...config.dependencies, ...config.devDependencies, ...config.optionalDependencies };
   const resolve = (from: string, specifier: string, css = false) => {
     if (css && specifier.startsWith('#')) return;
@@ -87,7 +90,7 @@ export function preflightEngineeringBundle(value: unknown) {
       return;
     }
     const name = dependencyName(specifier);
-    if (!['react', 'react-dom', '@rdesign/runtime-web', ...Object.keys(REVIEWED_RUNTIME_DEPENDENCIES)].includes(name)) errors.push(`${from}: 浏览器依赖或路径别名未受支持 ${specifier}`);
+    if (!['react', 'react-dom', '@rdesign/runtime-web', ...Object.keys(reviewed)].includes(name)) errors.push(`${from}: 浏览器依赖或路径别名未受支持 ${specifier}`);
     else if (!(name in dependencies)) errors.push(`${from}: 依赖没有声明 ${name}`);
   };
   for (const file of value.sourceFiles) {
@@ -163,13 +166,15 @@ export async function generateEngineeringBundle(config: EngineeringConfig): Prom
   if (!packageFile || !selected.has('src/main.tsx') || !selected.has('index.html')) throw new DomainError('ENGINEERING_ENTRY', '首版生成器需要 package.json、index.html、src/main.tsx', 400);
   const originalPackage = JSON.parse(packageFile.bytes.toString('utf8'));
   const declared = { ...originalPackage.devDependencies, ...originalPackage.dependencies, ...originalPackage.optionalDependencies };
+  const profile = runtimeProfileFromPackage(config.runtimeProfile === undefined ? {} : { rdesign: { runtimeProfile: config.runtimeProfile } });
+  const reviewed = reviewedRuntimeDependencies(profile);
   if (!originalPackage.dependencies?.react || !originalPackage.dependencies?.['react-dom']) throw new DomainError('ENGINEERING_FRAMEWORK', '首版生成器仅支持已登记依赖的 React 前端', 400);
-  if (![declared.react, declared['react-dom']].every(version => typeof version === 'string' && /^[\^~]?19(?:\.|$)/.test(version))) throw new DomainError('ENGINEERING_FRAMEWORK', '宿主使用 React 19；其他主版本须先完成兼容验收', 400);
+  if (![declared.react, declared['react-dom']].every(version => typeof version === 'string' && (profile === 'react18' ? version.replace(/^[\^~]/, '') === '18.3.1' : /^[\^~]?19(?:\.|$)/.test(version)))) throw new DomainError('ENGINEERING_FRAMEWORK', '原 React 版本不符合所选受控运行配置', 400);
   const dependencies: Record<string, string> = {};
   for (const name of Object.keys(originalPackage.dependencies ?? {})) {
     if (CORE_PROJECT_DEPENDENCIES.has(name)) continue;
     const value = declared[name], version = typeof value === 'string' ? value.replace(/^[\^~]/, '') : '';
-    if (REVIEWED_RUNTIME_DEPENDENCIES[name] !== version) throw new DomainError('ENGINEERING_DEPENDENCY', `需要先登记并验证依赖及版本: ${name}`, 400);
+    if (reviewed[name] !== version) throw new DomainError('ENGINEERING_DEPENDENCY', `需要先登记并验证依赖及版本: ${name}`, 400);
     dependencies[name] = version;
   }
   const adaptations: Array<{ file: string; reason: string; beforeHash: string; afterHash: string }> = [];
@@ -177,7 +182,7 @@ export async function generateEngineeringBundle(config: EngineeringConfig): Prom
     const item = selected.get(file); if (!item) throw new DomainError('ENGINEERING_EDIT', `编辑目标没有提交文件: ${file}`, 400);
     adaptations.push({ file, reason, beforeHash: digest(item.bytes), afterHash: digest(bytes) }); item.bytes = bytes;
   };
-  change('package.json', Buffer.from(JSON.stringify(projectPackage(dependencies), null, 2) + '\n'), '使用受控宿主脚本与固定运行依赖');
+  change('package.json', Buffer.from(JSON.stringify(projectPackage(dependencies, profile), null, 2) + '\n'), '使用受控宿主脚本与固定运行依赖');
   for (const edit of config.edits ?? []) {
     if (!edit.find || !selected.has(edit.file)) throw new DomainError('ENGINEERING_EDIT', '编辑必须指定现有文件和非空原文', 400);
     const before = selected.get(edit.file)!.bytes.toString('utf8'), matches = before.split(edit.find).length - 1;
@@ -190,7 +195,7 @@ export async function generateEngineeringBundle(config: EngineeringConfig): Prom
       const name = dependencyName(specifier);
       if (CORE_PROJECT_DEPENDENCIES.has(name) || !(name in declared)) continue;
       const value = declared[name], version = typeof value === 'string' ? value.replace(/^[\^~]/, '') : '';
-      if (REVIEWED_RUNTIME_DEPENDENCIES[name] !== version) throw new DomainError('ENGINEERING_DEPENDENCY', `需要先登记并验证依赖及版本: ${name}`, 400);
+      if (reviewed[name] !== version) throw new DomainError('ENGINEERING_DEPENDENCY', `需要先登记并验证依赖及版本: ${name}`, 400);
       dependencies[name] = version;
     }
   }
@@ -204,7 +209,8 @@ export async function generateEngineeringBundle(config: EngineeringConfig): Prom
   change('src/main.tsx', Buffer.from("import { installRuntime as installRDesignRuntime } from '@rdesign/runtime-web';\n" + entry.bytes.toString('utf8') + '\nif (import.meta.env.DEV || import.meta.env.VITE_RDESIGN_RUNTIME === \'true\') installRDesignRuntime({ maxNodes: 2500 });\n'), '在根 React 渲染入口后安装开发观察 SDK');
   const origin = { schemaVersion: 1, repositoryUrl: config.repositoryUrl, commit: config.commit, frontendDirectory: config.frontendDirectory,
     sourceFiles: [...selected].map(([file, item]) => ({ file, original: item.original, gitBlobSha: item.sha })),
-    runtimeDependencies: projectPackage(dependencies).dependencies,
+    runtimeDependencies: projectPackage(dependencies, profile).dependencies,
+    ...(profile === 'react18' ? { runtimeProfile: profile } : {}),
     relocations: config.relocations ?? [], adaptations, limitations: config.limitations, verification: '运行、业务、原生与外部后端验收须另附证据' };
   const directory = await mkdtemp(path.join(os.tmpdir(), 'rd-engineering-'));
   try {

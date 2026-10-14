@@ -1,0 +1,17 @@
+{
+  "name": "@rdesign/runtime-react18",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Host-owned, exact React 18 browser renderer dependencies; never installed from imported projects",
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "@react-three/fiber": "8.18.0",
+    "@react-three/drei": "9.122.0",
+    "three": "0.183.2",
+    "@types/react": "18.3.31",
+    "@types/react-dom": "18.3.7",
+    "@types/three": "0.183.1"
+  }
+}

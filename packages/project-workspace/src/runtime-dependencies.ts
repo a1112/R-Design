@@ -1,3 +1,5 @@
+import { assertRuntimeProfile, type RuntimeProfile } from './runtime-profiles.js';
+
 /** Reviewed browser packages shipped by the host. Import never installs packages. */
 export const REVIEWED_RUNTIME_DEPENDENCIES: Readonly<Record<string, string>> = Object.freeze({
   'lucide-react': '0.468.0',
@@ -79,6 +81,20 @@ export const CORE_PROJECT_DEPENDENCIES = new Set([
   'typescript', '@types/react', '@types/react-dom',
 ]);
 
-export function reviewedDependency(name: string, version: unknown): boolean {
-  return typeof version === 'string' && REVIEWED_RUNTIME_DEPENDENCIES[name] === version;
+/** Renderer versions match the pinned React 18 source lock; Router is not admitted to this new profile. */
+export const REACT18_RENDERER_DEPENDENCIES: Readonly<Record<string, string>> = Object.freeze({
+  '@react-three/fiber': '8.18.0', '@react-three/drei': '9.122.0', three: '0.183.2',
+});
+const react18Dependencies = Object.freeze({
+  ...Object.fromEntries(Object.entries(REVIEWED_RUNTIME_DEPENDENCIES).filter(([name]) => !['react-router-dom', 'recharts'].includes(name))),
+  ...REACT18_RENDERER_DEPENDENCIES,
+});
+
+export function reviewedRuntimeDependencies(profile: RuntimeProfile = 'react19'): Readonly<Record<string, string>> {
+  assertRuntimeProfile(profile);
+  return profile === 'react18' ? react18Dependencies : REVIEWED_RUNTIME_DEPENDENCIES;
+}
+
+export function reviewedDependency(name: string, version: unknown, profile: RuntimeProfile = 'react19'): boolean {
+  return typeof version === 'string' && reviewedRuntimeDependencies(profile)[name] === version;
 }
