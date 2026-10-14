@@ -270,7 +270,11 @@ export class ProjectWorkspace {
     const handle = await open(temporary, 'wx', 0o600);
     try { await handle.writeFile(content); await handle.sync(); } finally { await handle.close(); }
     try { await rename(temporary, file); } catch (error) { await rm(temporary, { force: true }); throw error; }
-    const directory = await open(path.dirname(file), 'r'); try { await directory.sync(); } finally { await directory.close(); }
+    // Node cannot fsync directory handles on Windows. The file is still flushed
+    // before its atomic rename; POSIX also flushes the directory entry.
+    if (process.platform !== 'win32') {
+      const directory = await open(path.dirname(file), 'r'); try { await directory.sync(); } finally { await directory.close(); }
+    }
   }
   async load(legacyProject: Project): Promise<this> {
     await mkdir(this.rootDataRoot, { recursive: true });

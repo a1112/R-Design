@@ -18,7 +18,9 @@ export function fileBoundary(options:{root:string;allow:string[];privateRoots?:s
     configureServer(server){server.middlewares.use((request,response,next)=>{
       try {const pathname=decodeURIComponent(new URL(request.url??'/', 'http://rdesign.local').pathname);if(pathname.includes('\0'))throw new Error('Invalid path');
         if(pathname.startsWith('/@vite/')||pathname.startsWith('/@id/')||pathname==='/__vite_ping')return next();
-        const file=pathname.startsWith('/@fs/')?path.resolve(pathname.slice(4)):path.resolve(root,'.'+pathname);
+        const fsPath=pathname.slice('/@fs/'.length);
+        // Match Vite's filesystem URL convention, including Windows drive paths.
+        const file=pathname.startsWith('/@fs/')?path.resolve(path.isAbsolute(fsPath)?fsPath:'/'+fsPath):path.resolve(root,'.'+pathname);
         if(!check(file)){response.statusCode=403;response.end('Resource is outside the authorized preview boundary');return;}
         const resolved=server.moduleGraph.urlToModuleMap.get(pathname)?.id;if(resolved&&path.isAbsolute(resolved.split('?')[0])&&!check(resolved.split('?')[0])){response.statusCode=403;response.end('Module is outside the authorized preview boundary');return;}
         next();
